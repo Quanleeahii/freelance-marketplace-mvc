@@ -11,6 +11,7 @@
         public DateTime? UpdatedAt { get; set; }
         public bool IsVerified { get; set; } = false;
         public List<PasswordResetToken> PasswordResetTokens { get; set; } = new();
-
+        public UserProfile? UserProfile { get; set; }
+        public FreelancerProfile? FreelancerProfile { get; set; }
     }
 }
