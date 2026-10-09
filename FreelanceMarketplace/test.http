@@ -1,18 +1,35 @@
 # For more info on HTTP files go to https://aka.ms/vs/httpfile
-@baseUrl = https://localhost:7xxx
+@baseUrl = https://localhost:7098
 
-### 1. Test kiểm tra email đã tồn tại chưa (GET)
+### 1. Test kiểm tra email đã tồn tại chưa 
 GET {{baseUrl}}/api/authapi/check-email?email=test@gmail.com
 
-###
 
-### 2. Test Đăng ký tài khoản (POST)
+### 2. Test Đăng ký tài khoản 
 POST {{baseUrl}}/api/authapi/register
 Content-Type: application/json
 
 {
   "fullName": "Lê Anh Quân",
-  "email": "quan@gmail.com",
+  "email": "quan2@gmail.com",
   "password": "Password123@",
   "confirmPassword": "Password123@"
+}
+
+### 3. Test Đăng nhập thành công
+POST {{baseUrl}}/api/authapi/login
+Content-Type: application/json
+
+{
+  "email": "quan2@gmail.com",
+  "password": "Password123@"
+}
+
+### 4. Test Đăng nhập sai mật khẩu
+POST {{baseUrl}}/api/authapi/login
+Content-Type: application/json
+
+{
+  "email": "quan@gmail.com",
+  "password": "WrongPassword123@"
 }

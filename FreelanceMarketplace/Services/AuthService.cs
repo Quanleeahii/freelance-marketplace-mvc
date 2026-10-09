@@ -43,4 +43,25 @@ public class AuthService : IAuthService
         await _context.SaveChangesAsync();
         return (true, string.Empty);
     }
+    public async Task<bool> LoginAsync(LoginViewModel model)
+    {
+        string normalizedEmail = model.Email.Trim().ToLower();
+        var user = await _context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Email == normalizedEmail);
+        if (user == null || user.Status != "Active")
+        {
+            return false;
+        }
+        return BCrypt.Net.BCrypt.Verify(model.Password, user.PasswordHash);
+    }
+    public async Task<User?> ValidateUserAsync(LoginViewModel model)
+    {
+        string normalizedEmail = model.Email.Trim().ToLower();
+        var user = await _context.Users.Include(u => u.UserProfile).AsNoTracking().FirstOrDefaultAsync(u => u.Email == normalizedEmail);
+        if (user == null || user.Status != "Active")
+        {
+            return null;
+        }
+        bool isPasswordValid = BCrypt.Net.BCrypt.Verify(model.Password, user.PasswordHash);
+        return isPasswordValid ? user : null;
+    }
 }
