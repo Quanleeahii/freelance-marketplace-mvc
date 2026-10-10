@@ -39,8 +39,24 @@ public class AuthApiController : ControllerBase
         }
         return StatusCode(StatusCodes.Status201Created, new
         {
-            message = "Tạo tài khoản thành công.",
+            message = "Tạo tài khoản thành công!",
             email = model.Email
         });
+    }
+    [HttpPost("login")]
+    public async Task<IActionResult> Login([FromBody] LoginViewModel model)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        var result = await _authService.LoginAsync(model);
+        if (!result)
+        {
+            return Unauthorized(new { message = "Email hoặc mật khẩu không chính xác." });
+        }
+
+        return Ok(new { message = "Đăng nhập thành công!" });
     }
 }
