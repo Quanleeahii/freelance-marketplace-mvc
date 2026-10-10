@@ -1,5 +1,5 @@
 # For more info on HTTP files go to https://aka.ms/vs/httpfile
-@baseUrl = https://localhost:7xxx
+@baseUrl = https://localhost:7098
 
 ### 1. Test kiểm tra email đã tồn tại chưa (GET)
 GET {{baseUrl}}/api/authapi/check-email?email=test@gmail.com
@@ -15,4 +15,38 @@ Content-Type: application/json
   "email": "quan@gmail.com",
   "password": "Password123@",
   "confirmPassword": "Password123@"
+}
+### 2.5. Test Client đăng bài công việc mới (Tạo Job để test)
+POST {{baseUrl}}/api/JobApi/create
+Content-Type: application/json
+
+{
+  "title": "Tuyển lập trình viên ASP.NET Core",
+  "description": "Xây dựng hệ thống sàn việc làm cho freelancer",
+  "budget": 5000000,
+  "clientUserId": 1
+}
+
+### 3. Test Freelancer nộp báo giá
+POST {{baseUrl}}/api/ProposalApi/submit
+Content-Type: application/json
+
+{
+  "jobId": 10,
+  "freelancerUserId": 2,
+  "bidAmount": 4500000,
+  "deliveryDays": 5,
+  "coverLetter": "Chào bạn, mình có kinh nghiệm làm ASP.NET Core, cam kết hoàn thành đúng hạn."
+}
+
+### 4. Test Client xem danh sách các báo giá của Job
+GET {{baseUrl}}/api/ProposalApi/job/10?clientUserId=1
+
+### 5. Test Client duyệt báo giá
+POST {{baseUrl}}/api/ProposalApi/accept
+Content-Type: application/json
+
+{
+  "proposalId": 3,
+  "clientUserId": 1
 }
