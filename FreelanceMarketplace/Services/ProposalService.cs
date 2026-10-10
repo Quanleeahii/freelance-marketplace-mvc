@@ -21,7 +21,6 @@ public class ProposalService : IProposalService
         string coverLetter,
         string? attachmentUrl = null)
     {
-
         var job = await _context.Jobs.FindAsync(jobId);
         if (job == null)
             return (false, "Công việc này không tồn tại.");
@@ -29,13 +28,11 @@ public class ProposalService : IProposalService
         if (job.Status != "Open")
             return (false, "Công việc này đã đóng hoặc đã giao cho người khác.");
 
-
         var freelancerProfile = await _context.FreelancerProfiles
             .FirstOrDefaultAsync(f => f.UserId == freelancerUserId);
 
         if (freelancerProfile == null)
         {
-
             var user = await _context.Users.FindAsync(freelancerUserId);
             if (user == null)
             {
@@ -59,20 +56,17 @@ public class ProposalService : IProposalService
             await _context.SaveChangesAsync();
         }
 
-
         var userProfile = await _context.UserProfiles
             .FirstOrDefaultAsync(u => u.UserId == freelancerUserId);
 
         if (userProfile != null && job.ClientProfileId == userProfile.Id)
             return (false, "Bạn không thể gửi báo giá cho dự án của chính mình.");
 
-
         bool alreadyBid = await _context.Proposals
             .AnyAsync(p => p.JobId == jobId && p.FreelancerProfileId == freelancerProfile.Id);
 
         if (alreadyBid)
             return (false, "Bạn đã gửi báo giá cho dự án này rồi.");
-
 
         var proposal = new Proposal
         {
@@ -94,7 +88,6 @@ public class ProposalService : IProposalService
 
     public async Task<List<Proposal>> GetProposalsByJobIdAsync(int jobId, int clientUserId)
     {
-
         var userProfile = await _context.UserProfiles
             .FirstOrDefaultAsync(u => u.UserId == clientUserId);
 
@@ -134,7 +127,6 @@ public class ProposalService : IProposalService
         if (proposal == null || proposal.Job == null)
             return (false, "Báo giá không tồn tại.");
 
-
         var userProfile = await _context.UserProfiles
             .FirstOrDefaultAsync(u => u.UserId == clientUserId);
 
@@ -147,7 +139,6 @@ public class ProposalService : IProposalService
         using var transaction = await _context.Database.BeginTransactionAsync();
         try
         {
-
             proposal.Status = "Accepted";
             proposal.UpdatedAt = DateTime.UtcNow;
 

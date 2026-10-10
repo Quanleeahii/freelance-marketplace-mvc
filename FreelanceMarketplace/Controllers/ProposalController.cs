@@ -1,7 +1,8 @@
-﻿using FreelanceMarketplace.Services;
+﻿using System.Security.Claims;
+using FreelanceMarketplace.Services;
+using FreelanceMarketplace.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace FreelanceMarketplace.Controllers;
 
@@ -25,43 +26,51 @@ public class ProposalController : Controller
     public IActionResult Create(int jobId)
     {
         if (jobId <= 0) return BadRequest();
-        ViewBag.JobId = jobId;
-        return View();
+
+        var model = new SubmitProposalViewModel
+        {
+            JobId = jobId
+        };
+        return View(model);
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create(int jobId, decimal bidAmount, int deliveryDays, string coverLetter)
+    public async Task<IActionResult> Create(SubmitProposalViewModel model)
     {
-        if (bidAmount <= 0 || deliveryDays <= 0 || string.IsNullOrWhiteSpace(coverLetter))
+        if (!ModelState.IsValid)
         {
             TempData["ErrorMessage"] = "Dữ liệu nhập vào chưa hợp lệ.";
-            return RedirectToAction("Details", "Job", new { id = jobId });
+            return RedirectToAction("Details", "Job", new { id = model.JobId });
         }
 
         int currentUserId = GetCurrentUserId();
-        var result = await _proposalService.SubmitProposalAsync(jobId, currentUserId, bidAmount, deliveryDays, coverLetter);
+        var result = await _proposalService.SubmitProposalAsync(
+            model.JobId,
+            currentUserId,
+            model.BidAmount,
+            model.DeliveryDays,
+            model.CoverLetter,
+            model.AttachmentUrl
+        );
 
-        if (result.Success)
-            TempData["SuccessMessage"] = result.Message;
-        else
-            TempData["ErrorMessage"] = result.Message;
-
-        return RedirectToAction("Details", "Job", new { id = jobId });
+        TempData[result.Success ? "SuccessMessage" : "ErrorMessage"] = result.Message;
+        return RedirectToAction("Details", "Job", new { id = model.JobId });
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Accept(int proposalId, int jobId)
+    public async Task<IActionResult> Accept(AcceptProposalViewModel model)
     {
+        if (!ModelState.IsValid)
+        {
+            return RedirectToAction("Details", "Job", new { id = model.JobId });
+        }
+
         int currentUserId = GetCurrentUserId();
-        var result = await _proposalService.AcceptProposalAsync(proposalId, currentUserId);
+        var result = await _proposalService.AcceptProposalAsync(model.ProposalId, currentUserId);
 
-        if (result.Success)
-            TempData["SuccessMessage"] = result.Message;
-        else
-            TempData["ErrorMessage"] = result.Message;
-
-        return RedirectToAction("Details", "Job", new { id = jobId });
+        TempData[result.Success ? "SuccessMessage" : "ErrorMessage"] = result.Message;
+        return RedirectToAction("Details", "Job", new { id = model.JobId });
     }
 }

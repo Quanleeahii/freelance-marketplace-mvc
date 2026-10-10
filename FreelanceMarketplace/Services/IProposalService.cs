@@ -10,7 +10,8 @@ public interface IProposalService
         decimal bidAmount,
         int deliveryDays,
         string coverLetter,
-        string? attachmentUrl = null);
+        string? attachmentUrl = null
+    );
 
     Task<List<Proposal>> GetProposalsByJobIdAsync(int jobId, int clientUserId);
 

@@ -1,4 +1,6 @@
-﻿using FreelanceMarketplace.Services;
+﻿using System.Security.Claims;
+using FreelanceMarketplace.Services;
+using FreelanceMarketplace.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FreelanceMarketplace.Controllers;
@@ -14,24 +16,26 @@ public class ProposalApiController : ControllerBase
         _proposalService = proposalService;
     }
 
-    public class SubmitProposalRequest
+    private int GetEffectiveUserId(int fallbackId)
     {
-        public int JobId { get; set; }
-        public int FreelancerUserId { get; set; }
-        public decimal BidAmount { get; set; }
-        public int DeliveryDays { get; set; }
-        public string CoverLetter { get; set; } = string.Empty;
+        var idClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        return int.TryParse(idClaim, out int id) && id > 0 ? id : fallbackId;
     }
 
     [HttpPost("submit")]
-    public async Task<IActionResult> Submit([FromBody] SubmitProposalRequest request)
+    public async Task<IActionResult> Submit([FromBody] SubmitProposalViewModel request)
     {
+        int userId = GetEffectiveUserId(request.FreelancerUserId);
+        if (userId <= 0)
+            return BadRequest(new { success = false, message = "Vui lòng cung cấp FreelancerUserId hợp lệ." });
+
         var result = await _proposalService.SubmitProposalAsync(
             request.JobId,
-            request.FreelancerUserId,
+            userId,
             request.BidAmount,
             request.DeliveryDays,
-            request.CoverLetter
+            request.CoverLetter,
+            request.AttachmentUrl
         );
 
         if (!result.Success)
@@ -40,16 +44,14 @@ public class ProposalApiController : ControllerBase
         return Ok(new { success = true, message = result.Message });
     }
 
-    public class AcceptProposalRequest
-    {
-        public int ProposalId { get; set; }
-        public int ClientUserId { get; set; }
-    }
-
     [HttpPost("accept")]
-    public async Task<IActionResult> Accept([FromBody] AcceptProposalRequest request)
+    public async Task<IActionResult> Accept([FromBody] AcceptProposalViewModel request)
     {
-        var result = await _proposalService.AcceptProposalAsync(request.ProposalId, request.ClientUserId);
+        int userId = GetEffectiveUserId(request.ClientUserId);
+        if (userId <= 0)
+            return BadRequest(new { success = false, message = "Vui lòng cung cấp ClientUserId hợp lệ." });
+
+        var result = await _proposalService.AcceptProposalAsync(request.ProposalId, userId);
 
         if (!result.Success)
             return BadRequest(new { success = false, message = result.Message });
@@ -57,10 +59,11 @@ public class ProposalApiController : ControllerBase
         return Ok(new { success = true, message = result.Message });
     }
 
-    [HttpGet("job/{jobId}")]
-    public async Task<IActionResult> GetByJob(int jobId, [FromQuery] int clientUserId)
+    [HttpGet("job/{jobId:int}")]
+    public async Task<IActionResult> GetByJob(int jobId, [FromQuery] int clientUserId = 0)
     {
-        var proposals = await _proposalService.GetProposalsByJobIdAsync(jobId, clientUserId);
+        int userId = GetEffectiveUserId(clientUserId);
+        var proposals = await _proposalService.GetProposalsByJobIdAsync(jobId, userId);
         return Ok(proposals);
     }
 }
