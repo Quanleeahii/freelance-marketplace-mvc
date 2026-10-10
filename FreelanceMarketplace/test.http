@@ -1,9 +1,7 @@
-# For more info on HTTP files go to https://aka.ms/vs/httpfile
 @baseUrl = https://localhost:7098
 
 ### 1. Test kiểm tra email đã tồn tại chưa 
 GET {{baseUrl}}/api/authapi/check-email?email=test@gmail.com
-
 
 ### 2. Test Đăng ký tài khoản 
 POST {{baseUrl}}/api/authapi/register
@@ -30,6 +28,21 @@ POST {{baseUrl}}/api/authapi/login
 Content-Type: application/json
 
 {
-  "email": "quan@gmail.com",
-  "password": "WrongPassword123@"
+  "email": "quan3@gmail.com",
+  "password": "Password123@"
 }
+
+### 6. Test Freelancer nộp báo giá
+POST {{baseUrl}}/api/proposals
+Content-Type: application/json
+
+{
+  "jobId": 2,
+  "freelancerUserId": 2,
+  "bidAmount": 4500000,
+  "deliveryDays": 5,
+  "coverLetter": "Chào bạn, mình có kinh nghiệm làm ASP.NET Core, cam kết hoàn thành đúng hạn."
+}
+
+### 7. Test Freelancer xem các báo giá mình đã nộp
+GET {{baseUrl}}/api/proposals/me?freelancerUserId=2
