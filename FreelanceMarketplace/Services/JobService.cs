@@ -79,6 +79,24 @@ namespace FreelanceMarketplace.Services
 
             return (items, totalItems);
         }
+        var job = new Job
+        {
+            ClientProfileId = model.ClientProfileId > 0 ? model.ClientProfileId : 1,
+            CategoryId = model.CategoryId,
+            Title = model.Title,
+            Description = model.Description,
+            WorkType = model.WorkType ?? string.Empty,
+            PaymentType = model.PaymentType ?? string.Empty,
+            LocationCity = model.LocationCity ?? string.Empty,
+            BudgetMin = model.BudgetMin ?? 0m,
+            Deadline = model.Deadline,
+            Category = null!
+        };
+
+        _context.Jobs.Add(job);
+    await _context.SaveChangesAsync();
+
+    return job;
 
         public async Task<Job?> GetJobByIdAsync(int id)
         {

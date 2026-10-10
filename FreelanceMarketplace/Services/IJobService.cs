@@ -1,10 +1,11 @@
 ﻿using FreelanceMarketplace.Models;
+using FreelanceMarketplace.ViewModels;
 
 namespace FreelanceMarketplace.Services
 {
     public interface IJobService
     {
-        Task<Job> CreateJobAsync(Job job, List<int>? skillIds = null);
+        Task<Job> CreateJobAsync(JobCreateViewModel model, List<int>? skillIds);
 
         Task<(List<Job> Items, int TotalItems)> GetJobsAsync(
             string? search,
