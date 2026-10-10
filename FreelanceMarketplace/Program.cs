@@ -9,6 +9,7 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IJobService, JobService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -41,11 +42,12 @@ app.UseRouting();
 app.UseAuthorization();
 
 app.MapStaticAssets();
-
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
 
 app.MapControllers();
+
+
 app.Run();
