@@ -58,3 +58,49 @@ Content-Type: application/json
   "title": "Tuyển Designer thiết kế UI/UX ứng dụng di động",
   "description": "Cần tìm bạn thiết kế giao diện ứng dụng quản lý công việc trên Figma."
 }
+### 6.1 TEST DANH SÁCH VÀ PHÂN TRANG TÌM KIẾM
+
+### Test phân trang với số trang lớn (Trả về mảng rỗng [], thành công 200 OK)
+GET {{baseUrl}}/api/jobs?pageNumber=9999&pageSize=5
+
+
+### ==========================================
+### 6.2. TEST TẤT CẢ CÁC BỘ LỌC TÌM KIẾM RIÊNG LẺ
+### ==========================================
+
+### Lọc theo Từ khóa (Keyword không tồn tại -> Trả về 200 OK)
+GET {{baseUrl}}/api/jobs?keyword=TuKhoaKhongTonTaiXYZ
+
+### Lọc theo Lĩnh vực (CategoryId không tồn tại -> Trả về 200 OK)
+GET {{baseUrl}}/api/jobs?categoryId=99999
+
+### Lọc theo Kỹ năng (SkillIds không tồn tại -> Trả về 200 OK)
+GET {{baseUrl}}/api/jobs?skillIds=99999
+
+### Lọc theo Trạng thái (Status không tồn tại -> Trả về 200 OK)
+GET {{baseUrl}}/api/jobs?status=TrangThaiAo123
+
+### Lọc theo Hình thức làm việc (WorkType không tồn tại -> Trả về 200 OK)
+GET {{baseUrl}}/api/jobs?workType=HinhThucAo
+
+### Lọc theo Hình thức trả lương (PaymentType không tồn tại -> Trả về 200 OK)
+GET {{baseUrl}}/api/jobs?paymentType=TraLuongAo
+
+### Lọc theo Thành phố (LocationCity không tồn tại -> Trả về 200 OK)
+GET {{baseUrl}}/api/jobs?locationCity=ThanhPhoAo
+
+
+### ==========================================
+### 6.3. TEST KẾT HỢP NHIỀU BỘ LỌC CÙNG LÚC
+### ==========================================
+
+### Kết hợp: Từ khóa + Lĩnh vực + Trạng thái (Trả về mảng rỗng [], 200 OK)
+GET {{baseUrl}}/api/jobs?keyword=Test&categoryId=99999&status=TrangThaiAo
+
+
+### ==========================================
+### 6.4. TEST XEM CHI TIẾT DỰ ÁN THEO ID
+### ==========================================
+
+### Lấy thông tin chi tiết với ID không tồn tại (Trả về 404 Not Found chuẩn chỉnh)
+GET {{baseUrl}}/api/jobs/99999
