@@ -5,7 +5,7 @@
 GET {{baseUrl}}/api/authapi/check-email?email=test@gmail.com
 
 
-### 4. Test Đăng ký tài khoản 
+### 2. Test Đăng ký tài khoản 
 POST {{baseUrl}}/api/authapi/register
 Content-Type: application/json
 
@@ -15,32 +15,41 @@ Content-Type: application/json
   "password": "Password123@",
   "confirmPassword": "Password123@"
 }
-### 3. Đăng dự án hợp lệ (Thành công -> HTTP Status 201 Created)
-POST {{baseUrl}}/api/JobPostingAPI/create
+### 3. Test Đăng dự án hợp lệ (Thành công -> Trả về HTTP 201 Created)
+POST {{baseUrl}}/api/jobs/create
 Content-Type: application/json
 
 {
   "clientProfileId": 1,
   "categoryId": 1,
   "title": "Tuyển Lập trình viên ASP.NET Core RESTful API",
-  "description": "Cần tuyển 1 bạn Backend làm API Entity Framework chuẩn RESTful cho bài tập lớn.",
+  "description": "Cần tuyển 1 bạn Backend làm API Entity Framework chuẩn RESTful cho bài tập lớn",
   "workType": "Làm online",
   "paymentType": "Trả theo dự án",
-  "locationCity": "Hà Nội",
-  "budgetMin": 3000000,
-  "deadline": "2026-11-20T00:00:00Z"
+  "locationCity": "Hà Nội"
 }
 
 ###
 
-### 5. Đăng dự án lỗi thiếu Tiêu đề do kiểm tra Validation Annotation (HTTP Status 400 Bad Request)
-POST {{baseUrl}}/api/JobPostingAPI/create
+### 3. Test Đăng dự án bị lỗi thiếu Tiêu đề (Trả về HTTP 400 Bad Request)
+POST {{baseUrl}}/api/jobs/create
 Content-Type: application/json
 
 {
   "clientProfileId": 1,
   "categoryId": 1,
   "title": "",
-  "description": "Mô tả đầy đủ nhưng tiêu đề trống để test Annotation.",
+  "description": "Mô tả bài đăng đầy đủ nhưng tiêu đề bị để trống.",
   "workType": "Làm online"
+}
+
+### 5. Test Đăng dự án với dữ liệu tối thiểu (Chỉ gồm các trường bắt buộc)
+POST {{baseUrl}}/api/jobs/create
+Content-Type: application/json
+
+{
+  "clientProfileId": 1,
+  "categoryId": 2,
+  "title": "Tuyển Designer thiết kế UI/UX ứng dụng di động",
+  "description": "Cần tìm bạn thiết kế giao diện ứng dụng quản lý công việc trên Figma."
 }
