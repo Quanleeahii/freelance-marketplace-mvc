@@ -1,5 +1,6 @@
 ﻿using FreelanceMarketplace.Data;
 using FreelanceMarketplace.Models;
+using FreelanceMarketplace.ViewModels;
 using Microsoft.EntityFrameworkCore;
 
 namespace FreelanceMarketplace.Services;
@@ -13,21 +14,16 @@ public class ProposalService : IProposalService
         _context = context;
     }
 
-    public async Task<(bool Success, string Message)> SubmitProposalAsync(
-        int jobId,
-        int freelancerUserId,
-        decimal bidAmount,
-        int deliveryDays,
-        string coverLetter,
-        string? attachmentUrl = null)
+    public async Task<(bool Success, string Message)> SubmitProposalAsync(SubmitProposalViewModel model, int freelancerUserId)
     {
-        var job = await _context.Jobs.FindAsync(jobId);
+        var job = await _context.Jobs.FindAsync(model.JobId);
         if (job == null)
             return (false, "Công việc này không tồn tại.");
 
         if (job.Status != "Open")
-            return (false, "Công việc này đã đóng hoặc đã giao cho người khác.");
+            return (false, "Công việc này đã đóng hoặc không còn nhận chào giá.");
 
+        // Kiểm tra hoặc tự sinh profile cho Freelancer
         var freelancerProfile = await _context.FreelancerProfiles
             .FirstOrDefaultAsync(f => f.UserId == freelancerUserId);
 
@@ -56,26 +52,28 @@ public class ProposalService : IProposalService
             await _context.SaveChangesAsync();
         }
 
+        // Không cho phép tự chào giá vào job của chính mình
         var userProfile = await _context.UserProfiles
             .FirstOrDefaultAsync(u => u.UserId == freelancerUserId);
 
         if (userProfile != null && job.ClientProfileId == userProfile.Id)
             return (false, "Bạn không thể gửi báo giá cho dự án của chính mình.");
 
+        // Kiểm tra xem đã từng chào giá job này chưa
         bool alreadyBid = await _context.Proposals
-            .AnyAsync(p => p.JobId == jobId && p.FreelancerProfileId == freelancerProfile.Id);
+            .AnyAsync(p => p.JobId == model.JobId && p.FreelancerProfileId == freelancerProfile.Id);
 
         if (alreadyBid)
             return (false, "Bạn đã gửi báo giá cho dự án này rồi.");
 
         var proposal = new Proposal
         {
-            JobId = jobId,
+            JobId = model.JobId,
             FreelancerProfileId = freelancerProfile.Id,
-            BidAmount = bidAmount,
-            DeliveryDays = deliveryDays,
-            CoverLetter = coverLetter,
-            AttachmentUrl = attachmentUrl,
+            BidAmount = model.BidAmount,
+            DeliveryDays = model.DeliveryDays,
+            CoverLetter = model.CoverLetter,
+            AttachmentUrl = model.AttachmentUrl,
             Status = "Pending",
             CreatedAt = DateTime.UtcNow
         };
@@ -86,84 +84,29 @@ public class ProposalService : IProposalService
         return (true, "Gửi báo giá thành công!");
     }
 
-    public async Task<List<Proposal>> GetProposalsByJobIdAsync(int jobId, int clientUserId)
+    public async Task<List<FreelancerProposalItemViewModel>> GetMyProposalsAsync(int freelancerUserId)
     {
-        var userProfile = await _context.UserProfiles
-            .FirstOrDefaultAsync(u => u.UserId == clientUserId);
+        var freelancerProfile = await _context.FreelancerProfiles
+            .FirstOrDefaultAsync(f => f.UserId == freelancerUserId);
 
-        if (userProfile == null) return new List<Proposal>();
-
-        var job = await _context.Jobs
-            .FirstOrDefaultAsync(j => j.Id == jobId && j.ClientProfileId == userProfile.Id);
-
-        if (job == null) return new List<Proposal>();
+        if (freelancerProfile == null) return new List<FreelancerProposalItemViewModel>();
 
         return await _context.Proposals
             .AsNoTracking()
-            .Where(p => p.JobId == jobId)
+            .Where(p => p.FreelancerProfileId == freelancerProfile.Id)
             .OrderByDescending(p => p.CreatedAt)
-            .Select(p => new Proposal
+            .Select(p => new FreelancerProposalItemViewModel
             {
                 Id = p.Id,
                 JobId = p.JobId,
-                FreelancerProfileId = p.FreelancerProfileId,
+                JobTitle = p.Job != null ? p.Job.Title : string.Empty,
                 BidAmount = p.BidAmount,
                 DeliveryDays = p.DeliveryDays,
                 CoverLetter = p.CoverLetter,
                 AttachmentUrl = p.AttachmentUrl,
                 Status = p.Status,
-                CreatedAt = p.CreatedAt,
-                UpdatedAt = p.UpdatedAt
+                CreatedAt = p.CreatedAt
             })
             .ToListAsync();
-    }
-
-    public async Task<(bool Success, string Message)> AcceptProposalAsync(int proposalId, int clientUserId)
-    {
-        var proposal = await _context.Proposals
-            .Include(p => p.Job)
-            .FirstOrDefaultAsync(p => p.Id == proposalId);
-
-        if (proposal == null || proposal.Job == null)
-            return (false, "Báo giá không tồn tại.");
-
-        var userProfile = await _context.UserProfiles
-            .FirstOrDefaultAsync(u => u.UserId == clientUserId);
-
-        if (userProfile == null || proposal.Job.ClientProfileId != userProfile.Id)
-            return (false, "Bạn không có quyền duyệt báo giá cho dự án này.");
-
-        if (proposal.Job.Status != "Open")
-            return (false, "Dự án này đã được giao hoặc không còn nhận duyệt.");
-
-        using var transaction = await _context.Database.BeginTransactionAsync();
-        try
-        {
-            proposal.Status = "Accepted";
-            proposal.UpdatedAt = DateTime.UtcNow;
-
-            proposal.Job.Status = "InProgress";
-            proposal.Job.UpdatedAt = DateTime.UtcNow;
-
-            var otherProposals = await _context.Proposals
-                .Where(p => p.JobId == proposal.JobId && p.Id != proposalId && p.Status == "Pending")
-                .ToListAsync();
-
-            foreach (var p in otherProposals)
-            {
-                p.Status = "Rejected";
-                p.UpdatedAt = DateTime.UtcNow;
-            }
-
-            await _context.SaveChangesAsync();
-            await transaction.CommitAsync();
-
-            return (true, "Đã chọn ứng viên thành công!");
-        }
-        catch
-        {
-            await transaction.RollbackAsync();
-            return (false, "Đã xảy ra lỗi trong quá trình xử lý.");
-        }
     }
 }

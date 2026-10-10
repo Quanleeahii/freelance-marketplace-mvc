@@ -2,55 +2,43 @@
 
 namespace FreelanceMarketplace.ViewModels;
 
-/// <summary>
-/// ViewModel dùng cho form nộp báo giá (Freelancer nộp hoặc test qua API)
-/// </summary>
 public class SubmitProposalViewModel
 {
     [Required(ErrorMessage = "Mã công việc không được để trống.")]
-    [Range(1, int.MaxValue, ErrorMessage = "Mã công việc không hợp lệ.")]
-    [Display(Name = "Mã dự án")]
     public int JobId { get; set; }
 
-    [Display(Name = "Mã ứng viên")]
+    // Dùng khi test API trực tiếp không qua đăng nhập
     public int FreelancerUserId { get; set; }
 
     [Required(ErrorMessage = "Vui lòng nhập giá chào thầu.")]
-    [Range(1000, 10000000000, ErrorMessage = "Giá chào thầu phải từ {1:N0} VNĐ đến {2:N0} VNĐ.")]
-    [DataType(DataType.Currency)]
+    [Range(1000, 1000000000, ErrorMessage = "Giá chào thầu phải từ 1.000 VNĐ trở lên.")]
     [Display(Name = "Giá chào thầu (VNĐ)")]
     public decimal BidAmount { get; set; }
 
-    [Required(ErrorMessage = "Vui lòng nhập thời gian hoàn thành dự kiến.")]
-    [Range(1, 365, ErrorMessage = "Thời gian hoàn thành phải từ 1 đến 365 ngày.")]
-    [Display(Name = "Thời gian hoàn thành (ngày)")]
+    [Required(ErrorMessage = "Vui lòng nhập số ngày dự kiến hoàn thành.")]
+    [Range(1, 365, ErrorMessage = "Số ngày hoàn thành phải từ 1 đến 365 ngày.")]
+    [Display(Name = "Số ngày hoàn thành")]
     public int DeliveryDays { get; set; }
 
-    [Required(ErrorMessage = "Vui lòng nhập thư giới thiệu.")]
-    [StringLength(2000, MinimumLength = 20, ErrorMessage = "Thư giới thiệu phải có độ dài từ {2} đến {1} ký tự.")]
-    [DataType(DataType.MultilineText)]
-    [Display(Name = "Thư giới thiệu")]
+    [Required(ErrorMessage = "Vui lòng nhập thư giới thiệu / kế hoạch thực hiện.")]
+    [StringLength(2000, MinimumLength = 20, ErrorMessage = "Thư giới thiệu từ 20 đến 2000 ký tự.")]
+    [Display(Name = "Thư giới thiệu / Đề xuất")]
     public string CoverLetter { get; set; } = string.Empty;
 
-    [Url(ErrorMessage = "Đường dẫn tệp đính kèm không đúng định dạng URL.")]
-    [MaxLength(500, ErrorMessage = "Đường dẫn đính kèm không được vượt quá 500 ký tự.")]
-    [Display(Name = "Đường dẫn tệp đính kèm")]
+    [Url(ErrorMessage = "Đường dẫn đính kèm phải là URL hợp lệ.")]
+    [Display(Name = "Link tài liệu / Portfolio")]
     public string? AttachmentUrl { get; set; }
 }
 
-/// <summary>
-/// ViewModel dùng khi Client duyệt báo giá
-/// </summary>
-public class AcceptProposalViewModel
+public class FreelancerProposalItemViewModel
 {
-    [Required(ErrorMessage = "Mã báo giá không được để trống.")]
-    [Range(1, int.MaxValue, ErrorMessage = "Mã báo giá không hợp lệ.")]
-    [Display(Name = "Mã báo giá")]
-    public int ProposalId { get; set; }
-
-    [Display(Name = "Mã dự án")]
+    public int Id { get; set; }
     public int JobId { get; set; }
-
-    [Display(Name = "Mã khách hàng")]
-    public int ClientUserId { get; set; }
+    public string JobTitle { get; set; } = string.Empty;
+    public decimal BidAmount { get; set; }
+    public int DeliveryDays { get; set; }
+    public string CoverLetter { get; set; } = string.Empty;
+    public string? AttachmentUrl { get; set; }
+    public string Status { get; set; } = "Pending";
+    public DateTime CreatedAt { get; set; }
 }

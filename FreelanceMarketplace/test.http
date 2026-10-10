@@ -10,7 +10,7 @@ Content-Type: application/json
 
 {
   "fullName": "Lê Anh Quân",
-  "email": "quan2@gmail.com",
+  "email": "quan7@gmail.com",
   "password": "Password123@",
   "confirmPassword": "Password123@"
 }
@@ -29,8 +29,8 @@ POST {{baseUrl}}/api/authapi/login
 Content-Type: application/json
 
 {
-  "email": "quan@gmail.com",
-  "password": "WrongPassword123@"
+  "email": "quan3@gmail.com",
+  "password": "Password123@"
 }
 
 ### 5. Test Client đăng bài công việc mới (Tạo Job để test)
@@ -49,21 +49,12 @@ POST {{baseUrl}}/api/ProposalApi/submit
 Content-Type: application/json
 
 {
-  "jobId": 10,
+  "jobId": 4,
   "freelancerUserId": 2,
   "bidAmount": 4500000,
   "deliveryDays": 5,
   "coverLetter": "Chào bạn, mình có kinh nghiệm làm ASP.NET Core, cam kết hoàn thành đúng hạn."
 }
 
-### 7. Test Client xem danh sách các báo giá của Job
-GET {{baseUrl}}/api/ProposalApi/job/10?clientUserId=1
-
-### 8. Test Client duyệt báo giá
-POST {{baseUrl}}/api/ProposalApi/accept
-Content-Type: application/json
-
-{
-  "proposalId": 3,
-  "clientUserId": 1
-}
+### 7. Test Freelancer xem các báo giá mình đã nộp
+GET {{baseUrl}}/api/ProposalApi/my-proposals?freelancerUserId=2

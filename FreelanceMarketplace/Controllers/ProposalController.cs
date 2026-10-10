@@ -40,35 +40,11 @@ public class ProposalController : Controller
     {
         if (!ModelState.IsValid)
         {
-            TempData["ErrorMessage"] = "Dữ liệu nhập vào chưa hợp lệ.";
-            return RedirectToAction("Details", "Job", new { id = model.JobId });
+            return View(model);
         }
 
         int currentUserId = GetCurrentUserId();
-        var result = await _proposalService.SubmitProposalAsync(
-            model.JobId,
-            currentUserId,
-            model.BidAmount,
-            model.DeliveryDays,
-            model.CoverLetter,
-            model.AttachmentUrl
-        );
-
-        TempData[result.Success ? "SuccessMessage" : "ErrorMessage"] = result.Message;
-        return RedirectToAction("Details", "Job", new { id = model.JobId });
-    }
-
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Accept(AcceptProposalViewModel model)
-    {
-        if (!ModelState.IsValid)
-        {
-            return RedirectToAction("Details", "Job", new { id = model.JobId });
-        }
-
-        int currentUserId = GetCurrentUserId();
-        var result = await _proposalService.AcceptProposalAsync(model.ProposalId, currentUserId);
+        var result = await _proposalService.SubmitProposalAsync(model, currentUserId);
 
         TempData[result.Success ? "SuccessMessage" : "ErrorMessage"] = result.Message;
         return RedirectToAction("Details", "Job", new { id = model.JobId });

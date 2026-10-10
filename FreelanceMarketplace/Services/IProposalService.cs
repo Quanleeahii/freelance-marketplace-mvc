@@ -1,19 +1,11 @@
 ﻿using FreelanceMarketplace.Models;
+using FreelanceMarketplace.ViewModels;
 
 namespace FreelanceMarketplace.Services;
 
 public interface IProposalService
 {
-    Task<(bool Success, string Message)> SubmitProposalAsync(
-        int jobId,
-        int freelancerUserId,
-        decimal bidAmount,
-        int deliveryDays,
-        string coverLetter,
-        string? attachmentUrl = null
-    );
+    Task<(bool Success, string Message)> SubmitProposalAsync(SubmitProposalViewModel model, int freelancerUserId);
 
-    Task<List<Proposal>> GetProposalsByJobIdAsync(int jobId, int clientUserId);
-
-    Task<(bool Success, string Message)> AcceptProposalAsync(int proposalId, int clientUserId);
+    Task<List<FreelancerProposalItemViewModel>> GetMyProposalsAsync(int freelancerUserId);
 }

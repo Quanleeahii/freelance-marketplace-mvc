@@ -29,14 +29,7 @@ public class ProposalApiController : ControllerBase
         if (userId <= 0)
             return BadRequest(new { success = false, message = "Vui lòng cung cấp FreelancerUserId hợp lệ." });
 
-        var result = await _proposalService.SubmitProposalAsync(
-            request.JobId,
-            userId,
-            request.BidAmount,
-            request.DeliveryDays,
-            request.CoverLetter,
-            request.AttachmentUrl
-        );
+        var result = await _proposalService.SubmitProposalAsync(request, userId);
 
         if (!result.Success)
             return BadRequest(new { success = false, message = result.Message });
@@ -44,26 +37,14 @@ public class ProposalApiController : ControllerBase
         return Ok(new { success = true, message = result.Message });
     }
 
-    [HttpPost("accept")]
-    public async Task<IActionResult> Accept([FromBody] AcceptProposalViewModel request)
+    [HttpGet("my-proposals")]
+    public async Task<IActionResult> GetMyProposals([FromQuery] int freelancerUserId = 0)
     {
-        int userId = GetEffectiveUserId(request.ClientUserId);
+        int userId = GetEffectiveUserId(freelancerUserId);
         if (userId <= 0)
-            return BadRequest(new { success = false, message = "Vui lòng cung cấp ClientUserId hợp lệ." });
+            return BadRequest(new { success = false, message = "FreelancerUserId không hợp lệ." });
 
-        var result = await _proposalService.AcceptProposalAsync(request.ProposalId, userId);
-
-        if (!result.Success)
-            return BadRequest(new { success = false, message = result.Message });
-
-        return Ok(new { success = true, message = result.Message });
-    }
-
-    [HttpGet("job/{jobId:int}")]
-    public async Task<IActionResult> GetByJob(int jobId, [FromQuery] int clientUserId = 0)
-    {
-        int userId = GetEffectiveUserId(clientUserId);
-        var proposals = await _proposalService.GetProposalsByJobIdAsync(jobId, userId);
+        var proposals = await _proposalService.GetMyProposalsAsync(userId);
         return Ok(proposals);
     }
 }
