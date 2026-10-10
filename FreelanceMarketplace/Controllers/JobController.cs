@@ -45,8 +45,7 @@ namespace FreelanceMarketplace.Controllers
                 model.ClientProfileId = 1;
             }
 
-            await _jobService.CreateJobAsync(model);
-
+            var createdJob = await _jobService.CreateJobAsync(model);
             return RedirectToAction("Index", "Home");
         }
     }

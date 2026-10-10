@@ -5,19 +5,11 @@ namespace FreelanceMarketplace.Services
 {
     public interface IJobService
     {
-        Task<Job> CreateJobAsync(JobCreateViewModel model, List<int>? skillIds);
+        // Dành cho API Controller mới dùng ViewModel
+        Task<Job> CreateJobAsync(JobCreateViewModel model, List<int>? skillIds = null);
 
-        Task<(List<Job> Items, int TotalItems)> GetJobsAsync(
-            string? search,
-            int? categoryId,
-            string? workType,
-            string? paymentType,
-            string? locationCity,
-            string? status,
-            int pageNumber = 1,
-            int pageSize = 6);
-
-        Task<Job?> GetJobByIdAsync(int id);
+        // Dành cho JobController cũ truyền trực tiếp đối tượng Job
+        Task<Job> CreateJobAsync(Job job, List<int>? skillIds = null);
 
     }
     }
