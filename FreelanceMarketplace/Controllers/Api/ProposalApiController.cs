@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace FreelanceMarketplace.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/proposals")]
 public class ProposalApiController : ControllerBase
 {
     private readonly IProposalService _proposalService;
@@ -22,29 +22,29 @@ public class ProposalApiController : ControllerBase
         return int.TryParse(idClaim, out int id) && id > 0 ? id : fallbackId;
     }
 
-    [HttpPost("submit")]
+    [HttpPost]
     public async Task<IActionResult> Submit([FromBody] SubmitProposalViewModel request)
     {
         int userId = GetEffectiveUserId(request.FreelancerUserId);
         if (userId <= 0)
-            return BadRequest(new { success = false, message = "Vui lòng cung cấp FreelancerUserId hợp lệ." });
+            return Unauthorized(new { success = false, message = "Vui lòng cung cấp FreelancerUserId hợp lệ hoặc đăng nhập." });
 
         var result = await _proposalService.SubmitProposalAsync(request, userId);
 
         if (!result.Success)
             return BadRequest(new { success = false, message = result.Message });
 
-        return Ok(new { success = true, message = result.Message });
+        return StatusCode(StatusCodes.Status201Created, new { success = true, message = result.Message });
     }
 
-    [HttpGet("my-proposals")]
+    [HttpGet("me")]
     public async Task<IActionResult> GetMyProposals([FromQuery] int freelancerUserId = 0)
     {
         int userId = GetEffectiveUserId(freelancerUserId);
         if (userId <= 0)
-            return BadRequest(new { success = false, message = "FreelancerUserId không hợp lệ." });
+            return Unauthorized(new { success = false, message = "FreelancerUserId không hợp lệ." });
 
         var proposals = await _proposalService.GetMyProposalsAsync(userId);
-        return Ok(proposals);
+        return Ok(new { success = true, data = proposals });
     }
 }

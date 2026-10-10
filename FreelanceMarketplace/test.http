@@ -1,4 +1,3 @@
-# For more info on HTTP files go to https://aka.ms/vs/httpfile
 @baseUrl = https://localhost:7098
 
 ### 1. Test kiểm tra email đã tồn tại chưa 
@@ -10,7 +9,7 @@ Content-Type: application/json
 
 {
   "fullName": "Lê Anh Quân",
-  "email": "quan7@gmail.com",
+  "email": "quan2@gmail.com",
   "password": "Password123@",
   "confirmPassword": "Password123@"
 }
@@ -33,23 +32,12 @@ Content-Type: application/json
   "password": "Password123@"
 }
 
-### 5. Test Client đăng bài công việc mới (Tạo Job để test)
-POST {{baseUrl}}/api/JobApi/create
-Content-Type: application/json
-
-{
-  "title": "Tuyển lập trình viên ASP.NET Core",
-  "description": "Xây dựng hệ thống sàn việc làm cho freelancer",
-  "budget": 5000000,
-  "clientUserId": 1
-}
-
 ### 6. Test Freelancer nộp báo giá
-POST {{baseUrl}}/api/ProposalApi/submit
+POST {{baseUrl}}/api/proposals
 Content-Type: application/json
 
 {
-  "jobId": 4,
+  "jobId": 2,
   "freelancerUserId": 2,
   "bidAmount": 4500000,
   "deliveryDays": 5,
@@ -57,4 +45,4 @@ Content-Type: application/json
 }
 
 ### 7. Test Freelancer xem các báo giá mình đã nộp
-GET {{baseUrl}}/api/ProposalApi/my-proposals?freelancerUserId=2
+GET {{baseUrl}}/api/proposals/me?freelancerUserId=2

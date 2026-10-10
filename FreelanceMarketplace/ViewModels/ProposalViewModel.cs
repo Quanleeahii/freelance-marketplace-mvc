@@ -7,7 +7,6 @@ public class SubmitProposalViewModel
     [Required(ErrorMessage = "Mã công việc không được để trống.")]
     public int JobId { get; set; }
 
-    // Dùng khi test API trực tiếp không qua đăng nhập
     public int FreelancerUserId { get; set; }
 
     [Required(ErrorMessage = "Vui lòng nhập giá chào thầu.")]
@@ -20,9 +19,9 @@ public class SubmitProposalViewModel
     [Display(Name = "Số ngày hoàn thành")]
     public int DeliveryDays { get; set; }
 
-    [Required(ErrorMessage = "Vui lòng nhập thư giới thiệu / kế hoạch thực hiện.")]
-    [StringLength(2000, MinimumLength = 20, ErrorMessage = "Thư giới thiệu từ 20 đến 2000 ký tự.")]
-    [Display(Name = "Thư giới thiệu / Đề xuất")]
+    [Required(ErrorMessage = "Vui lòng nhập thư giới thiệu.")]
+    [StringLength(2000, MinimumLength = 10, ErrorMessage = "Thư giới thiệu từ 10 đến 2000 ký tự.")]
+    [Display(Name = "Thư giới thiệu")]
     public string CoverLetter { get; set; } = string.Empty;
 
     [Url(ErrorMessage = "Đường dẫn đính kèm phải là URL hợp lệ.")]
