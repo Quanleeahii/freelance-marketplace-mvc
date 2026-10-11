@@ -114,7 +114,7 @@ public class AccountController : Controller
         HttpContext.Session.SetString("UserId", user.Id.ToString());
         HttpContext.Session.SetString("UserEmail", user.Email);
         HttpContext.Session.SetString("UserRole", user.Role);
-        if (user.UserProfile != null)
+        if (!string.IsNullOrEmpty(user.UserProfile?.FullName))
         {
             HttpContext.Session.SetString("FullName", user.UserProfile.FullName);
         }
