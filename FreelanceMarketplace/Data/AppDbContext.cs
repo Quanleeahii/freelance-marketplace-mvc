@@ -17,6 +17,7 @@ namespace FreelanceMarketplace.Data
         public DbSet<Skill> Skills { get; set; }
         public DbSet<Job> Jobs { get; set; }
         public DbSet<Proposal> Proposals { get; set; }
+        public DbSet<ClientProfile> ClientProfiles { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -38,6 +39,18 @@ namespace FreelanceMarketplace.Data
                 .HasForeignKey<FreelancerProfile>(fp => fp.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            modelBuilder.Entity<User>()
+                .HasOne(u => u.ClientProfile)
+                .WithOne(cp => cp.User)
+                .HasForeignKey<ClientProfile>(cp => cp.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Job>()
+                .HasOne(j => j.ClientProfile)
+                .WithMany(cp => cp.Jobs)
+                .HasForeignKey(j => j.ClientProfileId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             modelBuilder.Entity<Category>()
                 .HasOne(c => c.Parent)
                 .WithMany(c => c.SubCategories)
@@ -49,7 +62,7 @@ namespace FreelanceMarketplace.Data
                 .WithMany(s => s.Jobs);
 
             modelBuilder.Entity<Proposal>()
-                .HasOne(p => p.Freelancer)
+                .HasOne(p => p.FreelancerProfile)
                 .WithMany(fp => fp.Proposals)
                 .HasForeignKey(p => p.FreelancerProfileId)
                 .OnDelete(DeleteBehavior.Restrict);

@@ -16,6 +16,7 @@
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; }
         public Category Category { get; set; } = null!;
+        public ClientProfile ClientProfile { get; set; } = null!;
         public List<Proposal> Proposals { get; set; } = new();
         public List<Skill> Skills { get; set; } = new();
     }
