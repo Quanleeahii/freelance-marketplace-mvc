@@ -2,7 +2,7 @@
 using FreelanceMarketplace.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/auth")]
 public class AuthApiController : ControllerBase
 {
     private readonly IAuthService _authService;
