@@ -1,4 +1,5 @@
-﻿@{
+﻿@model FreelanceMarketplace.ViewModels.LoginViewModel
+@{
     ViewData["Title"] = "Đăng nhập - NextHub";
     Layout = "_Layout";
     ViewData["HideFooter"] = true;
@@ -14,28 +15,34 @@
             <p>Đăng nhập để tiếp tục công việc của bạn</p>
         </div>
 
-        <!-- Thẻ hiển thị lỗi trả về từ Backend (ModelState Error) -->
         <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
 
-        <form asp-controller="Account" asp-action="Login" method="post" id="loginForm" novalidate>
+        <form asp-controller="Account" asp-action="Login" asp-route-returnurl="@ViewData["ReturnUrl"]" method="post" id="loginForm" novalidate>
             @Html.AntiForgeryToken()
 
             <div class="form-group">
-                <label for="email">Email</label>
-                <input type="email" id="email" name="Email" class="form-control-custom" placeholder="Nhập email của bạn" required />
-                <span class="field-error-msg" id="emailErr"></span>
+                <label asp-for="Email"></label>
+                <input asp-for="Email" id="loginEmail" class="form-control-custom" placeholder="Nhập email của bạn" />
+                <span asp-validation-for="Email" class="field-error-msg" id="loginEmailErr"></span>
             </div>
 
             <div class="form-group">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                    <label for="password" style="margin-bottom: 0;">Mật khẩu</label>
-                    <a href="#" style="font-size: 13px; color: var(--primary-color); text-decoration: none;">Quên mật khẩu?</a>
+                    <label asp-for="Password" style="margin-bottom: 0;"></label>
+                    <a href="#" style="font-size: 13px; color: #00b14f; text-decoration: none;">Quên mật khẩu?</a>
                 </div>
                 <div class="pw-wrapper">
-                    <input type="password" id="password" name="Password" class="form-control-custom" placeholder="Nhập mật khẩu" required />
-                    <button type="button" class="pw-toggle-btn" onclick="togglePassword('password', this)">Hiện</button>
+                    <input asp-for="Password" id="loginPassword" class="form-control-custom" placeholder="Nhập mật khẩu" />
+                    <button type="button" class="pw-toggle-btn" onclick="togglePassword('loginPassword', this)">Hiện</button>
                 </div>
-                <span class="field-error-msg" id="passwordErr"></span>
+                <span asp-validation-for="Password" class="field-error-msg" id="loginPasswordErr"></span>
+            </div>
+
+            <div class="form-group" style="margin-top: 14px;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <input asp-for="RememberMe" id="rememberMe" style="width: 18px; height: 18px; accent-color: #00b14f; cursor: pointer;" />
+                    <label asp-for="RememberMe" style="display: inline !important; font-size: 13px; font-weight: normal; color: #555; cursor: pointer; margin-bottom: 0;"></label>
+                </div>
             </div>
 
             <button type="submit" class="auth-btn-submit" id="btnLogin">
@@ -49,4 +56,6 @@
     </div>
 </div>
 
-<script src="~/js/auth-validation.js"></script>
+@section Scripts {
+    <script src="~/js/auth-validation.js"></script>
+}

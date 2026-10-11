@@ -1,4 +1,5 @@
-﻿using FreelanceMarketplace.Services;
+﻿using FreelanceMarketplace.Models;
+using FreelanceMarketplace.Services;
 using FreelanceMarketplace.ViewModels;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -32,10 +33,20 @@ public class AccountController : Controller
         var (success, errorMessage) = await _authService.RegisterAsync(model);
         if (!success)
         {
-            ModelState.AddModelError(string.Empty, errorMessage);
+            ModelState.AddModelError(nameof(model.Email), errorMessage);
             return View(model);
         }
-        return RedirectToAction("Index", "Home");
+        var user = await _authService.ValidateUserAsync(new LoginViewModel
+        {
+            Email = model.Email,
+            Password = model.Password
+        });
+        if (user != null)
+        {
+            await SignInUserAsync(user, isPersistent: false);
+            return RedirectToAction("Index", "Home");
+        }
+        return RedirectToAction("Login", "Account");
     }
 
     [HttpGet]
@@ -53,37 +64,16 @@ public class AccountController : Controller
         {
             return View(model);
         }
-        var user = await _authService.ValidateUserAsync(model);
-        if (user == null)
+
+        var (success, user, errorField, errorMessage) = await _authService.LoginAsync(model);
+        if (!success)
         {
-            ModelState.AddModelError(string.Empty, "Email hoặc mật khẩu không chính xác.");
+            ModelState.AddModelError(errorField ?? string.Empty, errorMessage ?? "Đăng nhập không thành công");
             return View(model);
         }
-        var claims = new List<Claim>
-        {
-            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new Claim(ClaimTypes.Email, user.Email),
-            new Claim(ClaimTypes.Name, user.UserProfile?.FullName ?? user.Email),
-            new Claim(ClaimTypes.Role, user.Role) 
-        };
 
-        var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-        var authProperties = new AuthenticationProperties
-        {
-            IsPersistent = model.RememberMe, 
-            ExpiresUtc = DateTimeOffset.UtcNow.AddHours(8)
-        };
-        await HttpContext.SignInAsync(
-            CookieAuthenticationDefaults.AuthenticationScheme,
-            new ClaimsPrincipal(claimsIdentity),
-            authProperties);
-        HttpContext.Session.SetString("UserId", user.Id.ToString());
-        HttpContext.Session.SetString("UserEmail", user.Email);
-        HttpContext.Session.SetString("UserRole", user.Role);
-        if (user.UserProfile != null)
-        {
-            HttpContext.Session.SetString("FullName", user.UserProfile.FullName);
-        }
+        await SignInUserAsync(user!, model.RememberMe);
+
         if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
         {
             return Redirect(returnUrl);
@@ -98,5 +88,35 @@ public class AccountController : Controller
         await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
         HttpContext.Session.Clear();
         return RedirectToAction("Index", "Home");
+    }
+    private async Task SignInUserAsync(User user, bool isPersistent = false)
+    {
+        var claims = new List<Claim>
+    {
+        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+        new Claim(ClaimTypes.Email, user.Email),
+        new Claim(ClaimTypes.Name, user.UserProfile?.FullName ?? user.Email),
+        new Claim(ClaimTypes.Role, user.Role)
+    };
+
+        var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+        var authProperties = new AuthenticationProperties
+        {
+            IsPersistent = isPersistent,
+            ExpiresUtc = DateTimeOffset.UtcNow.AddHours(8)
+        };
+
+        await HttpContext.SignInAsync(
+            CookieAuthenticationDefaults.AuthenticationScheme,
+            new ClaimsPrincipal(claimsIdentity),
+            authProperties);
+
+        HttpContext.Session.SetString("UserId", user.Id.ToString());
+        HttpContext.Session.SetString("UserEmail", user.Email);
+        HttpContext.Session.SetString("UserRole", user.Role);
+        if (user.UserProfile != null)
+        {
+            HttpContext.Session.SetString("FullName", user.UserProfile.FullName);
+        }
     }
 }

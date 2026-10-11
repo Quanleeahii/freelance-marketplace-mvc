@@ -1,4 +1,5 @@
-﻿@{
+﻿@model FreelanceMarketplace.ViewModels.RegisterViewModel
+@{
     ViewData["Title"] = "Đăng ký tài khoản - NextHub";
     Layout = "_Layout";
     ViewData["HideFooter"] = true;
@@ -14,45 +15,44 @@
             <p>Tham gia cộng đồng Freelancer & Nhà tuyển dụng</p>
         </div>
 
-        <!-- Thẻ hiển thị lỗi trả về từ Backend (ModelState Error) -->
         <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
 
         <form asp-controller="Account" asp-action="Register" method="post" id="registerForm" novalidate>
             @Html.AntiForgeryToken()
 
             <div class="form-group">
-                <label for="fullName">Họ và tên</label>
-                <input type="text" id="fullName" name="FullName" class="form-control-custom" placeholder="Ví dụ: Nguyễn Văn A" required />
-                <span class="field-error-msg" id="fullNameErr"></span>
+                <label asp-for="FullName"></label>
+                <input asp-for="FullName" id="fullName" class="form-control-custom" />
+                <span asp-validation-for="FullName" class="field-error-msg" id="fullNameErr"></span>
             </div>
 
             <div class="form-group">
-                <label for="regEmail">Email</label>
-                <input type="email" id="regEmail" name="Email" class="form-control-custom" placeholder="name@example.com" required />
-                <span class="field-error-msg" id="regEmailErr"></span>
+                <label asp-for="Email"></label>
+                <input asp-for="Email" id="email" class="form-control-custom" placeholder="name@example.com" />
+                <span asp-validation-for="Email" class="field-error-msg" id="emailErr"></span>
             </div>
 
             <div class="form-group">
-                <label for="regPassword">Mật khẩu</label>
+                <label asp-for="Password"></label>
                 <div class="pw-wrapper">
-                    <input type="password" id="regPassword" name="Password" class="form-control-custom" placeholder="Ít nhất 6 ký tự" required minlength="6" />
-                    <button type="button" class="pw-toggle-btn" onclick="togglePassword('regPassword', this)">Hiện</button>
+                    <input asp-for="Password" id="password" class="form-control-custom"/>
+                    <button type="button" class="pw-toggle-btn" onclick="togglePassword('password', this)">Hiện</button>
                 </div>
-                <span class="field-error-msg" id="regPasswordErr"></span>
+                <span asp-validation-for="Password" class="field-error-msg" id="passwordErr"></span>
             </div>
 
             <div class="form-group">
-                <label for="confirmPassword">Xác nhận mật khẩu</label>
+                <label asp-for="ConfirmPassword"></label>
                 <div class="pw-wrapper">
-                    <input type="password" id="confirmPassword" name="ConfirmPassword" class="form-control-custom" placeholder="Nhập lại mật khẩu" required />
+                    <input asp-for="ConfirmPassword" id="confirmPassword" class="form-control-custom" placeholder="Nhập lại mật khẩu" />
                     <button type="button" class="pw-toggle-btn" onclick="togglePassword('confirmPassword', this)">Hiện</button>
                 </div>
-                <span class="field-error-msg" id="confirmPasswordErr"></span>
+                <span asp-validation-for="ConfirmPassword" class="field-error-msg" id="confirmPasswordErr"></span>
             </div>
 
             <div class="form-group" style="margin-top: 14px;">
                 <div style="display: flex; align-items: flex-start; gap: 8px;">
-                    <input type="checkbox" id="terms" name="terms" required style="width: 18px; height: 18px; margin-top: 2px; accent-color: #00b14f; cursor: pointer;" />
+                    <input type="checkbox" id="terms" name="terms" style="width: 18px; height: 18px; margin-top: 2px; accent-color: #00b14f; cursor: pointer;" />
                     <label for="terms" style="display: inline !important; font-size: 13px; font-weight: normal; color: #555; cursor: pointer; margin-bottom: 0;">
                         Tôi đồng ý với <a href="#" style="color: #00b14f;">Điều khoản dịch vụ</a> và <a href="#" style="color: #00b14f;">Chính sách bảo mật</a>.
                     </label>
@@ -71,4 +71,6 @@
     </div>
 </div>
 
-<script src="~/js/auth-validation.js"></script>
+@section Scripts {
+    <script src="~/js/auth-validation.js"></script>
+}
