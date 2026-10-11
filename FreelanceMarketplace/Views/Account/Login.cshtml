@@ -1,0 +1,52 @@
+﻿@{
+    ViewData["Title"] = "Đăng nhập - NextHub";
+    Layout = "_Layout";
+    ViewData["HideFooter"] = true;
+}
+
+<link rel="stylesheet" href="~/css/auth.css" />
+
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <a href="/" class="brand-logo">NextHub</a>
+            <h2>Chào mừng quay trở lại</h2>
+            <p>Đăng nhập để tiếp tục công việc của bạn</p>
+        </div>
+
+        <!-- Thẻ hiển thị lỗi trả về từ Backend (ModelState Error) -->
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+        <form asp-controller="Account" asp-action="Login" method="post" id="loginForm" novalidate>
+            @Html.AntiForgeryToken()
+
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="Email" class="form-control-custom" placeholder="Nhập email của bạn" required />
+                <span class="field-error-msg" id="emailErr"></span>
+            </div>
+
+            <div class="form-group">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                    <label for="password" style="margin-bottom: 0;">Mật khẩu</label>
+                    <a href="#" style="font-size: 13px; color: var(--primary-color); text-decoration: none;">Quên mật khẩu?</a>
+                </div>
+                <div class="pw-wrapper">
+                    <input type="password" id="password" name="Password" class="form-control-custom" placeholder="Nhập mật khẩu" required />
+                    <button type="button" class="pw-toggle-btn" onclick="togglePassword('password', this)">Hiện</button>
+                </div>
+                <span class="field-error-msg" id="passwordErr"></span>
+            </div>
+
+            <button type="submit" class="auth-btn-submit" id="btnLogin">
+                <span>Đăng nhập</span>
+            </button>
+        </form>
+
+        <div class="auth-footer">
+            Chưa có tài khoản? <a href="@Url.Action("Register", "Account")">Đăng ký ngay</a>
+        </div>
+    </div>
+</div>
+
+<script src="~/js/auth-validation.js"></script>
