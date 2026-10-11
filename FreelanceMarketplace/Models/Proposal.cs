@@ -12,8 +12,7 @@
         public string? AttachmentUrl { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; }
-
         public Job Job { get; set; } = null!;
-        public FreelancerProfile Freelancer { get; set; } = null!;
+        public FreelancerProfile FreelancerProfile { get; set; } = null!;
     }
 }
