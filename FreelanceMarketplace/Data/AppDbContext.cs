@@ -77,9 +77,25 @@ namespace FreelanceMarketplace.Data
                 .Property(j => j.BudgetMin)
                 .HasColumnType("numeric(18,2)");
 
+            modelBuilder.Entity<Job>()
+                .Property(j => j.BudgetMax)
+                .HasColumnType("numeric(18,2)");
+
             modelBuilder.Entity<Proposal>()
                 .Property(p => p.BidAmount)
                 .HasColumnType("numeric(18,2)");
+
+            modelBuilder.Entity<Job>()
+                .Property(j => j.WorkType)
+                .HasConversion<string>();
+
+            modelBuilder.Entity<Job>()
+                .Property(j => j.WorkMode)
+                .HasConversion<string>();
+
+            modelBuilder.Entity<Job>()
+                .Property(j => j.PaymentType)
+                .HasConversion<string>();
         }
     }
 }

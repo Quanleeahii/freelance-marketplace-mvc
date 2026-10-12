@@ -137,7 +137,7 @@ namespace FreelanceMarketplace.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<decimal?>("BudgetMax")
-                        .HasColumnType("numeric");
+                        .HasColumnType("numeric(18,2)");
 
                     b.Property<decimal?>("BudgetMin")
                         .HasColumnType("numeric(18,2)");
@@ -175,6 +175,10 @@ namespace FreelanceMarketplace.Migrations
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("WorkMode")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<string>("WorkType")
                         .IsRequired()
