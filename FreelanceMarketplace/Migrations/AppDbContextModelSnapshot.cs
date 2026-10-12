@@ -51,6 +51,40 @@ namespace FreelanceMarketplace.Migrations
                     b.ToTable("Categories");
                 });
 
+            modelBuilder.Entity("FreelanceMarketplace.Models.ClientProfile", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<string>("DisplayName")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Website")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("ClientProfiles");
+                });
+
             modelBuilder.Entity("FreelanceMarketplace.Models.FreelancerProfile", b =>
                 {
                     b.Property<int>("Id")
@@ -102,7 +136,10 @@ namespace FreelanceMarketplace.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<decimal>("BudgetMin")
+                    b.Property<decimal?>("BudgetMax")
+                        .HasColumnType("numeric");
+
+                    b.Property<decimal?>("BudgetMin")
                         .HasColumnType("numeric(18,2)");
 
                     b.Property<int>("CategoryId")
@@ -146,6 +183,8 @@ namespace FreelanceMarketplace.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CategoryId");
+
+                    b.HasIndex("ClientProfileId");
 
                     b.ToTable("Jobs");
                 });
@@ -359,6 +398,17 @@ namespace FreelanceMarketplace.Migrations
                     b.Navigation("Parent");
                 });
 
+            modelBuilder.Entity("FreelanceMarketplace.Models.ClientProfile", b =>
+                {
+                    b.HasOne("FreelanceMarketplace.Models.User", "User")
+                        .WithOne("ClientProfile")
+                        .HasForeignKey("FreelanceMarketplace.Models.ClientProfile", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("FreelanceMarketplace.Models.FreelancerProfile", b =>
                 {
                     b.HasOne("FreelanceMarketplace.Models.User", "User")
@@ -378,7 +428,15 @@ namespace FreelanceMarketplace.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("FreelanceMarketplace.Models.ClientProfile", "ClientProfile")
+                        .WithMany("Jobs")
+                        .HasForeignKey("ClientProfileId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.Navigation("Category");
+
+                    b.Navigation("ClientProfile");
                 });
 
             modelBuilder.Entity("FreelanceMarketplace.Models.PasswordResetToken", b =>
@@ -394,7 +452,7 @@ namespace FreelanceMarketplace.Migrations
 
             modelBuilder.Entity("FreelanceMarketplace.Models.Proposal", b =>
                 {
-                    b.HasOne("FreelanceMarketplace.Models.FreelancerProfile", "Freelancer")
+                    b.HasOne("FreelanceMarketplace.Models.FreelancerProfile", "FreelancerProfile")
                         .WithMany("Proposals")
                         .HasForeignKey("FreelancerProfileId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -406,7 +464,7 @@ namespace FreelanceMarketplace.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Freelancer");
+                    b.Navigation("FreelancerProfile");
 
                     b.Navigation("Job");
                 });
@@ -457,6 +515,11 @@ namespace FreelanceMarketplace.Migrations
                     b.Navigation("SubCategories");
                 });
 
+            modelBuilder.Entity("FreelanceMarketplace.Models.ClientProfile", b =>
+                {
+                    b.Navigation("Jobs");
+                });
+
             modelBuilder.Entity("FreelanceMarketplace.Models.FreelancerProfile", b =>
                 {
                     b.Navigation("Proposals");
@@ -469,6 +532,8 @@ namespace FreelanceMarketplace.Migrations
 
             modelBuilder.Entity("FreelanceMarketplace.Models.User", b =>
                 {
+                    b.Navigation("ClientProfile");
+
                     b.Navigation("FreelancerProfile");
 
                     b.Navigation("PasswordResetTokens");

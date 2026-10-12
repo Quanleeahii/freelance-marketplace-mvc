@@ -11,11 +11,13 @@
         public string WorkType { get; set; } = string.Empty;
         public string PaymentType { get; set; } = string.Empty;
         public string? LocationCity { get; set; }
-        public decimal BudgetMin { get; set; }
+        public decimal? BudgetMin { get; set; }
+        public decimal? BudgetMax { get; set; }
         public DateTime? Deadline { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; }
         public Category Category { get; set; } = null!;
+        public ClientProfile ClientProfile { get; set; } = null!;
         public List<Proposal> Proposals { get; set; } = new();
         public List<Skill> Skills { get; set; } = new();
     }
