@@ -11,7 +11,8 @@
         public string WorkType { get; set; } = string.Empty;
         public string PaymentType { get; set; } = string.Empty;
         public string? LocationCity { get; set; }
-        public decimal BudgetMin { get; set; }
+        public decimal? BudgetMin { get; set; }
+        public decimal? BudgetMax { get; set; }
         public DateTime? Deadline { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; }
