@@ -1,4 +1,5 @@
 # For more info on HTTP files go to https://aka.ms/vs/httpfile
+@FreelanceMarketplace_HostAddress = https://localhost:7098
 @baseUrl = https://localhost:7098
 
 ### 1. Test kiểm tra email đã tồn tại chưa 
@@ -15,41 +16,29 @@ Content-Type: application/json
   "password": "Password123@",
   "confirmPassword": "Password123@"
 }
-### 3. Test Đăng dự án hợp lệ (Thành công -> Trả về HTTP 201 Created)
-POST {{baseUrl}}/api/jobs/create
-Content-Type: application/json
 
-{
-  "clientProfileId": 1,
-  "categoryId": 1,
-  "title": "Tuyển Lập trình viên ASP.NET Core RESTful API",
-  "description": "Cần tuyển 1 bạn Backend làm API Entity Framework chuẩn RESTful cho bài tập lớn",
-  "workType": "Làm online",
-  "paymentType": "Trả theo dự án",
-  "locationCity": "Hà Nội"
-}
+### 1. Test lấy danh sách danh mục con (SubCategories) theo ParentId (ví dụ ParentId = 1)
+
+GET {{FreelanceMarketplace_HostAddress}}/api/jobs/subcategories/1
+Accept: application/json
 
 ###
 
-### 3. Test Đăng dự án bị lỗi thiếu Tiêu đề (Trả về HTTP 400 Bad Request)
-POST {{baseUrl}}/api/jobs/create
+### 2. Test đăng việc mới (Tạo Job)
+POST {{FreelanceMarketplace_HostAddress}}/api/jobs/create
 Content-Type: application/json
 
 {
-  "clientProfileId": 1,
-  "categoryId": 1,
-  "title": "",
-  "description": "Mô tả bài đăng đầy đủ nhưng tiêu đề bị để trống.",
-  "workType": "Làm online"
-}
-
-### 5. Test Đăng dự án với dữ liệu tối thiểu (Chỉ gồm các trường bắt buộc)
-POST {{baseUrl}}/api/jobs/create
-Content-Type: application/json
-
-{
-  "clientProfileId": 1,
+  "title": "Thiết kế Website Freelance Marketplace bằng ASP.NET Core",
+  "description": "Cần tuyển lập trình viên xây dựng hệ thống kết nối việc làm freelance, sử dụng ASP.NET Core MVC và Web API, database PostgreSQL.",
+  "parentCategoryId": 1,
   "categoryId": 2,
-  "title": "Tuyển Designer thiết kế UI/UX ứng dụng di động",
-  "description": "Cần tìm bạn thiết kế giao diện ứng dụng quản lý công việc trên Figma."
+  "workType": 1,
+  "workMode": 1,
+  "paymentType": 1,
+  "locationCity": "Hà Nội",
+  "budgetMin": 500000,
+  "budgetMax": 2000000,
+  "deadline": "2026-11-30T23:59:59Z",
+  "skillIds": [1, 2]
 }
