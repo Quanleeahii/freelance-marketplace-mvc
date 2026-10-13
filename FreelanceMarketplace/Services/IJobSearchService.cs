@@ -5,6 +5,6 @@ namespace FreelanceMarketplace.Services;
 
 public interface IJobSearchService
 {
-    Task<(IEnumerable<Job> Items, int TotalItems)> GetJobsAsync(JobSearchViewModel model);
+    Task<PagedResult<Job>> GetJobsAsync(JobFilterRequest request);
     Task<Job?> GetJobByIdAsync(int id);
 }

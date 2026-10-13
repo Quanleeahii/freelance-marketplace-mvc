@@ -5,7 +5,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FreelanceMarketplace.Services;
 
-
 public class JobSearchService : IJobSearchService
 {
     private readonly AppDbContext _context;
@@ -15,68 +14,77 @@ public class JobSearchService : IJobSearchService
         _context = context;
     }
 
-    public async Task<(IEnumerable<Job> Items, int TotalItems)> GetJobsAsync(JobSearchViewModel model)
+    public async Task<PagedResult<Job>> GetJobsAsync(JobFilterRequest request)
     {
         var query = _context.Jobs
+            .AsNoTracking()
             .Include(j => j.Category)
             .Include(j => j.Proposals)
             .Include(j => j.Skills)
+            .Where(j => j.Status == "Open")
             .AsQueryable();
-
-        if (!string.IsNullOrWhiteSpace(model.Keyword))
+        if (!string.IsNullOrWhiteSpace(request.Keyword))
         {
-            string keyword = model.Keyword.Trim().ToLower();
-            query = query.Where(j => j.Title.ToLower().Contains(keyword) || j.Description.ToLower().Contains(keyword));
+            string keyword = request.Keyword.Trim().ToLower();
+            query = query.Where(j => j.Title.ToLower().Contains(keyword) ||
+                                     j.Description.ToLower().Contains(keyword) ||
+                                     j.Skills.Any(s => s.Name.ToLower().Contains(keyword)));
+        }
+        if (!string.IsNullOrWhiteSpace(request.LocationCity))
+        {
+            string city = request.LocationCity.Trim().ToLower();
+            query = query.Where(j => j.LocationCity != null && j.LocationCity.ToLower().Contains(city));
+        }
+        if (request.SubCategoryId.HasValue && request.SubCategoryId.Value > 0)
+        {
+            query = query.Where(j => j.CategoryId == request.SubCategoryId.Value);
+        }
+        else if (request.CategoryId.HasValue && request.CategoryId.Value > 0)
+        {
+            query = query.Where(j => j.CategoryId == request.CategoryId.Value ||
+                                     j.Category.ParentId == request.CategoryId.Value);
+        }
+        if (request.SkillIds != null && request.SkillIds.Any())
+        {
+            query = query.Where(j => j.Skills.Any(s => request.SkillIds.Contains(s.Id)));
         }
 
-        if (model.CategoryId.HasValue && model.CategoryId.Value > 0)
+        if (request.WorkType.HasValue)
         {
-            query = query.Where(j => j.CategoryId == model.CategoryId.Value);
+            query = query.Where(j => j.WorkType == request.WorkType.Value);
         }
 
-        if (model.SkillIds != null && model.SkillIds.Any())
+        if (request.WorkMode.HasValue)
         {
-            query = query.Where(j => j.Skills.Any(s => model.SkillIds.Contains(s.Id)));
+            query = query.Where(j => j.WorkMode == request.WorkMode.Value);
         }
 
-        if (!string.IsNullOrWhiteSpace(model.Status) && model.Status != "Tất cả")
+        if (request.PaymentType.HasValue)
         {
-            query = query.Where(j => j.Status == model.Status);
+            query = query.Where(j => j.PaymentType == request.PaymentType.Value);
         }
-
-        if (!string.IsNullOrWhiteSpace(model.WorkType) && model.WorkType != "Tất cả")
-        {
-            query = query.Where(j => j.WorkType == model.WorkType);
-        }
-
-        if (!string.IsNullOrWhiteSpace(model.PaymentType) && model.PaymentType != "Tất cả")
-        {
-            query = query.Where(j => j.PaymentType == model.PaymentType);
-        }
-
-        if (!string.IsNullOrWhiteSpace(model.LocationCity) && model.LocationCity != "Toàn quốc")
-        {
-            query = query.Where(j => j.LocationCity == model.LocationCity);
-        }
-
         query = query.OrderByDescending(j => j.CreatedAt);
-
-        int totalItems = await query.CountAsync();
-
-        int pageNumber = model.PageNumber > 0 ? model.PageNumber : 1;
-        int pageSize = model.PageSize > 0 ? model.PageSize : 10;
-
+        int totalCount = await query.CountAsync();
+        int pageNumber = request.PageNumber > 0 ? request.PageNumber : 1;
+        int pageSize = request.PageSize > 0 ? request.PageSize : 10;
+        int totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
         var items = await query
             .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
-
-        return (items, totalItems);
+        return new PagedResult<Job>
+        {
+            Items = items,
+            CurrentPage = pageNumber,
+            PageSize = pageSize,
+            TotalCount = totalCount,
+            TotalPages = totalPages
+        };
     }
-
     public async Task<Job?> GetJobByIdAsync(int id)
     {
         return await _context.Jobs
+            .AsNoTracking()
             .Include(j => j.Category)
             .Include(j => j.Proposals)
             .Include(j => j.Skills)

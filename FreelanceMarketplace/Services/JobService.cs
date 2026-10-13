@@ -1,91 +1,101 @@
 ﻿using FreelanceMarketplace.Data;
 using FreelanceMarketplace.Models;
+using FreelanceMarketplace.ViewModels;
 using Microsoft.EntityFrameworkCore;
 
-namespace FreelanceMarketplace.Services
+namespace FreelanceMarketplace.Services;
+
+public class JobService : IJobService
 {
-    public class JobService : IJobService
+    private readonly AppDbContext _context;
+
+    public JobService(AppDbContext context)
     {
-        private readonly AppDbContext _context;
+        _context = context;
+    }
 
-        public JobService(AppDbContext context)
+    public async Task<Job> CreateJobAsync(JobCreateViewModel model, int clientProfileId, List<int>? skillIds = null)
+    {
+        var job = new Job
         {
-            _context = context;
-        }
+            ClientProfileId = clientProfileId,
+            CategoryId = model.CategoryId,
+            Title = model.Title,
+            Description = model.Description,
+            WorkType = model.WorkType,
+            WorkMode = model.WorkMode,
+            PaymentType = model.PaymentType,
+            LocationCity = model.LocationCity ?? string.Empty,
+            BudgetMin = model.BudgetMin ?? 0m,
+            BudgetMax = model.BudgetMax,
+            Deadline = model.Deadline,
+            Status = "Open",
+            CreatedAt = DateTime.UtcNow
+        };
 
-        public async Task<Job> CreateJobAsync(Job job, List<int>? skillIds = null)
+        var selectedSkillIds = skillIds ?? model.SkillIds;
+        if (selectedSkillIds != null && selectedSkillIds.Any())
         {
-            if (job.CreatedAt == default) job.CreatedAt = DateTime.UtcNow;
-            if (string.IsNullOrWhiteSpace(job.Status)) job.Status = "Open";
-
-            job.Category = null;
-
-            if (skillIds != null && skillIds.Any())
-            {
-                var skills = await _context.Skills
-                    .Where(s => skillIds.Contains(s.Id))
-                    .ToListAsync();
-                job.Skills = skills;
-            }
-
-            _context.Jobs.Add(job);
-            await _context.SaveChangesAsync();
-            return job;
-        }
-
-        public async Task<(List<Job> Items, int TotalItems)> GetJobsAsync(
-            string? search,
-            int? categoryId,
-            string? workType,
-            string? paymentType,
-            string? locationCity,
-            string? status,
-            int pageNumber = 1,
-            int pageSize = 6)
-        {
-            var query = _context.Jobs
-                .Include(j => j.Category)
-                .Include(j => j.Skills)
-                .AsQueryable();
-
-            if (!string.IsNullOrWhiteSpace(status))
-                query = query.Where(j => j.Status.ToLower() == status.Trim().ToLower());
-
-            if (!string.IsNullOrWhiteSpace(search))
-            {
-                var keyword = search.Trim().ToLower();
-                query = query.Where(j => j.Title.ToLower().Contains(keyword)
-                                      || j.Description.ToLower().Contains(keyword));
-            }
-
-            if (categoryId.HasValue && categoryId.Value > 0)
-                query = query.Where(j => j.CategoryId == categoryId.Value);
-
-            if (!string.IsNullOrWhiteSpace(workType))
-                query = query.Where(j => j.WorkType.ToLower() == workType.Trim().ToLower());
-
-            if (!string.IsNullOrWhiteSpace(paymentType))
-                query = query.Where(j => j.PaymentType.ToLower() == paymentType.Trim().ToLower());
-
-            if (!string.IsNullOrWhiteSpace(locationCity))
-                query = query.Where(j => j.LocationCity != null && j.LocationCity.ToLower() == locationCity.Trim().ToLower());
-
-            var totalItems = await query.CountAsync();
-            var items = await query
-                .OrderByDescending(j => j.CreatedAt)
-                .Skip((pageNumber - 1) * pageSize)
-                .Take(pageSize)
+            var skills = await _context.Skills
+                .Where(s => selectedSkillIds.Contains(s.Id))
                 .ToListAsync();
 
-            return (items, totalItems);
+            job.Skills = skills;
         }
 
-        public async Task<Job?> GetJobByIdAsync(int id)
+        _context.Jobs.Add(job);
+        await _context.SaveChangesAsync();
+
+        return job;
+    }
+
+    public async Task<Job> CreateJobAsync(Job job, List<int>? skillIds = null)
+    {
+        if (job.CreatedAt == default)
         {
-            return await _context.Jobs
-                .Include(j => j.Category)
-                .Include(j => j.Skills)
-                .FirstOrDefaultAsync(j => j.Id == id);
+            job.CreatedAt = DateTime.UtcNow;
         }
+        if (string.IsNullOrEmpty(job.Status))
+        {
+            job.Status = "Open";
+        }
+
+        if (skillIds != null && skillIds.Any())
+        {
+            var skills = await _context.Skills
+                .Where(s => skillIds.Contains(s.Id))
+                .ToListAsync();
+
+            job.Skills = skills;
+        }
+
+        _context.Jobs.Add(job);
+        await _context.SaveChangesAsync();
+
+        return job;
+    }
+    public async Task<IEnumerable<Category>> GetSubCategoriesByParentIdAsync(int parentId)
+    {
+        return await _context.Categories
+            .Where(c => c.ParentId == parentId)
+            .OrderBy(c => c.DisplayOrder)
+            .AsNoTracking()
+            .ToListAsync();
+    }
+
+    public async Task<IEnumerable<Skill>> GetAllSkillsAsync()
+    {
+        return await _context.Skills
+            .OrderBy(s => s.Name)
+            .AsNoTracking()
+            .ToListAsync();
+    }
+    public async Task<IEnumerable<Category>> GetParentCategoriesAsync()
+    {
+        return await _context.Categories
+            .Where(c => c.ParentId == null)
+            .OrderBy(c => c.DisplayOrder)
+            .AsNoTracking()
+            .ToListAsync();
     }
 }

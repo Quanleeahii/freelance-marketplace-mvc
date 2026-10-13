@@ -14,43 +14,37 @@ public class JobSearchAPIController : ControllerBase
     {
         _jobSearchService = jobSearchService;
     }
-
     [HttpGet]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> GetJobs([FromQuery] JobSearchViewModel model)
+    public async Task<IActionResult> GetJobs([FromQuery] JobFilterRequest request)
     {
         if (!ModelState.IsValid)
         {
             return BadRequest(ModelState);
         }
-
-        var (items, totalItems) = await _jobSearchService.GetJobsAsync(model);
-        int totalPages = (int)Math.Ceiling(totalItems / (double)model.PageSize);
-
+        var result = await _jobSearchService.GetJobsAsync(request);
         return Ok(new
         {
             success = true,
+            data = result.Items,
             meta = new
             {
-                totalItems = totalItems,
-                pageNumber = model.PageNumber,
-                pageSize = model.PageSize,
-                totalPages = totalPages > 0 ? totalPages : 1
-            },
-            data = items
+                totalItems = result.TotalCount,
+                currentPage = result.CurrentPage,
+                pageSize = result.PageSize,
+                totalPages = result.TotalPages,
+                hasPreviousPage = result.HasPreviousPage,
+                hasNextPage = result.HasNextPage
+            }
         });
     }
 
-    [HttpGet("{id}")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [HttpGet("{id:int}")]
     public async Task<IActionResult> GetJobById(int id)
     {
         var job = await _jobSearchService.GetJobByIdAsync(id);
         if (job == null)
         {
-            return NotFound(new { success = false, message = "Không tìm thấy dự án." });
+            return NotFound(new { success = false, message = "Không tìm thấy dự án phù hợp" });
         }
 
         return Ok(new { success = true, data = job });
