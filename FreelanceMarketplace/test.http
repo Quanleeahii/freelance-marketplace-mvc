@@ -33,6 +33,56 @@ Content-Type: application/json
   "description": "Cần tuyển lập trình viên xây dựng hệ thống kết nối việc làm freelance, sử dụng ASP.NET Core MVC và Web API, database PostgreSQL.",
   "parentCategoryId": 1,
   "categoryId": 2,
+  "title": "Tuyển Designer thiết kế UI/UX ứng dụng di động",
+  "description": "Cần tìm bạn thiết kế giao diện ứng dụng quản lý công việc trên Figma."
+}
+### 6.1 TEST DANH SÁCH VÀ PHÂN TRANG TÌM KIẾM
+
+### Test phân trang với số trang lớn (Trả về mảng rỗng [], thành công 200 OK)
+GET {{baseUrl}}/api/jobs?pageNumber=9999&pageSize=5
+
+
+### ==========================================
+### 6.2. TEST TẤT CẢ CÁC BỘ LỌC TÌM KIẾM RIÊNG LẺ
+### ==========================================
+
+### Lọc theo Từ khóa (Keyword không tồn tại -> Trả về 200 OK)
+GET {{baseUrl}}/api/jobs?keyword=TuKhoaKhongTonTaiXYZ
+
+### Lọc theo Lĩnh vực (CategoryId không tồn tại -> Trả về 200 OK)
+GET {{baseUrl}}/api/jobs?categoryId=99999
+
+### Lọc theo Kỹ năng (SkillIds không tồn tại -> Trả về 200 OK)
+GET {{baseUrl}}/api/jobs?skillIds=99999
+
+### Lọc theo Trạng thái (Status không tồn tại -> Trả về 200 OK)
+GET {{baseUrl}}/api/jobs?status=TrangThaiAo123
+
+### Lọc theo Hình thức làm việc (WorkType không tồn tại -> Trả về 200 OK)
+GET {{baseUrl}}/api/jobs?workType=HinhThucAo
+
+### Lọc theo Hình thức trả lương (PaymentType không tồn tại -> Trả về 200 OK)
+GET {{baseUrl}}/api/jobs?paymentType=TraLuongAo
+
+### Lọc theo Thành phố (LocationCity không tồn tại -> Trả về 200 OK)
+GET {{baseUrl}}/api/jobs?locationCity=ThanhPhoAo
+
+
+### ==========================================
+### 6.3. TEST KẾT HỢP NHIỀU BỘ LỌC CÙNG LÚC
+### ==========================================
+
+### Kết hợp: Từ khóa + Lĩnh vực + Trạng thái (Trả về mảng rỗng [], 200 OK)
+GET {{baseUrl}}/api/jobs?keyword=Test&categoryId=99999&status=TrangThaiAo
+
+
+### ==========================================
+### 6.4. TEST XEM CHI TIẾT DỰ ÁN THEO ID
+### ==========================================
+
+### Lấy thông tin chi tiết với ID không tồn tại (Trả về 404 Not Found chuẩn chỉnh)
+GET {{baseUrl}}/api/jobs/99999
+
   "workType": 1,
   "workMode": 1,
   "paymentType": 1,
@@ -42,3 +92,78 @@ Content-Type: application/json
   "deadline": "2026-11-30T23:59:59Z",
   "skillIds": [1, 2]
 }
+
+### ==================================================================
+### 1. KIỂM TRA ROUTE VÀ DANH SÁCH MẶC ĐỊNH
+### ==================================================================
+# Lấy danh sách việc làm trang 1 (mặc định pageSize = 10)
+GET {{FreelanceMarketplace_HostAddress}}/api/jobs
+Accept: application/json
+
+### ==================================================================
+### 2. KIỂM TRA PHÂN TRANG (PAGING)
+### ==================================================================
+# Thử ép pageSize = 2 để kiểm tra meta.totalPages, hasNextPage
+GET {{FreelanceMarketplace_HostAddress}}/api/jobs?pageNumber=1&pageSize=2
+Accept: application/json
+
+### Kiểm tra sang trang 2 (phải thấy hasPreviousPage = true)
+GET {{FreelanceMarketplace_HostAddress}}/api/jobs?pageNumber=2&pageSize=2
+Accept: application/json
+
+### ==================================================================
+### 3. KIỂM TRA TÌM KIẾM TỪ KHÓA VÀ THÀNH PHỐ
+### ==================================================================
+# Tìm theo từ khóa (tìm thử 1 từ có trong Title, Description hoặc Skill)
+GET {{FreelanceMarketplace_HostAddress}}/api/jobs?keyword=web
+Accept: application/json
+
+
+
+### ==================================================================
+### 4. KIỂM TRA LỌC DANH MỤC VÀ KỸ NĂNG (SIDEBAR PHẢN HỒI)
+### ==================================================================
+# Lọc theo Danh mục cha (phải ăn cả con của nó)
+GET {{FreelanceMarketplace_HostAddress}}/api/jobs?categoryId=1
+Accept: application/json
+
+###
+# Lọc theo Danh mục con cụ thể
+GET {{FreelanceMarketplace_HostAddress}}/api/jobs?subCategoryId=2
+Accept: application/json
+
+###
+# Lọc theo nhiều Skill cùng lúc (Skill ID 1 hoặc 2)
+GET {{FreelanceMarketplace_HostAddress}}/api/jobs?skillIds=1&skillIds=2
+Accept: application/json
+
+### ==================================================================
+### 5. KIỂM TRA LỌC THEO ENUM
+### ==================================================================
+# Lọc theo WorkType (truyền tên Enum hoặc số nguyên tương ứng)
+GET {{FreelanceMarketplace_HostAddress}}/api/jobs?workType=FullTime
+Accept: application/json
+
+###
+# Lọc theo WorkMode
+GET {{FreelanceMarketplace_HostAddress}}/api/jobs?workMode=Online
+Accept: application/json
+
+### ==================================================================
+### 6. KIỂM TRA XEM CHI TIẾT THEO ID
+### ==================================================================
+# ID tồn tại (thay số 1 bằng ID thực tế có trong DB của bạn)
+GET {{FreelanceMarketplace_HostAddress}}/api/jobs/1
+Accept: application/json
+
+###
+# ID không tồn tại -> Phải trả về 404 Not Found
+GET {{FreelanceMarketplace_HostAddress}}/api/jobs/999999
+Accept: application/json
+
+### ==================================================================
+### 7. KIỂM TRA XUNG ĐỘT ROUTE VỚI ĐĂNG BÀI (RẤT QUAN TRỌNG)
+### ==================================================================
+# Endpoint đăng bài sau khi đổi route sang /api/job-posting
+GET {{FreelanceMarketplace_HostAddress}}/api/job-posting/subcategories/1
+Accept: application/json
