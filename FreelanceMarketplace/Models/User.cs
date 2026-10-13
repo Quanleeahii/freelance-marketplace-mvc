@@ -6,12 +6,13 @@
         public string Email { get; set; } = string.Empty;
         public string PasswordHash { get; set; } = string.Empty;
         public string Status { get; set; } = "Active";
-        public string Role { get; set; } = "Client";
+        public string Role { get; set; } = "User";
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; }
         public bool IsVerified { get; set; } = false;
         public List<PasswordResetToken> PasswordResetTokens { get; set; } = new();
         public UserProfile? UserProfile { get; set; }
         public FreelancerProfile? FreelancerProfile { get; set; }
+        public ClientProfile? ClientProfile { get; set; }
     }
 }

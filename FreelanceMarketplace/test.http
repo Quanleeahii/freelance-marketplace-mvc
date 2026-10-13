@@ -14,20 +14,31 @@ Content-Type: application/json
   "confirmPassword": "Password123@"
 }
 
-### 3. Test Đăng nhập thành công
-POST {{baseUrl}}/api/authapi/login
+### 1. Test lấy danh sách danh mục con (SubCategories) theo ParentId (ví dụ ParentId = 1)
+
+GET {{FreelanceMarketplace_HostAddress}}/api/jobs/subcategories/1
+Accept: application/json
+
+###
+
+### 2. Test đăng việc mới (Tạo Job)
+POST {{FreelanceMarketplace_HostAddress}}/api/jobs/create
 Content-Type: application/json
 
 {
-  "email": "quan2@gmail.com",
-  "password": "Password123@"
+  "title": "Thiết kế Website Freelance Marketplace bằng ASP.NET Core",
+  "description": "Cần tuyển lập trình viên xây dựng hệ thống kết nối việc làm freelance, sử dụng ASP.NET Core MVC và Web API, database PostgreSQL.",
+  "parentCategoryId": 1,
+  "categoryId": 2,
+  "workType": 1,
+  "workMode": 1,
+  "paymentType": 1,
+  "locationCity": "Hà Nội",
+  "budgetMin": 500000,
+  "budgetMax": 2000000,
+  "deadline": "2026-11-30T23:59:59Z",
+  "skillIds": [1, 2]
 }
-
-### 4. Test Đăng nhập sai mật khẩu
-POST {{baseUrl}}/api/authapi/login
-Content-Type: application/json
-
-{
   "email": "quan3@gmail.com",
   "password": "Password123@"
 }
