@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace FreelanceMarketplace.Controllers.Api;
 
 [ApiController]
-[Route("api/jobs")]
+[Route("api/job-posting")]
 public class JobPostingAPIController : ControllerBase
 {
     private readonly IJobService _jobService;
