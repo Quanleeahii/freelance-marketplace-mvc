@@ -24,12 +24,13 @@ public class SubmitProposalViewModel
     [Display(Name = "Đề xuất thuyết phục")]
     public string CoverLetter { get; set; } = string.Empty;
 
-    [Url(ErrorMessage = "Đường dẫn đính kèm phải là URL hợp lệ (ví dụ: https://...).")]
-    [Display(Name = "Tài liệu đính kèm / Link sản phẩm mẫu")]
-    public string? AttachmentUrl { get; set; }
+    [Display(Name = "Tài liệu đính kèm")]
+    public IFormFile? AttachmentFile { get; set; }
+    public string? CurrentAttachmentUrl { get; set; }
+    public bool RemoveCurrentAttachment { get; set; } = false;
 
     [Required(ErrorMessage = "Vui lòng cung cấp số điện thoại liên hệ")]
-    [RegularExpression(@"^0[3|5|7|8|9][0-9]{8}$", ErrorMessage = "Số điện thoại Việt Nam không hợp lệ (gồm 10 số, bắt đầu bằng 03, 05, 07, 08, 09)")]
+    [RegularExpression(@"^0[35789]\d{8}$", ErrorMessage = "Số điện thoại Việt Nam không hợp lệ (gồm 10 số, bắt đầu bằng 03, 05, 07, 08, 09)")]
     [Display(Name = "Số điện thoại liên hệ")]
     public string PhoneNumber { get; set; } = string.Empty;
 }

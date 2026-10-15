@@ -7,6 +7,7 @@
         public int FreelancerProfileId { get; set; }
         public decimal BidAmount { get; set; }
         public int DeliveryDays { get; set; }
+        public string PhoneNumber { get; set; } = string.Empty;
         public string Status { get; set; } = "Pending";
         public string CoverLetter { get; set; } = string.Empty;
         public string? AttachmentUrl { get; set; }

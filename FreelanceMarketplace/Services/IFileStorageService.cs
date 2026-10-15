@@ -1,6 +1,9 @@
-﻿namespace FreelanceMarketplace.Services
+﻿using Microsoft.AspNetCore.Http;
+
+namespace FreelanceMarketplace.Services;
+
+public interface IFileStorageService
 {
-    public class IFileStorageService
-    {
-    }
+    Task<string> SaveFileAsync(IFormFile file, string subFolder, string[]? allowedExtensions = null);
+    void DeleteFile(string? relativeFilePath);
 }

@@ -13,6 +13,8 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IJobService, JobService>();
 builder.Services.AddScoped<IProposalService, ProposalService>();
 builder.Services.AddScoped<IJobSearchService, JobSearchService>();
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<ISignInService, SignInService>();
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
@@ -22,7 +24,11 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.ExpireTimeSpan = TimeSpan.FromHours(8);
         options.SlidingExpiration = true;
     });
-
+builder.Services.AddControllersWithViews()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+    });
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {

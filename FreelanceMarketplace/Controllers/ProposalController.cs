@@ -34,19 +34,17 @@ public class ProposalController : Controller
         return View(model);
     }
 
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create(SubmitProposalViewModel model)
+    [HttpGet]
+    public async Task<IActionResult> Edit(int id)
     {
-        if (!ModelState.IsValid)
+        if (id <= 0) return BadRequest();
+        int currentUserId = GetCurrentUserId();
+        var model = await _proposalService.GetProposalForEditAsync(id, currentUserId);
+        if (model == null)
         {
-            return View(model);
+            return NotFound();
         }
 
-        int currentUserId = GetCurrentUserId();
-        var result = await _proposalService.SubmitProposalAsync(model, currentUserId);
-
-        TempData[result.Success ? "SuccessMessage" : "ErrorMessage"] = result.Message;
-        return RedirectToAction("Details", "Job", new { id = model.JobId });
+        return View(model);
     }
 }

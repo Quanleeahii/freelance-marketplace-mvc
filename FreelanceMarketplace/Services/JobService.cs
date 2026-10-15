@@ -14,11 +14,30 @@ public class JobService : IJobService
         _context = context;
     }
 
-    public async Task<Job> CreateJobAsync(JobCreateViewModel model, int clientProfileId, List<int>? skillIds = null)
+    public async Task<Job> CreateJobAsync(JobCreateViewModel model, int userId, List<int>? skillIds = null)
     {
+        var clientProfile = await _context.ClientProfiles
+        .FirstOrDefaultAsync(cp => cp.UserId == userId);
+
+        // 2. Nếu chưa có (người dùng mới đăng bài lần đầu) -> Tự tạo ngầm
+        if (clientProfile == null)
+        {
+            var userProfile = await _context.UserProfiles
+                .FirstOrDefaultAsync(up => up.UserId == userId);
+
+            clientProfile = new ClientProfile
+            {
+                UserId = userId,
+                DisplayName = userProfile?.FullName,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            _context.ClientProfiles.Add(clientProfile);
+            await _context.SaveChangesAsync(); // Lưu để sinh ra clientProfile.Id
+        }
         var job = new Job
         {
-            ClientProfileId = clientProfileId,
+            ClientProfileId = clientProfile.Id,
             CategoryId = model.CategoryId,
             Title = model.Title,
             Description = model.Description,
