@@ -1,0 +1,116 @@
+@baseUrl = https://localhost:7098
+
+# ==============================================================================
+# LUỒNG 1: CHUẨN BỊ TÀI KHOẢN (ĐĂNG KÝ & LẤY SESSION)
+# ==============================================================================
+
+### 1.1. Đăng ký tài khoản Freelancer (Chỉ cần chạy 1 lần)
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+  "fullName": "Lê Anh Quân",
+  "email": "freelancer1@example.com",
+  "password": "Password123@",
+  "confirmPassword": "Password123@"
+}
+
+### 1.2. Đăng nhập để lấy Cookie Session (Bắt buộc chạy trước khi nộp proposal)
+# Chạy xong, chuyển qua tab Response Headers copy chuỗi Cookie nếu Visual Studio không tự lưu
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "quanlee13091111@gmail.com",
+  "password": "123456"
+}
+
+### 1.3. Tạo một bài đăng việc làm mẫu (Đúng route /api/job-posting/create)
+POST {{baseUrl}}/api/job-posting/create
+Content-Type: application/json
+
+
+{
+  "title": "Xây dựng website Freelance Marketplace",
+  "description": "Cần tuyển lập trình viên backend ASP.NET Core và PostgreSQL hoàn thiện tính năng đấu thầu.",
+  "parentCategoryId": 1,
+  "categoryId": 1,
+  "budgetMin": 1000000,
+  "budgetMax": 5000000,
+  "deadline": "2026-12-31T23:59:59Z",
+  "skillIds": [1]
+}
+###
+# ==============================================================================
+# LUỒNG 2: KIỂM TRA BÀI ĐĂNG CÔNG VIỆC (JOB) ĐỂ LẤY JOB_ID
+# ==============================================================================
+
+### 2.1. Lấy danh sách việc làm hiện có (Xem trường "id" của bài viết để điền vào Proposal)
+GET {{baseUrl}}/api/jobs?pageNumber=1&pageSize=5
+Accept: application/json
+
+### 2.2. Kiểm tra chi tiết 1 bài việc làm theo ID (Ví dụ ID = 1)
+GET {{baseUrl}}/api/jobs/40
+Accept: application/json
+
+###
+# ==============================================================================
+# LUỒNG 3: QUẢN LÝ BÁO GIÁ (PROPOSAL) - CHUẨN RESTFUL & MULTIPART
+# ==============================================================================
+
+### 3.1. Nộp báo giá mới (POST /api/proposals)
+# Lưu ý: Thay JobId bằng ID thực tế lấy được từ bước 2.1
+POST {{baseUrl}}/api/proposals
+Content-Type: multipart/form-data; boundary=boundary123
+
+--boundary123
+Content-Disposition: form-data; name="JobId"
+
+40
+--boundary123
+Content-Disposition: form-data; name="BidAmount"
+
+1500000
+--boundary123
+Content-Disposition: form-data; name="DeliveryDays"
+
+5
+--boundary123
+Content-Disposition: form-data; name="PhoneNumber"
+
+0912345678
+--boundary123
+Content-Disposition: form-data; name="CoverLetter"
+
+Toi co kinh nghiem lam du an nay va cam ket dung tien do.
+--boundary123--
+
+### 3.2. Lấy dữ liệu bài báo giá vừa nộp theo ID (GET /api/proposals/{id})
+GET {{baseUrl}}/api/proposals/40
+Accept: application/json
+
+### 3.3. Chỉnh sửa báo giá đã nộp (PUT /api/proposals/{id})
+PUT {{baseUrl}}/api/proposals/40
+Content-Type: multipart/form-data; boundary=boundary123
+
+--boundary123
+Content-Disposition: form-data; name="JobId"
+
+1
+--boundary123
+Content-Disposition: form-data; name="BidAmount"
+
+1800000
+--boundary123
+Content-Disposition: form-data; name="DeliveryDays"
+
+7
+--boundary123
+Content-Disposition: form-data; name="PhoneNumber"
+
+0912345678
+--boundary123
+Content-Disposition: form-data; name="CoverLetter"
+
+Toi cap nhat lai muc gia va thoi gian thuc hien.
+--boundary123--

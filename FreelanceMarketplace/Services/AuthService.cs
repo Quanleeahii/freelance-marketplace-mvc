@@ -1,5 +1,7 @@
 ﻿using FreelanceMarketplace.Data;
-
+using FreelanceMarketplace.Models;
+using FreelanceMarketplace.ViewModels;
+using Microsoft.EntityFrameworkCore;
 namespace FreelanceMarketplace.Services;
 
 public class AuthService : IAuthService
@@ -9,5 +11,73 @@ public class AuthService : IAuthService
     public AuthService(AppDbContext context)
     {
         _context = context;
+    }
+
+    public async Task<bool> IsEmailTakenAsync(string email)
+    {
+        string normalizedEmail = email.Trim().ToLower();
+        return await _context.Users.AnyAsync(u => u.Email != null && u.Email.ToLower() == normalizedEmail);
+    }
+
+    public async Task<(bool Success, string ErrorMessage)> RegisterAsync(RegisterViewModel model)
+    {
+        if (await IsEmailTakenAsync(model.Email))
+        {
+            return (false, "Email này đã được sử dụng");
+        }
+        string passwordHash = BCrypt.Net.BCrypt.HashPassword(model.Password);
+        var user = new User
+        {
+            Email = model.Email.Trim().ToLower(),
+            PasswordHash = passwordHash,
+            Role = "Client",
+            Status = "Active",
+            CreatedAt = DateTime.UtcNow,
+            IsVerified = false,
+            UserProfile = new UserProfile
+            {
+                FullName = model.FullName.Trim()
+            }
+        };
+        _context.Users.Add(user);
+        await _context.SaveChangesAsync();
+        return (true, string.Empty);
+    }
+    public async Task<(bool Success, User? User, string? ErrorField, string? ErrorMessage)> LoginAsync(LoginViewModel model)
+    {
+        string normalizedEmail = model.Email.Trim().ToLower();
+        var user = await _context.Users
+            .Include(u => u.UserProfile)
+            .AsNoTracking()
+            .FirstOrDefaultAsync(u => u.Email != null && u.Email.ToLower() == normalizedEmail);
+
+        if (user == null)
+        {
+            return (false, null, nameof(model.Email), "Email này chưa được đăng ký tài khoản");
+        }
+
+        if (user.Status != "Active")
+        {
+            return (false, null, nameof(model.Email), "Tài khoản hiện đang bị khóa");
+        }
+
+        bool isPasswordValid = BCrypt.Net.BCrypt.Verify(model.Password, user.PasswordHash);
+        if (!isPasswordValid)
+        {
+            return (false, null, nameof(model.Password), "Mật khẩu không chính xác");
+        }
+
+        return (true, user, null, null);
+    }
+    public async Task<User?> ValidateUserAsync(LoginViewModel model)
+    {
+        string normalizedEmail = model.Email.Trim().ToLower();
+        var user = await _context.Users.Include(u => u.UserProfile).AsNoTracking().FirstOrDefaultAsync(u => u.Email == normalizedEmail);
+        if (user == null || user.Status != "Active")
+        {
+            return null;
+        }
+        bool isPasswordValid = BCrypt.Net.BCrypt.Verify(model.Password, user.PasswordHash);
+        return isPasswordValid ? user : null;
     }
 }
