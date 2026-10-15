@@ -1,19 +1,18 @@
-﻿using FreelanceMarketplace.Models;
-using FreelanceMarketplace.Services;
+﻿using FreelanceMarketplace.Services;
 using FreelanceMarketplace.ViewModels;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace FreelanceMarketplace.Controllers;
 
 public class AccountController : Controller
 {
     private readonly IAuthService _authService;
-    public AccountController(IAuthService authService)
+    private readonly ISignInService _signInService;
+
+    public AccountController(IAuthService authService, ISignInService signInService)
     {
         _authService = authService;
+        _signInService = signInService;
     }
 
     [HttpGet]
@@ -23,29 +22,33 @@ public class AccountController : Controller
     }
 
     [HttpPost]
-    [ValidateAntiForgeryToken] 
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Register(RegisterViewModel model)
     {
         if (!ModelState.IsValid)
         {
             return View(model);
         }
+
         var (success, errorMessage) = await _authService.RegisterAsync(model);
         if (!success)
         {
             ModelState.AddModelError(nameof(model.Email), errorMessage);
             return View(model);
         }
+
         var user = await _authService.ValidateUserAsync(new LoginViewModel
         {
             Email = model.Email,
             Password = model.Password
         });
+
         if (user != null)
         {
-            await SignInUserAsync(user, isPersistent: false);
+            await _signInService.SignInUserAsync(user, isPersistent: false);
             return RedirectToAction("Index", "Home");
         }
+
         return RedirectToAction("Login", "Account");
     }
 
@@ -72,7 +75,7 @@ public class AccountController : Controller
             return View(model);
         }
 
-        await SignInUserAsync(user!, model.RememberMe);
+        await _signInService.SignInUserAsync(user!, model.RememberMe);
 
         if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
         {
@@ -81,42 +84,12 @@ public class AccountController : Controller
 
         return RedirectToAction("Index", "Home");
     }
+
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Logout()
     {
-        await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-        HttpContext.Session.Clear();
+        await _signInService.SignOutUserAsync();
         return RedirectToAction("Index", "Home");
-    }
-    private async Task SignInUserAsync(User user, bool isPersistent = false)
-    {
-        var claims = new List<Claim>
-    {
-        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-        new Claim(ClaimTypes.Email, user.Email),
-        new Claim(ClaimTypes.Name, user.UserProfile?.FullName ?? user.Email),
-        new Claim(ClaimTypes.Role, user.Role)
-    };
-
-        var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-        var authProperties = new AuthenticationProperties
-        {
-            IsPersistent = isPersistent,
-            ExpiresUtc = DateTimeOffset.UtcNow.AddHours(8)
-        };
-
-        await HttpContext.SignInAsync(
-            CookieAuthenticationDefaults.AuthenticationScheme,
-            new ClaimsPrincipal(claimsIdentity),
-            authProperties);
-
-        HttpContext.Session.SetString("UserId", user.Id.ToString());
-        HttpContext.Session.SetString("UserEmail", user.Email);
-        HttpContext.Session.SetString("UserRole", user.Role);
-        if (!string.IsNullOrEmpty(user.UserProfile?.FullName))
-        {
-            HttpContext.Session.SetString("FullName", user.UserProfile.FullName);
-        }
     }
 }

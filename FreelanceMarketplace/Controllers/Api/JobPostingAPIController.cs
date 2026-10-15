@@ -2,6 +2,7 @@
 using FreelanceMarketplace.Services;
 using FreelanceMarketplace.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace FreelanceMarketplace.Controllers.Api;
 
@@ -50,12 +51,23 @@ public class JobPostingAPIController : ControllerBase
         {
             return BadRequest(ModelState);
         }
-        var clientProfileId = HttpContext.Session.GetInt32("ClientProfileId");
-        if (clientProfileId == null)
+
+        // 1. Đọc UserId từ Cookie Claims hoặc Session
+        int currentUserId = 0;
+        var idClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!int.TryParse(idClaim, out currentUserId) || currentUserId <= 0)
+        {
+            var sessionUserId = HttpContext.Session.GetString("UserId");
+            int.TryParse(sessionUserId, out currentUserId);
+        }
+
+        // Kiểm tra chuẩn: Nếu không có Cookie/Session hợp lệ thì chặn lại
+        if (currentUserId <= 0)
         {
             return Unauthorized(new { message = "Vui lòng đăng nhập để đăng bài" });
         }
-        var createdJob = await _jobService.CreateJobAsync(model, clientProfileId.Value, model.SkillIds);
+
+        var createdJob = await _jobService.CreateJobAsync(model, currentUserId, model.SkillIds);
         return StatusCode(StatusCodes.Status201Created, new
         {
             message = "Đăng dự án thành công",

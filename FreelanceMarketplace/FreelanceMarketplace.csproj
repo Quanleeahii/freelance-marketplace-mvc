@@ -15,4 +15,10 @@
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.3" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\images\" />
+    <Folder Include="wwwroot\uploads\avatars\" />
+    <Folder Include="wwwroot\uploads\attachments\" />
+  </ItemGroup>
+
 </Project>
