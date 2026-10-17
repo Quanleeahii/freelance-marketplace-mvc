@@ -136,6 +136,9 @@ namespace FreelanceMarketplace.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("AttachmentUrl")
+                        .HasColumnType("text");
+
                     b.Property<decimal?>("BudgetMax")
                         .HasColumnType("numeric(18,2)");
 
