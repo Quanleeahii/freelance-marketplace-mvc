@@ -16,9 +16,13 @@
   </ItemGroup>
 
   <ItemGroup>
+
+    <Folder Include="Areas\Admin\Data\" />
+
     <Folder Include="wwwroot\images\" />
     <Folder Include="wwwroot\uploads\avatars\" />
     <Folder Include="wwwroot\uploads\attachments\" />
+
   </ItemGroup>
 
 </Project>

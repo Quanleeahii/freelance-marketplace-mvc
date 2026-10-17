@@ -2,19 +2,27 @@ using FreelanceMarketplace.Data;
 using FreelanceMarketplace.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+
+
 builder.Services.AddScoped<IFileStorageService, LocalFileStorageService>();
+
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IJobService, JobService>();
 builder.Services.AddScoped<IProposalService, ProposalService>();
 builder.Services.AddScoped<IJobSearchService, JobSearchService>();
+
+
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ISignInService, SignInService>();
+
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
@@ -43,9 +51,9 @@ var app = builder.Build();
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
+
 if (app.Environment.IsDevelopment())
 {
     using (var scope = app.Services.CreateScope())
@@ -63,6 +71,7 @@ if (app.Environment.IsDevelopment())
         }
     }
 }
+
 app.UseHttpsRedirection();
 app.UseRouting();
 
@@ -71,12 +80,19 @@ app.UseAuthorization();
 app.UseSession();
 
 app.MapStaticAssets();
+
+// 1. Thêm Route cho Area Admin tại đây (luôn đứng TRƯỚC route mặc định)
+app.MapControllerRoute(
+    name: "areas",
+    pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}")
+    .WithStaticAssets();
+
+// 2. Route mặc định cho người dùng ngoài
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
 
 app.MapControllers();
-
 
 app.Run();

@@ -1,0 +1,94 @@
+﻿@model IEnumerable<FreelanceMarketplace.Models.Skill>
+@{
+    ViewData["Title"] = "Quản lý kỹ năng";
+}
+
+<div class="app-content-header">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-6">
+                <h3 class="mb-0">Danh mục kỹ năng</h3>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-end">
+                    <li class="breadcrumb-item"><a asp-action="Index" asp-controller="Home">Admin</a></li>
+                    <li class="breadcrumb-item active">Skills</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="app-content">
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Form thêm mới kỹ năng -->
+            <div class="col-md-4">
+                <div class="card card-primary card-outline mb-4">
+                    <div class="card-header">
+                        <h4 class="card-title">Thêm kỹ năng mới</h4>
+                    </div>
+                    <form asp-action="Create" method="post">
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label class="form-label">Tên kỹ năng</label>
+                                <input type="text" name="Name" class="form-control" placeholder="Ví dụ: ASP.NET Core, Docker..." required />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Slug (tùy chọn)</label>
+                                <input type="text" name="Slug" class="form-control" placeholder="asp-net-core" />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Thuộc danh mục</label>
+                                <select name="CategoryId" class="form-select" asp-items="ViewBag.Categories" required></select>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <button type="submit" class="btn btn-primary w-100">Lưu kỹ năng</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Bảng hiển thị danh sách kỹ năng -->
+            <div class="col-md-8">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h3 class="card-title">Danh sách kỹ năng hiện có</h3>
+                    </div>
+                    <div class="card-body table-responsive p-0" style="max-height: 500px;">
+                        <table class="table table-head-fixed table-hover align-middle">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Tên kỹ năng</th>
+                                    <th>Slug</th>
+                                    <th>Danh mục</th>
+                                    <th class="text-end">Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td>@item.Id</td>
+                                        <td><strong>@item.Name</strong></td>
+                                        <td><code>@item.Slug</code></td>
+                                        <td><span class="badge bg-secondary">@item.Category?.Name</span></td>
+                                        <td class="text-end">
+                                            <form asp-action="Delete" asp-route-id="@item.Id" method="post" class="d-inline">
+                                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Xóa kỹ năng này?')">
+                                                    Xóa
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

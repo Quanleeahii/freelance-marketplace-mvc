@@ -1,0 +1,96 @@
+﻿@model IEnumerable<FreelanceMarketplace.Models.Job>
+@{
+    ViewData["Title"] = "Duyệt việc làm";
+}
+
+<div class="app-content-header">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-6">
+                <h3 class="mb-0">Quản lý duyệt việc làm</h3>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-end">
+                    <li class="breadcrumb-item"><a asp-action="Index" asp-controller="Home">Admin</a></li>
+                    <li class="breadcrumb-item active">Jobs</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="app-content">
+    <div class="container-fluid">
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h3 class="card-title">Danh sách bài đăng</h3>
+                <div class="btn-group">
+                    <a asp-action="Index" class="btn btn-sm btn-outline-secondary">Tất cả</a>
+                    <a asp-action="Index" asp-route-status="Pending" class="btn btn-sm btn-outline-warning">Chờ duyệt</a>
+                    <a asp-action="Index" asp-route-status="Approved" class="btn btn-sm btn-outline-success">Đã duyệt</a>
+                    <a asp-action="Index" asp-route-status="Rejected" class="btn btn-sm btn-outline-danger">Từ chối</a>
+                </div>
+            </div>
+            <div class="card-body table-responsive p-0">
+                <table class="table table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Tiêu đề công việc</th>
+                            <th>Danh mục</th>
+                            <th>Ngân sách</th>
+                            <th>Ngày đăng</th>
+                            <th>Trạng thái</th>
+                            <th class="text-end">Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>#@item.Id</td>
+                                <td>
+                                    <strong>@item.Title</strong>
+                                    <div class="small text-muted">@item.WorkMode | @item.WorkType</div>
+                                </td>
+                                <td>@item.Category?.Name</td>
+                                <td>
+                                    @(item.BudgetMin?.ToString("N0") ?? "0") - @(item.BudgetMax?.ToString("N0") ?? "0") VNĐ
+                                </td>
+                                <td>@item.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                                <td>
+                                    @if (item.Status == "Pending" || item.Status == "WaitingApproval")
+                                    {
+                                        <span class="badge text-bg-warning">Chờ duyệt</span>
+                                    }
+                                    else if (item.Status == "Approved" || item.Status == "Active")
+                                    {
+                                        <span class="badge text-bg-success">Đã duyệt</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge text-bg-danger">@item.Status</span>
+                                    }
+                                </td>
+                                <td class="text-end">
+                                    <div class="btn-group">
+                                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info text-white">Xem</a>
+                                        @if (item.Status == "Pending" || item.Status == "WaitingApproval")
+                                        {
+                                            <form asp-action="Approve" asp-route-id="@item.Id" method="post" class="d-inline">
+                                                <button type="submit" class="btn btn-sm btn-success">Duyệt</button>
+                                            </form>
+                                            <form asp-action="Reject" asp-route-id="@item.Id" method="post" class="d-inline">
+                                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Bạn có chắc muốn từ chối bài này?')">Từ chối</button>
+                                            </form>
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

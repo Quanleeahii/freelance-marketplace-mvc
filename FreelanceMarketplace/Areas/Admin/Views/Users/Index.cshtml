@@ -1,0 +1,105 @@
+﻿@model IEnumerable<FreelanceMarketplace.Models.User>
+@{
+    ViewData["Title"] = "Quản lý Người dùng & Tài khoản";
+}
+
+<div class="app-content-header">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-6">
+                <h3 class="mb-0">Quản lý người dùng sàn</h3>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-end">
+                    <li class="breadcrumb-item"><a asp-area="Admin" asp-controller="Home" asp-action="Index">Admin</a></li>
+                    <li class="breadcrumb-item active">Users</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="app-content">
+    <div class="container-fluid">
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <!-- Bộ lọc vai trò -->
+                <div class="btn-group">
+                    <a asp-action="Index" class="btn btn-sm btn-outline-secondary">Tất cả</a>
+                    <a asp-action="Index" asp-route-role="Freelancer" class="btn btn-sm btn-outline-primary">Freelancer</a>
+                    <a asp-action="Index" asp-route-role="Client" class="btn btn-sm btn-outline-success">Client (Nhà tuyển dụng)</a>
+                </div>
+
+                <!-- Ô tìm kiếm -->
+                <form asp-action="Index" method="get" class="d-flex">
+                    <input type="text" name="search" value="@ViewBag.SearchTerm" class="form-control form-control-sm me-2" placeholder="Tìm theo Email..." />
+                    <button type="submit" class="btn btn-sm btn-outline-secondary">
+                        <i class="bi bi-search"></i>
+                    </button>
+                </form>
+            </div>
+
+            <div class="card-body table-responsive p-0">
+                <table class="table table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Email tài khoản</th>
+                            <th>Vai trò trên sàn</th>
+                            <th>Trạng thái hồ sơ</th>
+                            <th class="text-end">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (!Model.Any())
+                        {
+                            <tr>
+                                <td colspan="5" class="text-center py-4 text-muted">Không tìm thấy tài khoản nào.</td>
+                            </tr>
+                        }
+                        @foreach (var user in Model)
+                        {
+                            <tr>
+                                <td>#@user.Id</td>
+                                <td>
+                                    <strong>@user.Email</strong>
+                                </td>
+                                <td>
+                                    @if (user.FreelancerProfile != null)
+                                    {
+                                        <span class="badge bg-primary me-1">Freelancer</span>
+                                    }
+                                    @if (user.ClientProfile != null)
+                                    {
+                                        <span class="badge bg-success">Client</span>
+                                    }
+                                    @if (user.FreelancerProfile == null && user.ClientProfile == null)
+                                    {
+                                        <span class="badge bg-secondary">Tài khoản thường</span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (user.UserProfile != null)
+                                    {
+                                        <span class="text-success"><i class="bi bi-check-circle-fill"></i> Đã có hồ sơ</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted"><i class="bi bi-dash-circle"></i> Chưa tạo profile</span>
+                                    }
+                                </td>
+                                <td class="text-end">
+                                    <form asp-action="Delete" asp-route-id="@user.Id" method="post" class="d-inline">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Bạn có chắc chắn muốn xóa người dùng này?')">
+                                            <i class="bi bi-trash"></i> Xóa
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
