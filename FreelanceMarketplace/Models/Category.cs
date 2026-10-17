@@ -1,4 +1,5 @@
 ﻿namespace FreelanceMarketplace.Models
+
 {
     public class Category
     {
@@ -11,5 +12,7 @@
         public List<Category> SubCategories { get; set; } = new();
         public List<Skill> Skills { get; set; } = new();
         public List<Job> Jobs { get; set; } = new();
+
     }
+
 }
