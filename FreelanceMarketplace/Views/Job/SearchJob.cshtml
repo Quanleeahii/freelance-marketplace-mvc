@@ -1,0 +1,226 @@
+﻿@model FreelanceMarketplace.ViewModels.PagedResult<FreelanceMarketplace.Models.Job>
+@{
+    ViewData["Title"] = "Tìm việc freelancer - NextHub";
+    var filter = ViewBag.Filter as FreelanceMarketplace.ViewModels.JobFilterRequest ?? new FreelanceMarketplace.ViewModels.JobFilterRequest();
+    var selectedSkillIds = filter.SkillIds ?? new List<int>();
+}
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+<link rel="stylesheet" href="~/css/job-search.css" asp-append-version="true" />
+
+<div class="job-search-container py-3">
+    <div class="row">
+        <div class="col-lg-3 col-md-4">
+            <div class="filter-sidebar shadow-sm p-3 bg-white rounded border">
+                
+                <div class="filter-group mb-4">
+                    <h6 class="fw-bold mb-3 text-dark">Lĩnh vực</h6>
+                    <div class="category-tree">
+                        <div class="category-parent-item @(!filter.CategoryId.HasValue ? "active" : "")" id="catAllItem">
+                            <span class="cat-title select-all-cat">Tất cả</span>
+                        </div>
+
+                        @if (ViewBag.Categories != null)
+                        {
+                            foreach (var parent in (List<FreelanceMarketplace.Models.Category>)ViewBag.Categories)
+                            {
+                                var hasChildren = parent.SubCategories != null && parent.SubCategories.Any();
+                                var isExpanded = filter.CategoryId == parent.Id;
+
+                                <div class="category-parent-wrapper mb-1">
+                                    <div class="category-parent-item @(isExpanded && !filter.SubCategoryId.HasValue ? "active" : "")">
+                                        <span class="cat-title parent-name" data-parent-id="@parent.Id">@parent.Name</span>
+                                        @if (hasChildren)
+                                        {
+                                            <span class="arrow-toggle @(isExpanded ? "rotated" : "")" data-target="#sub-@parent.Id">
+                                                <i class="bi bi-chevron-down"></i>
+                                            </span>
+                                        }
+                                    </div>
+
+                                    @if (hasChildren)
+                                    {
+                                        <div class="sub-category-list ps-3 mt-1 @(isExpanded ? "" : "d-none")" id="sub-@parent.Id">
+                                            @foreach (var sub in parent.SubCategories)
+                                            {
+                                                <div class="sub-category-item @(filter.SubCategoryId == sub.Id ? "active" : "")" 
+                                                     data-parent-id="@parent.Id" data-sub-id="@sub.Id">
+                                                    @sub.Name
+                                                </div>
+                                            }
+                                        </div>
+                                    }
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+
+                <hr />
+
+                <div class="filter-group mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h6 class="fw-bold text-dark m-0">Kỹ năng</h6>
+                        @if (selectedSkillIds.Any())
+                        {
+                            <a href="javascript:void(0)" id="btnClearSkills" class="small text-success text-decoration-none">
+                                Xóa chọn
+                            </a>
+                        }
+                    </div>
+
+                    <div class="category-tree">
+                        <div class="category-parent-wrapper">
+                            <div class="category-parent-item @(selectedSkillIds.Any() ? "" : "active")" id="skillAllToggle">
+                                <span class="cat-title fw-semibold">Tất cả</span>
+                                <span class="arrow-toggle skill-arrow-toggle @(selectedSkillIds.Any() ? "rotated" : "")">
+                                    <i class="bi bi-chevron-down"></i>
+                                </span>
+                            </div>
+
+                            <div class="sub-category-list ps-3 mt-2 @(selectedSkillIds.Any() ? "" : "d-none")" 
+                                 id="skillsDropdownList" 
+                                 style="max-height: 240px; overflow-y: auto;">
+                                @if (ViewBag.Skills != null)
+                                {
+                                    foreach (var skill in (IEnumerable<FreelanceMarketplace.Models.Skill>)ViewBag.Skills)
+                                    {
+                                        var isChecked = selectedSkillIds.Contains(skill.Id);
+                                        <div class="form-check py-1">
+                                            <input class="form-check-input filter-skill-item" type="checkbox" 
+                                                   name="skillIds" value="@skill.Id" id="skill_@skill.Id" 
+                                                   @(isChecked ? "checked" : "")>
+                                            <label class="form-check-label small text-secondary" for="skill_@skill.Id" style="cursor: pointer;">
+                                                @skill.Name
+                                            </label>
+                                        </div>
+                                    }
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr />
+
+                <div class="filter-group mb-4">
+                    <h6 class="fw-bold text-dark mb-2">Hình thức làm việc</h6>
+                    <div class="form-check mb-1">
+                        <input class="form-check-input filter-work-mode" type="radio" name="workMode" value="" id="wm_all" @(!filter.WorkMode.HasValue ? "checked" : "")>
+                        <label class="form-check-label small text-secondary" for="wm_all">Tất cả</label>
+                    </div>
+                    <div class="form-check mb-1">
+                        <input class="form-check-input filter-work-mode" type="radio" name="workMode" value="Online" id="wm_online" @(filter.WorkMode == FreelanceMarketplace.Enums.WorkMode.Online ? "checked" : "")>
+                        <label class="form-check-label small text-secondary" for="wm_online">Làm online</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input filter-work-mode" type="radio" name="workMode" value="Onsite" id="wm_office" @(filter.WorkMode == FreelanceMarketplace.Enums.WorkMode.Onsite ? "checked" : "")>
+                        <label class="form-check-label small text-secondary" for="wm_office">Làm tại văn phòng</label>
+                    </div>
+                </div>
+
+                <hr />
+
+                <div class="filter-group">
+                    <h6 class="fw-bold text-dark mb-2">Hình thức trả lương</h6>
+                    <div class="form-check mb-1">
+                        <input class="form-check-input filter-payment-type" type="radio" name="paymentType" value="" id="pt_all" @(!filter.PaymentType.HasValue ? "checked" : "")>
+                        <label class="form-check-label small text-secondary" for="pt_all">Tất cả</label>
+                    </div>
+                    <div class="form-check mb-1">
+                        <input class="form-check-input filter-payment-type" type="radio" name="paymentType" value="ByProject" id="pt_project" @(filter.PaymentType == FreelanceMarketplace.Enums.PaymentType.ByProject ? "checked" : "")>
+                        <label class="form-check-label small text-secondary" for="pt_project">Trả theo dự án</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input filter-payment-type" type="radio" name="paymentType" value="ByHour" id="pt_hour" @(filter.PaymentType == FreelanceMarketplace.Enums.PaymentType.ByHour ? "checked" : "")>
+                        <label class="form-check-label small text-secondary" for="pt_hour">Trả theo giờ</label>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="col-lg-9 col-md-8">
+            <ul class="nav nav-tabs work-type-tabs mb-3" id="workTypeTabs">
+                <li class="nav-item">
+                    <button class="nav-link @(!filter.WorkType.HasValue ? "active" : "")" data-work-type="">Tất cả công việc</button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link @(filter.WorkType == FreelanceMarketplace.Enums.WorkType.PartTime ? "active" : "")" data-work-type="PartTime">Việc bán thời gian</button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link @(filter.WorkType == FreelanceMarketplace.Enums.WorkType.FullTime ? "active" : "")" data-work-type="FullTime">Việc toàn thời gian</button>
+                </li>
+            </ul>
+
+            <div class="bg-white p-3 rounded border shadow-sm mb-3">
+                <div class="row g-2">
+                    <div class="col-md-7">
+                        <div class="search-box-wrapper">
+                            <i class="bi bi-search search-icon-left"></i>
+                            <input type="text" id="keywordInput" class="input-vlance search-with-icon"
+                                   placeholder="Tìm việc freelancer theo tên, kỹ năng..." value="@filter.Keyword" />
+                        </div>
+                    </div>
+                    <div class="col-md-3 position-relative">
+                        <input type="text" id="cityInput" class="form-control custom-search-box" value="@(string.IsNullOrEmpty(filter.LocationCity) ? "Toàn quốc" : filter.LocationCity)" autocomplete="off" />
+                        <div id="cityDropdownMenu" class="custom-dropdown-list" style="display: none;">
+                            <div class="dropdown-item-vlance" data-id="">Toàn quốc</div>
+                            @foreach (var city in FreelanceMarketplace.ViewModels.VietnameseProvinces.List)
+                            {
+                                if (city != "Toàn quốc")
+                                {
+                                    <div class="dropdown-item-vlance" data-id="@city">@city</div>
+                                }
+                            }
+                        </div>
+                        <input type="hidden" id="cityHidden" value="@(filter.LocationCity ?? "")" />
+                    </div>
+                    <div class="col-md-2">
+                        <button type="button" id="btnSearch" class="btn btn-success w-100 fw-bold">Tìm kiếm</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="jobListContainer" class="d-flex flex-column gap-3"></div>
+
+            <div id="paginationContainer" class="d-flex justify-content-center mt-4"></div>
+        </div>
+    </div>
+</div>
+
+<template id="jobCardTemplate">
+    <div class="job-card bg-white p-3 border rounded shadow-sm">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+                <a href="#" class="job-title text-decoration-none fw-bold fs-6 text-dark job-title-hover"></a>
+                <span class="badge-work-type"></span>
+            </div>
+            <button type="button" class="btn btn-sm btn-outline-secondary border-0"><i class="bi bi-bookmark"></i></button>
+        </div>
+        <div class="text-muted small mb-2">
+            <span class="text-warning">★★★★★</span>
+            <span class="client-name fw-semibold text-dark"></span>
+        </div>
+        <div class="p-2 mb-2 rounded bg-light small text-secondary d-flex flex-wrap gap-3 align-items-center">
+            <span><strong>ID:</strong> <span class="job-id"></span></span>
+            <span>|</span>
+            <span><i class="bi bi-geo-alt"></i> <span class="job-city"></span></span>
+            <span>|</span>
+            <span class="job-category"></span>
+            <span>|</span>
+            <span class="job-budget"></span>
+            <span class="ms-auto text-danger"><i class="bi bi-clock"></i> Hạn: <span class="job-deadline"></span></span>
+        </div>
+        <p class="text-muted small mb-3">
+            <span class="job-desc"></span>
+            <a href="#" class="job-link text-decoration-none ms-1 fw-semibold text-primary d-none">Xem thêm</a>
+        </p>
+        <div class="d-flex justify-content-between align-items-center">
+            <div class="skills-list d-flex flex-wrap gap-1"></div>
+            <span class="proposals-count small text-muted fw-semibold"></span>
+        </div>
+    </div>
+</template>
+
+<script src="~/js/job-search.js" asp-append-version="true"></script>

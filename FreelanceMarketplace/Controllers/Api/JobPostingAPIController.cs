@@ -2,6 +2,7 @@
 using FreelanceMarketplace.Services;
 using FreelanceMarketplace.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace FreelanceMarketplace.Controllers.Api;
 
@@ -43,19 +44,29 @@ public class JobPostingAPIController : ControllerBase
         var subCategories = await _jobService.GetSubCategoriesByParentIdAsync(parentId);
         return Ok(subCategories);
     }
-    [HttpPost("create")]
-    public async Task<IActionResult> CreateJob([FromBody] JobCreateViewModel model)
+    [HttpPost]
+    [Consumes("multipart/form-data")]
+    public async Task<IActionResult> CreateJob([FromForm] JobCreateViewModel model)
     {
         if (!ModelState.IsValid)
         {
             return BadRequest(ModelState);
         }
-        var clientProfileId = HttpContext.Session.GetInt32("ClientProfileId");
-        if (clientProfileId == null)
+        int currentUserId = 0;
+        var idClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!int.TryParse(idClaim, out currentUserId) || currentUserId <= 0)
+        {
+            var sessionUserId = HttpContext.Session.GetString("UserId");
+            int.TryParse(sessionUserId, out currentUserId);
+        }
+
+        if (currentUserId <= 0)
         {
             return Unauthorized(new { message = "Vui lòng đăng nhập để đăng bài" });
         }
-        var createdJob = await _jobService.CreateJobAsync(model, clientProfileId.Value, model.SkillIds);
+
+        var createdJob = await _jobService.CreateJobAsync(model, currentUserId, model.SkillIds);
+
         return StatusCode(StatusCodes.Status201Created, new
         {
             message = "Đăng dự án thành công",

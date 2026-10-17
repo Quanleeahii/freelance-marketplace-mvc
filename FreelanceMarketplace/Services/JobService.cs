@@ -8,17 +8,43 @@ namespace FreelanceMarketplace.Services;
 public class JobService : IJobService
 {
     private readonly AppDbContext _context;
-
-    public JobService(AppDbContext context)
+    private readonly IFileStorageService _fileStorageService;
+    public JobService(AppDbContext context, IFileStorageService fileStorageService)
     {
         _context = context;
+        _fileStorageService = fileStorageService;
     }
 
-    public async Task<Job> CreateJobAsync(JobCreateViewModel model, int clientProfileId, List<int>? skillIds = null)
+    public async Task<Job> CreateJobAsync(JobCreateViewModel model, int userId, List<int>? skillIds = null)
     {
+        var clientProfile = await _context.ClientProfiles
+        .FirstOrDefaultAsync(cp => cp.UserId == userId);
+
+        // 2. Nếu chưa có (người dùng mới đăng bài lần đầu) -> Tự tạo ngầm
+        if (clientProfile == null)
+        {
+            var userProfile = await _context.UserProfiles
+                .FirstOrDefaultAsync(up => up.UserId == userId);
+
+            clientProfile = new ClientProfile
+            {
+                UserId = userId,
+                DisplayName = userProfile?.FullName,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            _context.ClientProfiles.Add(clientProfile);
+            await _context.SaveChangesAsync(); // Lưu để sinh ra clientProfile.Id
+        }
+        string? attachmentUrl = null;
+        if (model.AttachmentFile != null && model.AttachmentFile.Length > 0)
+        {
+            var allowedExts = new[] { ".pdf", ".doc", ".docx", ".png", ".jpg", ".jpeg", ".zip", ".rar" };
+            attachmentUrl = await _fileStorageService.SaveFileAsync(model.AttachmentFile, "job-attachments", allowedExts);
+        }
         var job = new Job
         {
-            ClientProfileId = clientProfileId,
+            ClientProfileId = clientProfile.Id,
             CategoryId = model.CategoryId,
             Title = model.Title,
             Description = model.Description,
@@ -28,7 +54,10 @@ public class JobService : IJobService
             LocationCity = model.LocationCity ?? string.Empty,
             BudgetMin = model.BudgetMin ?? 0m,
             BudgetMax = model.BudgetMax,
-            Deadline = model.Deadline,
+            Deadline = model.Deadline.HasValue
+    ? DateTime.SpecifyKind(model.Deadline.Value, DateTimeKind.Utc)
+    : null,
+            AttachmentUrl = attachmentUrl,
             Status = "Open",
             CreatedAt = DateTime.UtcNow
         };
@@ -38,32 +67,6 @@ public class JobService : IJobService
         {
             var skills = await _context.Skills
                 .Where(s => selectedSkillIds.Contains(s.Id))
-                .ToListAsync();
-
-            job.Skills = skills;
-        }
-
-        _context.Jobs.Add(job);
-        await _context.SaveChangesAsync();
-
-        return job;
-    }
-
-    public async Task<Job> CreateJobAsync(Job job, List<int>? skillIds = null)
-    {
-        if (job.CreatedAt == default)
-        {
-            job.CreatedAt = DateTime.UtcNow;
-        }
-        if (string.IsNullOrEmpty(job.Status))
-        {
-            job.Status = "Open";
-        }
-
-        if (skillIds != null && skillIds.Any())
-        {
-            var skills = await _context.Skills
-                .Where(s => skillIds.Contains(s.Id))
                 .ToListAsync();
 
             job.Skills = skills;
@@ -94,6 +97,7 @@ public class JobService : IJobService
     {
         return await _context.Categories
             .Where(c => c.ParentId == null)
+            .Include(c => c.SubCategories)
             .OrderBy(c => c.DisplayOrder)
             .AsNoTracking()
             .ToListAsync();

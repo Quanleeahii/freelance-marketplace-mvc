@@ -136,6 +136,9 @@ namespace FreelanceMarketplace.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("AttachmentUrl")
+                        .HasColumnType("text");
+
                     b.Property<decimal?>("BudgetMax")
                         .HasColumnType("numeric(18,2)");
 
@@ -253,6 +256,10 @@ namespace FreelanceMarketplace.Migrations
 
                     b.Property<int>("JobId")
                         .HasColumnType("integer");
+
+                    b.Property<string>("PhoneNumber")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<string>("Status")
                         .IsRequired()

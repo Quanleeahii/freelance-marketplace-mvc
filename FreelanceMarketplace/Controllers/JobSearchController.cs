@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace FreelanceMarketplace.Controllers;
 
+[Route("jobs")]
 public class JobSearchController : Controller
 {
     private readonly IJobSearchService _jobSearchService;
@@ -18,18 +19,15 @@ public class JobSearchController : Controller
     }
 
     [HttpGet]
-    [Route("jobs")]
-    [Route("jobs/search")]
     public async Task<IActionResult> Index([FromQuery] JobFilterRequest request)
     {
         var result = await _jobSearchService.GetJobsAsync(request);
         await LoadSidebarDataAsync(request.CategoryId);
         ViewBag.Filter = request;
-        return View(result);
+        return View("~/Views/Job/SearchJob.cshtml", result);
     }
 
-    [HttpGet]
-    [Route("jobs/{id:int}")]
+    [HttpGet("{id:int}")]
     public async Task<IActionResult> Details(int id)
     {
         var job = await _jobSearchService.GetJobByIdAsync(id);
@@ -46,9 +44,5 @@ public class JobSearchController : Controller
         var skills = await _jobService.GetAllSkillsAsync();
         ViewBag.Categories = parentCategories;
         ViewBag.Skills = skills;
-        if (selectedCategoryId.HasValue && selectedCategoryId.Value > 0)
-        {
-            ViewBag.SubCategories = await _jobService.GetSubCategoriesByParentIdAsync(selectedCategoryId.Value);
-        }
     }
 }

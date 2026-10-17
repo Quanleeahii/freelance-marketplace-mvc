@@ -1,0 +1,305 @@
+/* Tông màu thương hiệu chính */
+:root {
+    --brand-primary: #059669; /* Xanh ngọc chính */
+    --brand-primary-hover: #047857; /* Xanh đậm khi hover */
+    --brand-light: #ecfdf5; /* Nền xanh nhạt */
+    --brand-border: #a7f3d0; /* Viền xanh nhạt */
+}
+
+/* Khung layout */
+.profile-container {
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 28px;
+    border: 1px solid #e5e7eb;
+}
+
+.user-summary-card {
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 24px 20px;
+    text-align: center;
+    border: 1px solid #e5e7eb;
+    margin-bottom: 20px;
+}
+
+.summary-avatar-wrapper {
+    position: relative;
+    width: 96px;
+    height: 96px;
+    margin: 0 auto 10px;
+}
+
+.summary-avatar {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--brand-primary);
+}
+
+.online-indicator {
+    position: absolute;
+    bottom: 4px;
+    right: 4px;
+    width: 14px;
+    height: 14px;
+    background-color: #10b981;
+    border: 2px solid #ffffff;
+    border-radius: 50%;
+}
+
+.user-name {
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 4px;
+}
+
+.user-email {
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin-bottom: 12px;
+    word-break: break-all;
+}
+
+.badge-role {
+    display: inline-block;
+    padding: 4px 14px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--brand-primary);
+    background-color: var(--brand-light);
+    border: 1px solid var(--brand-border);
+    border-radius: 20px;
+    margin-bottom: 16px;
+}
+
+.meta-stats {
+    display: flex;
+    justify-content: space-around;
+    padding-top: 14px;
+    border-top: 1px solid #f3f4f6;
+}
+
+.meta-item {
+    display: flex;
+    flex-direction: column;
+}
+
+    .meta-item strong {
+        font-size: 0.95rem;
+        color: #111827;
+    }
+
+    .meta-item span {
+        font-size: 0.75rem;
+        color: #9ca3af;
+    }
+
+/* Sidebar navigation */
+.profile-sidebar {
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid #e5e7eb;
+}
+
+.list-group-header {
+    background-color: #f9fafb;
+    padding: 10px 16px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #6b7280;
+    letter-spacing: 0.5px;
+}
+
+.profile-sidebar .list-group-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border: none;
+    border-bottom: 1px solid #f3f4f6;
+    color: #374151;
+    font-weight: 500;
+    padding: 13px 18px;
+    transition: all 0.2s ease;
+}
+
+    .profile-sidebar .list-group-item:hover {
+        background-color: var(--brand-light);
+        color: var(--brand-primary);
+    }
+
+    .profile-sidebar .list-group-item.active {
+        background-color: var(--brand-primary) !important;
+        color: #ffffff !important;
+        font-weight: 600;
+    }
+
+/* Nav Pills Tabs ngang */
+.profile-nav-pills .nav-link {
+    color: #4b5563;
+    font-weight: 600;
+    border-radius: 8px;
+    padding: 9px 18px;
+    transition: all 0.2s ease;
+}
+
+    .profile-nav-pills .nav-link:hover {
+        background-color: var(--brand-light);
+        color: var(--brand-primary);
+    }
+
+    .profile-nav-pills .nav-link.active {
+        background-color: var(--brand-primary) !important;
+        color: #ffffff !important;
+    }
+
+/* Step Header */
+.section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 22px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #f3f4f6;
+}
+
+.badge-step {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background-color: var(--brand-primary);
+    color: #ffffff;
+    font-size: 0.8rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.section-title {
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 0;
+    font-size: 0.95rem;
+}
+
+/* Avatar Preview */
+.avatar-preview-wrapper {
+    width: 82px;
+    height: 82px;
+    flex-shrink: 0;
+}
+
+.avatar-preview-img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--brand-border);
+}
+
+.avatar-custom-btn {
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+    .avatar-custom-btn input[type="file"] {
+        position: absolute;
+        left: 0;
+        top: 0;
+        opacity: 0;
+        width: 100%;
+        height: 100%;
+        cursor: pointer;
+    }
+
+/* Form Controls */
+.form-label-custom {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #374151;
+}
+
+.form-control-custom, .form-select-custom {
+    border-radius: 8px;
+    border: 1px solid #d1d5db;
+    padding: 9px 12px;
+}
+
+    .form-control-custom:focus, .form-select-custom:focus {
+        border-color: var(--brand-primary);
+        box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.15);
+    }
+
+.input-group-text-custom {
+    background-color: #f9fafb;
+    border-color: #d1d5db;
+    color: #6b7280;
+    border-radius: 8px 0 0 8px;
+}
+
+.badge-verified {
+    font-size: 0.8rem;
+    color: var(--brand-primary);
+    font-weight: 600;
+}
+
+/* Buttons */
+.btn-brand-primary {
+    background-color: var(--brand-primary);
+    color: #ffffff;
+    font-weight: 600;
+    padding: 9px 22px;
+    border-radius: 8px;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+    .btn-brand-primary:hover {
+        background-color: var(--brand-primary-hover);
+        color: #ffffff;
+    }
+
+.btn-brand-secondary {
+    background-color: #f3f4f6;
+    color: #374151;
+    font-weight: 600;
+    padding: 9px 22px;
+    border-radius: 8px;
+    border: none;
+}
+
+    .btn-brand-secondary:hover {
+        background-color: #e5e7eb;
+    }
+
+.btn-outline-brand {
+    border: 1px solid var(--brand-primary);
+    color: var(--brand-primary);
+}
+
+    .btn-outline-brand:hover {
+        background-color: var(--brand-primary);
+        color: #ffffff;
+    }
+
+.text-primary-custom {
+    color: var(--brand-primary) !important;
+}
+
+.meta-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.8rem;
+    background-color: var(--brand-light);
+    color: var(--brand-primary);
+    border: 1px solid var(--brand-border);
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-weight: 500;
+}
