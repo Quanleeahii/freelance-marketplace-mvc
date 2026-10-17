@@ -2,7 +2,6 @@
 @{
     ViewData["Title"] = "Hồ sơ quản trị viên";
     
-    // Ảnh mặc định dạng SVG base64 siêu nhẹ, luôn luôn hiển thị 100% không lo thiếu file ảnh
     var defaultAvatar = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 128 128' fill='%236c757d'><circle cx='64' cy='64' r='64' fill='%23343a40'/><circle cx='64' cy='48' r='24' fill='%23adb5bd'/><path d='M20,112 C20,88 40,78 64,78 C88,78 108,88 108,112 Z' fill='%23adb5bd'/></svg>";
 
     var avatarSrc = !string.IsNullOrEmpty(Model?.UserProfile?.AvatarUrl) 
@@ -139,13 +138,13 @@
             avatarInput.addEventListener('change', function (e) {
                 const file = e.target.files[0];
                 if (file) {
-                    // Cắt ngắn nếu tên file quá dài (> 25 ký tự) để UI luôn gọn gàng
+                    
                     const displayName = file.name.length > 25 
                         ? file.name.substring(0, 12) + '...' + file.name.substring(file.name.length - 10) 
                         : file.name;
 
                     fileNameDisplay.textContent = 'Đã chọn: ' + displayName;
-                    fileNameDisplay.title = file.name; // Di chuột vào vẫn xem được tên gốc đầy đủ
+                    fileNameDisplay.title = file.name; 
 
                     const reader = new FileReader();
                     reader.onload = function (event) {
