@@ -1,9 +1,8 @@
 ﻿using FreelanceMarketplace.Enums;
-using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 namespace FreelanceMarketplace.ViewModels;
 
-public class JobCreateViewModel
+public class JobCreateViewModel : IValidatableObject
 {
     [Required(ErrorMessage = "Vui lòng chọn lĩnh vực cần tuyển")]
     [Display(Name = "Lĩnh vực cần tuyển")]
@@ -37,9 +36,10 @@ public class JobCreateViewModel
     [Display(Name = "Hình thức trả lương")]
     public PaymentType PaymentType { get; set; } = PaymentType.ByProject;
 
-    [Display(Name = "Nơi cần tuyển freelancer")]
-    [StringLength(100, ErrorMessage = "Địa điểm tối đa 100 ký tự")]
-    public string? LocationCity { get; set; }
+    [Display(Name = "Nơi cần tuyển Freelancer")]
+    public string LocationCity { get; set; } = "Toàn quốc";
+    [Display(Name = "Tài liệu đính kèm")]
+    public IFormFile? AttachmentFile { get; set; }
 
     [Display(Name = "Ngân sách tối thiểu (VNĐ)")]
     [Range(200000, (double)decimal.MaxValue, ErrorMessage = "Ngân sách tối thiểu từ 200.000 VNĐ trở lên")]
@@ -49,13 +49,31 @@ public class JobCreateViewModel
     [Display(Name = "Ngân sách tối đa (VNĐ)")]
     [Range(200000, (double)decimal.MaxValue, ErrorMessage = "Ngân sách tối đa từ 200.000 VNĐ trở lên")]
     [DataType(DataType.Currency)]
-    [Remote(action: "VerifyBudget", controller: "Job", AdditionalFields = nameof(BudgetMin), ErrorMessage = "Ngân sách tối đa phải lớn hơn ngân sách tối thiểu")]
     public decimal? BudgetMax { get; set; }
 
     [Display(Name = "Hạn chót nhận hồ sơ")]
-    [DataType(DataType.DateTime)]
+    [Required(ErrorMessage = "Vui lòng chọn hạn chót nhận hồ sơ")]
+    [DataType(DataType.Date)]
     public DateTime? Deadline { get; set; }
 
     [Display(Name = "Kỹ năng yêu cầu")]
+    [MinLength(1, ErrorMessage = "Vui lòng chọn ít nhất 1 kỹ năng")]
     public List<int> SkillIds { get; set; } = new();
+    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+    {
+        if (BudgetMin.HasValue && BudgetMax.HasValue && BudgetMax.Value <= BudgetMin.Value)
+        {
+            yield return new ValidationResult(
+                "Ngân sách tối đa phải lớn hơn ngân sách tối thiểu",
+                new[] { nameof(BudgetMax) }
+            );
+        }
+        if (Deadline.HasValue && Deadline.Value.Date <= DateTime.UtcNow.Date)
+        {
+            yield return new ValidationResult(
+                "Hạn chót nhận hồ sơ phải sau ngày hiện tại",
+                new[] { nameof(Deadline) }
+            );
+        }
+    }
 }

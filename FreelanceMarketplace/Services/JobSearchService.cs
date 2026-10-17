@@ -21,13 +21,14 @@ public class JobSearchService : IJobSearchService
             .Include(j => j.Category)
             .Include(j => j.Proposals)
             .Include(j => j.Skills)
+            .Include(j => j.ClientProfile)
+            .ThenInclude(cp => cp.User)
             .Where(j => j.Status == "Open")
             .AsQueryable();
         if (!string.IsNullOrWhiteSpace(request.Keyword))
         {
             string keyword = request.Keyword.Trim().ToLower();
-            query = query.Where(j => j.Title.ToLower().Contains(keyword) ||
-                                     j.Description.ToLower().Contains(keyword) ||
+            query = query.Where(j => j.Title.ToLower().Contains(keyword) ||                           
                                      j.Skills.Any(s => s.Name.ToLower().Contains(keyword)));
         }
         if (!string.IsNullOrWhiteSpace(request.LocationCity))

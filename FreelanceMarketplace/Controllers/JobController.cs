@@ -2,9 +2,11 @@
 using FreelanceMarketplace.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Security.Claims;
 
 namespace FreelanceMarketplace.Controllers;
 
+[Route("jobs")]
 public class JobController : Controller
 {
     private readonly IJobService _jobService;
@@ -14,54 +16,34 @@ public class JobController : Controller
         _jobService = jobService;
     }
 
-    [HttpGet]
-    public IActionResult Index()
+    [HttpGet("create")]
+    public async Task<IActionResult> CreateJob()
     {
-        return View();
-    }
+        var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier)
+                        ?? HttpContext.Session.GetString("UserId");
+        //if (string.IsNullOrEmpty(userIdStr) || !int.TryParse(userIdStr, out int userId))
+        //{
+        //    return RedirectToAction("Login", "Account", new { returnUrl = "/Job/CreateJob" });
+        //}
+        //var userProfile = await _jobService.GetUserProfileByUserIdAsync(userId);
 
-    [HttpGet]
-    public async Task<IActionResult> Create()
-    {
-        var clientProfileId = HttpContext.Session.GetInt32("ClientProfileId");
-        if (clientProfileId == null)
+        //bool isProfileCompleted = userProfile != null
+        //                          && !string.IsNullOrWhiteSpace(userProfile.FullName)
+        //                          && !string.IsNullOrWhiteSpace(userProfile.Phone);
+        //if (!isProfileCompleted)
+        //{
+        //    TempData["WarningMessage"] = "Bạn cần cập nhật đầy đủ thông tin cá nhân trước khi đăng dự án";
+        //    return RedirectToAction("Profile", "Account"); 
+        //}
+        //await LoadFormDataAsync();
+        //return View(new JobCreateViewModel());
+        if (string.IsNullOrEmpty(userIdStr))
         {
-            return RedirectToAction("Login", "Account");
+            return RedirectToAction("Login", "Account", new { returnUrl = "/Job/CreateJob" });
         }
         await LoadFormDataAsync();
         return View(new JobCreateViewModel());
     }
-    [AcceptVerbs("GET", "POST")]
-    public IActionResult VerifyBudget(decimal? budgetMax, decimal? budgetMin)
-    {
-        if (budgetMax.HasValue && budgetMax.Value < 200000)
-        {
-            return Json("Ngân sách tối đa từ 200.000 VNĐ trở lên");
-        }
-        if (budgetMax.HasValue && budgetMin.HasValue && budgetMax.Value <= budgetMin.Value)
-        {
-            return Json("Ngân sách tối đa phải lớn hơn ngân sách tối thiểu");
-        }
-        return Json(true);
-    }
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create(JobCreateViewModel model)
-    {
-        var clientProfileId = HttpContext.Session.GetInt32("ClientProfileId");
-        if (clientProfileId == null)
-        {
-            return RedirectToAction("Login", "Account");
-        }
-        if (!ModelState.IsValid)
-        {
-            await LoadFormDataAsync(model.ParentCategoryId);
-            return View(model);
-        }
-        var createdJob = await _jobService.CreateJobAsync(model, clientProfileId.Value, model.SkillIds);
-        return RedirectToAction("Index", "Home");
-    }
-
     private async Task LoadFormDataAsync(int? selectedParentId = null)
     {
         var parentCategories = await _jobService.GetParentCategoriesAsync();
