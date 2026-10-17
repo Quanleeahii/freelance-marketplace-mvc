@@ -1,0 +1,159 @@
+﻿@model FreelanceMarketplace.Models.User
+@{
+    ViewData["Title"] = "Hồ sơ quản trị viên";
+    
+    // Ảnh mặc định dạng SVG base64 siêu nhẹ, luôn luôn hiển thị 100% không lo thiếu file ảnh
+    var defaultAvatar = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 128 128' fill='%236c757d'><circle cx='64' cy='64' r='64' fill='%23343a40'/><circle cx='64' cy='48' r='24' fill='%23adb5bd'/><path d='M20,112 C20,88 40,78 64,78 C88,78 108,88 108,112 Z' fill='%23adb5bd'/></svg>";
+
+    var avatarSrc = !string.IsNullOrEmpty(Model?.UserProfile?.AvatarUrl) 
+        ? Model.UserProfile.AvatarUrl 
+        : defaultAvatar;
+}
+
+<div class="app-content-header">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-6">
+                <h3 class="mb-0">Thông tin tài khoản Admin</h3>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-end">
+                    <li class="breadcrumb-item"><a asp-area="Admin" asp-controller="Home" asp-action="Index">Admin</a></li>
+                    <li class="breadcrumb-item active">Hồ sơ</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="app-content">
+    <div class="container-fluid">
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="bi bi-check-circle-fill me-2"></i>@TempData["SuccessMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+
+        <form asp-area="Admin" asp-controller="Home" asp-action="UpdateProfile" method="post" enctype="multipart/form-data">
+            <div class="row">
+                <!-- Cột trái: Avatar và Nút đổi ảnh -->
+                <div class="col-md-4">
+                    <div class="card card-primary card-outline mb-4 h-100">
+                        <div class="card-body d-flex flex-column align-items-center text-center">
+                            
+                            <!-- Khung ảnh đại diện có fallback dự phòng onerror -->
+                            <div class="mb-3 position-relative">
+                                <img id="avatarPreview"
+                                     src="@avatarSrc" 
+                                     onerror="this.onerror=null; this.src='@defaultAvatar';"
+                                     class="rounded-circle shadow img-fluid border border-3 border-primary" 
+                                     style="width: 130px; height: 130px; object-fit: cover;" 
+                                     alt="Avatar" />
+                            </div>
+
+                            <!-- Nút chọn ảnh và tên file được thu gọn chống tràn -->
+                            <div class="mb-3 w-100 px-3">
+                                <label for="avatarInput" class="btn btn-sm btn-outline-primary w-100">
+                                    <i class="bi bi-camera me-1"></i> Thay đổi ảnh đại diện
+                                </label>
+                                <input type="file" id="avatarInput" name="avatarFile" accept="image/png, image/jpeg, image/jpg, image/webp" class="d-none" />
+                                
+                                <!-- Khung tên file có text-truncate và text-break chống tràn tuyệt đối -->
+                                <div id="fileNameDisplay" 
+                                     class="small text-muted mt-2 text-truncate" 
+                                     style="max-width: 100%; font-size: 11px;" 
+                                     title="">
+                                </div>
+                            </div>
+
+                            <h4 class="fw-bold mb-1">@(Model?.UserProfile?.FullName ?? "Lê Minh Quân")</h4>
+                            <p class="text-secondary small mb-3">Quản trị viên hệ thống</p>
+                            
+                            <div class="w-100 mt-auto border-top pt-3 text-start">
+                                <div class="d-flex justify-content-between py-2 border-bottom">
+                                    <span class="text-secondary"><i class="bi bi-envelope me-1"></i> Email:</span>
+                                    <span class="fw-semibold">@(Model?.Email ?? "quan2@gmail.com")</span>
+                                </div>
+                                <div class="d-flex justify-content-between py-2">
+                                    <span class="text-secondary"><i class="bi bi-geo-alt me-1"></i> Tỉnh/Thành:</span>
+                                    <span>@(Model?.UserProfile?.City ?? "Chưa thiết lập")</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cột phải: Form cập nhật thông tin -->
+                <div class="col-md-8">
+                    <div class="card mb-4 h-100">
+                        <div class="card-header">
+                            <h3 class="card-title mb-0">Chỉnh sửa hồ sơ cá nhân</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Email tài khoản (không thể đổi)</label>
+                                <input type="email" class="form-control" value="@Model?.Email" readonly disabled />
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">Họ và Tên</label>
+                                    <input type="text" name="fullName" class="form-control" value="@Model?.UserProfile?.FullName" placeholder="Nhập họ và tên..." required />
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">Số điện thoại</label>
+                                    <input type="text" name="phone" class="form-control" value="@Model?.UserProfile?.Phone" placeholder="Ví dụ: 0987xxxxxx" />
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">Tỉnh / Thành phố (City)</label>
+                                    <input type="text" name="city" class="form-control" value="@Model?.UserProfile?.City" placeholder="Ví dụ: Hà Nội, TP.HCM..." />
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">Địa chỉ chi tiết (Address)</label>
+                                    <input type="text" name="address" class="form-control" value="@Model?.UserProfile?.Address" placeholder="Số nhà, tên đường..." />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer text-end">
+                            <button type="submit" class="btn btn-primary px-3">
+                                <i class="bi bi-floppy-fill me-1"></i> Lưu thay đổi
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const avatarInput = document.getElementById('avatarInput');
+        const avatarPreview = document.getElementById('avatarPreview');
+        const fileNameDisplay = document.getElementById('fileNameDisplay');
+
+        if (avatarInput) {
+            avatarInput.addEventListener('change', function (e) {
+                const file = e.target.files[0];
+                if (file) {
+                    // Cắt ngắn nếu tên file quá dài (> 25 ký tự) để UI luôn gọn gàng
+                    const displayName = file.name.length > 25 
+                        ? file.name.substring(0, 12) + '...' + file.name.substring(file.name.length - 10) 
+                        : file.name;
+
+                    fileNameDisplay.textContent = 'Đã chọn: ' + displayName;
+                    fileNameDisplay.title = file.name; // Di chuột vào vẫn xem được tên gốc đầy đủ
+
+                    const reader = new FileReader();
+                    reader.onload = function (event) {
+                        avatarPreview.src = event.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+    </script>
+}

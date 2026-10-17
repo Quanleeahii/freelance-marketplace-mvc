@@ -1,0 +1,345 @@
+﻿@model FreelanceMarketplace.Areas.Admin.Models.DashboardViewModel
+@{
+    ViewData["Title"] = "Bảng điều khiển";
+}
+
+<!-- Content Header -->
+<div class="app-content-header">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-6">
+                <h1 class="mb-0 fs-3">Bảng điều khiển quản trị</h1>
+            </div>
+            <div class="col-sm-6">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb float-sm-end">
+                        <li class="breadcrumb-item"><a asp-area="Admin" asp-controller="Home" asp-action="Index">Admin</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Dashboard</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Content Body -->
+<div class="app-content">
+    <div class="container-fluid">
+        <!-- 4 Khối thống kê -->
+        <div class="row">
+            <div class="col-lg-3 col-6">
+                <div class="small-box text-bg-primary">
+                    <div class="inner">
+                        <h3>@Model.PendingJobsCount</h3>
+                        <p>Việc làm chờ duyệt</p>
+                    </div>
+                    <svg class="small-box-icon" fill="currentColor" viewBox="0 0 24 24"><path d="M2.25 2.25a.75.75 0 000 1.5h1.386c.17 0 .318.114.362.278l2.558 9.592a3.752 3.752 0 00-2.806 3.63c0 .414.336.75.75.75h15.75a.75.75 0 000-1.5H5.378A2.25 2.25 0 017.5 15h11.218a.75.75 0 00.674-.421 60.358 60.358 0 002.96-7.228.75.75 0 00-.525-.965A60.864 60.864 0 005.68 4.509l-.232-.867A1.875 1.875 0 003.636 2.25H2.25zM3.75 20.25a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0zM16.5 20.25a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0z"></path></svg>
+                    <a asp-area="Admin" asp-controller="Jobs" asp-action="Index" class="small-box-footer link-light link-underline-opacity-0">Xem danh sách <i class="bi bi-arrow-right"></i></a>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-6">
+                <div class="small-box text-bg-success">
+                    <div class="inner">
+                        <h3>@Model.TotalProposalsCount</h3>
+                        <p>Lượt chào giá (Proposals)</p>
+                    </div>
+                    <svg class="small-box-icon" fill="currentColor" viewBox="0 0 24 24"><path d="M18.375 2.25c-1.035 0-1.875.84-1.875 1.875v15.75c0 1.035.84 1.875 1.875 1.875h.75c1.035 0 1.875-.84 1.875-1.875V4.125c0-1.036-.84-1.875-1.875-1.875h-.75zM9.75 8.625c0-1.036.84-1.875 1.875-1.875h.75c1.036 0 1.875.84 1.875 1.875v11.25c0 1.035-.84 1.875-1.875 1.875h-.75a1.875 1.875 0 01-1.875-1.875V8.625zM3 13.125c0-1.036.84-1.875 1.875-1.875h.75c1.036 0 1.875.84 1.875 1.875v6.75c0 1.035-.84 1.875-1.875 1.875h-.75A1.875 1.875 0 013 19.875v-6.75z"></path></svg>
+                    <span class="small-box-footer link-light">Tổng giao dịch đề xuất</span>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-6">
+                <div class="small-box text-bg-warning">
+                    <div class="inner">
+                        <h3>@Model.TotalFreelancersCount</h3>
+                        <p>Freelancer trên sàn</p>
+                    </div>
+                    <svg class="small-box-icon" fill="currentColor" viewBox="0 0 24 24"><path d="M6.25 6.375a4.125 4.125 0 118.25 0 4.125 4.125 0 01-8.25 0zM3.25 19.125a7.125 7.125 0 0114.25 0v.003l-.001.119a.75.75 0 01-.363.63 13.067 13.067 0 01-6.761 1.873c-2.472 0-4.786-.684-6.76-1.873a.75.75 0 01-.364-.63l-.001-.122zM19.75 7.5a.75.75 0 00-1.5 0v2.25H16a.75.75 0 000 1.5h2.25v2.25a.75.75 0 001.5 0v-2.25H22a.75.75 0 000-1.5h-2.25V7.5z"></path></svg>
+                    <span class="small-box-footer link-dark">Hồ sơ ứng viên</span>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-6">
+                <div class="small-box text-bg-danger">
+                    <div class="inner">
+                        <h3>@Model.TotalUsersCount</h3>
+                        <p>Tổng tài khoản người dùng</p>
+                    </div>
+                    <svg class="small-box-icon" fill="currentColor" viewBox="0 0 24 24"><path clip-rule="evenodd" fill-rule="evenodd" d="M2.25 13.5a8.25 8.25 0 018.25-8.25.75.75 0 01.75.75v6.75H18a.75.75 0 01.75.75 8.25 8.25 0 01-16.5 0z"></path><path clip-rule="evenodd" fill-rule="evenodd" d="M12.75 3a.75.75 0 01.75-.75 8.25 8.25 0 018.25 8.25.75.75 0 01-.75.75h-7.5a.75.75 0 01-.75-.75V3z"></path></svg>
+                    <span class="small-box-footer link-light">Cộng đồng NextHub</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hàng biểu đồ và phân bố người dùng VN -->
+        <div class="row mt-4">
+            <!-- Biểu đồ đường bên trái -->
+            <div class="col-lg-7">
+                <div class="card mb-4 h-100">
+                    <div class="card-header">
+                        <h3 class="card-title">Tăng trưởng giao dịch sàn</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="position-relative" style="height: 310px">
+                            <canvas id="revenue-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card phân bố người dùng VN -->
+            <div class="col-lg-5">
+                <div class="card text-white bg-primary bg-gradient border-primary mb-4 h-100">
+                    <div class="card-header border-0 d-flex justify-content-between align-items-center flex-wrap">
+                        <h3 class="card-title mb-0">
+                            <i class="bi bi-geo-alt-fill me-1"></i> Phân bố Việt Nam
+                        </h3>
+                        <!-- Nút bấm Tab đổi rõ ràng -->
+                        <div class="btn-group btn-group-sm">
+                            <button type="button" id="btn-tab-map" class="btn btn-light active fw-semibold">
+                                <i class="bi bi-map-fill me-1"></i> Bản đồ
+                            </button>
+                            <button type="button" id="btn-tab-chart" class="btn btn-outline-light fw-semibold">
+                                <i class="bi bi-bar-chart-fill me-1"></i> Biểu đồ
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="card-body pt-2 pb-0">
+                        <!-- VÙNG 1: BẢN ĐỒ -->
+                        <div id="panel-map" style="height: 230px; width: 100%;">
+                            <div id="vn-map" style="height: 100%; width: 100%;"></div>
+                        </div>
+
+                        <!-- VÙNG 2: BIỂU ĐỒ (Mặc định ẩn) -->
+                        <div id="panel-chart" style="height: 230px; width: 100%; display: none;">
+                            <canvas id="vn-city-chart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="card-footer border-0 pt-2">
+                        <div class="row">
+                            <div class="col-4 text-center">
+                                <div class="position-relative" style="height: 45px">
+                                    <canvas id="sparkline-1"></canvas>
+                                </div>
+                                <div class="text-white small">Truy cập</div>
+                            </div>
+                            <div class="col-4 text-center">
+                                <div class="position-relative" style="height: 45px">
+                                    <canvas id="sparkline-2"></canvas>
+                                </div>
+                                <div class="text-white small">Trực tuyến</div>
+                            </div>
+                            <div class="col-4 text-center">
+                                <div class="position-relative" style="height: 45px">
+                                    <canvas id="sparkline-3"></canvas>
+                                </div>
+                                <div class="text-white small">Giao dịch</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsvectormap@1.5.3/dist/js/jsvectormap.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsvectormap@1.5.3/dist/maps/world.js" crossorigin="anonymous"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // 1. Biểu đồ đường doanh thu
+            const revenueCtx = document.getElementById('revenue-chart');
+            if (revenueCtx) {
+                new Chart(revenueCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ["Tháng 1", "Tháng 2", "Tháng 3", "Tháng 4", "Tháng 5", "Tháng 6", "Tháng 7"],
+                        datasets: [
+                            {
+                                label: 'Dự án hoàn thành',
+                                data: [28, 48, 40, 19, 86, 27, 90],
+                                borderColor: '#0d6efd',
+                                backgroundColor: 'rgba(13, 110, 253, 0.2)',
+                                fill: true,
+                                tension: 0.4
+                            },
+                            {
+                                label: 'Bài đăng mới',
+                                data: [65, 59, 80, 81, 56, 55, 40],
+                                borderColor: '#20c997',
+                                backgroundColor: 'rgba(32, 201, 151, 0.2)',
+                                fill: true,
+                                tension: 0.4
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: { y: { beginAtZero: true } }
+                    }
+                });
+            }
+
+            // 2. Bản đồ Việt Nam (loại bỏ series lỗi để tránh crash Console)
+            let mapInstance = null;
+            try {
+                if (document.getElementById('vn-map')) {
+                    mapInstance = new jsVectorMap({
+                        selector: '#vn-map',
+                        map: 'world',
+                        zoomButtons: true,
+                        zoomOnScroll: false,
+                        focusOn: {
+                            coords: [16.0, 107.0],
+                            scale: 17,
+                            animate: false
+                        },
+                        markers: [
+                            { name: 'Hà Nội (50%)', coords: [21.0285, 105.8542] },
+                            { name: 'Đà Nẵng (10%)', coords: [16.0544, 108.2022] },
+                            { name: 'TP. Hồ Chí Minh (35%)', coords: [10.8231, 106.6297] },
+                            { name: 'Cần Thơ (5%)', coords: [10.0452, 105.7469] }
+                        ],
+                        markerStyle: {
+                            initial: {
+                                fill: '#ffc107',
+                                stroke: '#ffffff',
+                                strokeWidth: 2,
+                                r: 5
+                            },
+                            hover: {
+                                fill: '#fd7e14',
+                                cursor: 'pointer'
+                            }
+                        },
+                        regionStyle: {
+                            initial: {
+                                fill: 'rgba(255, 255, 255, 0.3)',
+                                fillOpacity: 1
+                            },
+                            hover: {
+                                fillOpacity: 0.7
+                            }
+                        }
+                    });
+                }
+            } catch (err) {
+                console.error("Lỗi khởi tạo bản đồ:", err);
+            }
+
+            // 3. Khởi tạo Biểu đồ Tỉnh/Thành
+            let cityChartInstance = null;
+            function loadCityChart() {
+                if (cityChartInstance) {
+                    cityChartInstance.resize();
+                    return;
+                }
+                const cityCanvas = document.getElementById('vn-city-chart');
+                if (cityCanvas) {
+                    cityChartInstance = new Chart(cityCanvas, {
+                        type: 'bar',
+                        data: {
+                            labels: ['Hà Nội', 'TP. HCM', 'Đà Nẵng', 'Khác'],
+                            datasets: [{
+                                label: 'Tỷ lệ (%)',
+                                data: [50, 35, 10, 5],
+                                backgroundColor: ['#ffc107', '#0dcaf0', '#20c997', '#adb5bd'],
+                                borderRadius: 4,
+                                barThickness: 16
+                            }]
+                        },
+                        options: {
+                            indexAxis: 'y',
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { display: false },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function (ctx) { return ' ' + ctx.parsed.x + '% người dùng'; }
+                                    }
+                                }
+                            },
+                            scales: {
+                                x: {
+                                    beginAtZero: true,
+                                    max: 60,
+                                    ticks: { color: '#ffffff', callback: v => v + '%' },
+                                    grid: { color: 'rgba(255, 255, 255, 0.2)' }
+                                },
+                                y: {
+                                    ticks: { color: '#ffffff', font: { weight: 'bold' } },
+                                    grid: { display: false }
+                                }
+                            }
+                        }
+                    });
+                }
+            }
+
+            // 4. Cơ chế chuyển đổi 2 Tab
+            const btnMap = document.getElementById('btn-tab-map');
+            const btnChart = document.getElementById('btn-tab-chart');
+            const panelMap = document.getElementById('panel-map');
+            const panelChart = document.getElementById('panel-chart');
+
+            if (btnMap && btnChart) {
+                btnMap.addEventListener('click', function () {
+                    btnMap.className = 'btn btn-light active fw-semibold';
+                    btnChart.className = 'btn btn-outline-light fw-semibold';
+
+                    panelChart.style.display = 'none';
+                    panelMap.style.display = 'block';
+
+                    if (mapInstance && mapInstance.updateSize) {
+                        mapInstance.updateSize();
+                    }
+                });
+
+                btnChart.addEventListener('click', function () {
+                    btnChart.className = 'btn btn-light active fw-semibold';
+                    btnMap.className = 'btn btn-outline-light fw-semibold';
+
+                    panelMap.style.display = 'none';
+                    panelChart.style.display = 'block';
+
+                    loadCityChart();
+                });
+            }
+
+            // 5. Sparklines
+            const makeSparkline = (id, data) => {
+                const el = document.querySelector(id);
+                if (!el) return;
+                new Chart(el, {
+                    type: 'line',
+                    data: {
+                        labels: data.map((_, i) => i + 1),
+                        datasets: [{
+                            data,
+                            borderColor: '#DCE6EC',
+                            backgroundColor: 'rgba(220, 230, 236, 0.3)',
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        layout: { padding: { top: 2 } },
+                        plugins: { legend: { display: false } },
+                        scales: { x: { display: false }, y: { display: false } }
+                    }
+                });
+            };
+
+            makeSparkline('#sparkline-1', [1000, 1200, 920, 927, 931, 1027, 819, 930, 1021]);
+            makeSparkline('#sparkline-2', [515, 519, 520, 522, 652, 810, 370, 627, 319, 630, 921]);
+            makeSparkline('#sparkline-3', [15, 19, 20, 22, 33, 27, 31, 27, 19, 30, 21]);
+        });
+    </script>
+}
