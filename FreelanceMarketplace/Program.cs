@@ -13,7 +13,7 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IJobService, JobService>();
 builder.Services.AddScoped<IProposalService, ProposalService>();
 builder.Services.AddScoped<IJobSearchService, JobSearchService>();
-builder.Services.AddScoped<IUserProfileService, UserProfileService>();
+//builder.Services.AddScoped<IUserProfileService, UserProfileService>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ISignInService, SignInService>();
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
