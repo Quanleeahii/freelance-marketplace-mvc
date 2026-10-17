@@ -254,6 +254,10 @@ namespace FreelanceMarketplace.Migrations
                     b.Property<int>("JobId")
                         .HasColumnType("integer");
 
+                    b.Property<string>("PhoneNumber")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("text");

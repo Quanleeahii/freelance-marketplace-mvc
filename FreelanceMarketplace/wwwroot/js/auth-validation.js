@@ -6,23 +6,20 @@
     input.type = isPassword ? 'text' : 'password';
     btn.textContent = isPassword ? 'Ẩn' : 'Hiện';
 }
-
 document.addEventListener('DOMContentLoaded', () => {
     function showError(inputEl, errId, msg) {
         const errEl = document.getElementById(errId);
         if (errEl) errEl.textContent = msg || '';
         if (inputEl) inputEl.classList.add('is-invalid');
     }
-
     function clearError(inputEl, errId) {
         const errEl = document.getElementById(errId);
         if (errEl) errEl.textContent = '';
         if (inputEl) inputEl.classList.remove('is-invalid');
     }
 
-    // ==========================================
-    // 1. XỬ LÝ FORM ĐĂNG KÝ (Nếu đang ở trang Register)
-    // ==========================================
+    // Register
+    
     const registerForm = document.getElementById('registerForm');
     if (registerForm) {
         const fullName = document.getElementById('fullName');
@@ -31,6 +28,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const confirmPassword = document.getElementById('confirmPassword');
         const terms = document.getElementById('terms');
 
+        let lastCheckedEmail = '';
+        let lastEmailResult = { isValid: false, message: '' };
         function validateFullName() {
             const val = fullName.value.trim();
             if (!val) {
@@ -44,22 +43,47 @@ document.addEventListener('DOMContentLoaded', () => {
             clearError(fullName, 'fullNameErr');
             return true;
         }
-
-        function validateEmail() {
+        async function validateEmail() {
             const val = email.value.trim();
             if (!val) {
                 showError(email, 'emailErr', email.getAttribute('data-val-required'));
+                lastCheckedEmail = '';
                 return false;
             }
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!emailRegex.test(val)) {
                 showError(email, 'emailErr', email.getAttribute('data-val-email'));
+                lastCheckedEmail = '';
                 return false;
             }
+            if (val.toLowerCase() === lastCheckedEmail.toLowerCase()) {
+                if (!lastEmailResult.isValid) {
+                    showError(email, 'emailErr', lastEmailResult.message);
+                }
+                return lastEmailResult.isValid;
+            }
+            try {
+                const response = await fetch(`/api/auth/check-email?email=${encodeURIComponent(val)}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    lastCheckedEmail = val;
+                    lastEmailResult = {
+                        isValid: !data.isTaken,
+                        message: data.message || ''
+                    };
+                    if (data.isTaken) {
+                        showError(email, 'emailErr', data.message);
+                        return false;
+                    }
+                }
+            } catch (err) {
+                console.error('Lỗi khi kiểm tra email:', err);
+                return true;
+            }
+
             clearError(email, 'emailErr');
             return true;
         }
-
         function validatePassword() {
             const val = password.value;
             if (!val) {
@@ -73,7 +97,6 @@ document.addEventListener('DOMContentLoaded', () => {
             clearError(password, 'passwordErr');
             return true;
         }
-
         function validateConfirmPassword() {
             const val = confirmPassword.value;
             if (!val) {
@@ -87,22 +110,20 @@ document.addEventListener('DOMContentLoaded', () => {
             clearError(confirmPassword, 'confirmPasswordErr');
             return true;
         }
-
         function validateTerms() {
             if (!terms.checked) {
-                showError(terms, 'termsErr', terms.getAttribute('data-val-required') || 'Vui lòng đồng ý điều khoản.');
+                showError(terms, 'termsErr', terms.getAttribute('data-val-required') || 'Vui lòng đồng ý điều khoản');
                 return false;
             }
             clearError(terms, 'termsErr');
             return true;
         }
-
         fullName.addEventListener('blur', validateFullName);
         fullName.addEventListener('input', () => { if (fullName.value.trim()) clearError(fullName, 'fullNameErr'); });
-
         email.addEventListener('blur', validateEmail);
-        email.addEventListener('input', () => { if (email.value.trim()) clearError(email, 'emailErr'); });
-
+        email.addEventListener('input', () => {
+            clearError(email, 'emailErr');
+        });
         password.addEventListener('blur', validatePassword);
         password.addEventListener('input', () => {
             if (password.value) clearError(password, 'passwordErr');
@@ -113,30 +134,28 @@ document.addEventListener('DOMContentLoaded', () => {
         confirmPassword.addEventListener('input', () => {
             if (confirmPassword.value === password.value) clearError(confirmPassword, 'confirmPasswordErr');
         });
-
         terms.addEventListener('change', validateTerms);
+        registerForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
 
-        registerForm.addEventListener('submit', (e) => {
             const isNameOk = validateFullName();
-            const isEmailOk = validateEmail();
+            const isEmailOk = await validateEmail();
             const isPassOk = validatePassword();
             const isConfirmOk = validateConfirmPassword();
             const isTermsOk = validateTerms();
 
-            if (!isNameOk || !isEmailOk || !isPassOk || !isConfirmOk || !isTermsOk) {
-                e.preventDefault();
+            if (isNameOk && isEmailOk && isPassOk && isConfirmOk && isTermsOk) {
+                registerForm.submit();
             }
         });
     }
 
-    // ==========================================
-    // 2. XỬ LÝ FORM ĐĂNG NHẬP (Nếu đang ở trang Login)
-    // ==========================================
+    // Login
+
     const loginForm = document.getElementById('loginForm');
     if (loginForm) {
         const loginEmail = document.getElementById('loginEmail');
         const loginPassword = document.getElementById('loginPassword');
-
         function validateLoginEmail() {
             const val = loginEmail.value.trim();
             if (!val) {
@@ -151,7 +170,6 @@ document.addEventListener('DOMContentLoaded', () => {
             clearError(loginEmail, 'loginEmailErr');
             return true;
         }
-
         function validateLoginPassword() {
             const val = loginPassword.value;
             if (!val) {
@@ -161,17 +179,13 @@ document.addEventListener('DOMContentLoaded', () => {
             clearError(loginPassword, 'loginPasswordErr');
             return true;
         }
-
         loginEmail.addEventListener('blur', validateLoginEmail);
         loginEmail.addEventListener('input', () => { if (loginEmail.value.trim()) clearError(loginEmail, 'loginEmailErr'); });
-
         loginPassword.addEventListener('blur', validateLoginPassword);
         loginPassword.addEventListener('input', () => { if (loginPassword.value) clearError(loginPassword, 'loginPasswordErr'); });
-
         loginForm.addEventListener('submit', (e) => {
             const isEmailOk = validateLoginEmail();
             const isPassOk = validateLoginPassword();
-
             if (!isEmailOk || !isPassOk) {
                 e.preventDefault();
             }
