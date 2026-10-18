@@ -1,101 +1,129 @@
-﻿//using System.Security.Claims;
-//using FreelanceMarketplace.Services;
-//using FreelanceMarketplace.ViewModels;
-//using Microsoft.AspNetCore.Authorization;
-//using Microsoft.AspNetCore.Mvc;
+﻿using System.Security.Claims;
+using FreelanceMarketplace.Services;
+using FreelanceMarketplace.ViewModels;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
-//namespace FreelanceMarketplace.Controllers.Api
-//{
-//    [Route("api/user/profile")]
-//    [ApiController]
-//    public class UserProfileApiController : ControllerBase
-//    {
-//        private readonly IUserProfileService _profileService;
+namespace FreelanceMarketplace.Controllers.Api;
 
-//        public UserProfileApiController(IUserProfileService profileService)
-//        {
-//            _profileService = profileService;
-//        }
+[ApiController]
+[Route("api/user-profile")]
+[Authorize]
+public class UserProfileApiController : ControllerBase
+{
+    private readonly IUserProfileService _userProfileService;
+    private readonly ISignInService _signInService;
 
-//        private int? GetCurrentUserId()
-//        {
-//            var idClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
-//                          ?? User.FindFirst("id")?.Value;
+    public UserProfileApiController(IUserProfileService userProfileService, ISignInService signInService)
+    {
+        _userProfileService = userProfileService;
+        _signInService = signInService;
+    }
 
-//            if (int.TryParse(idClaim, out int userId))
-//            {
-//                return userId;
-//            }
-//            return null;
-//        }
+    private bool TryGetCurrentUserId(out int userId)
+    {
+        userId = 0;
+        var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier)
+                        ?? HttpContext.Session.GetString("UserId");
 
-//        // 1. GET: Lấy thông tin hồ sơ theo UserId
-//        // GET: https://localhost:7098/api/user/profile/{userId}
-//        [HttpGet("{userId:int}")]
-//        public async Task<IActionResult> GetProfile(int userId)
-//        {
-//            var profile = await _profileService.GetProfileAsync(userId);
-//            if (profile == null)
-//            {
-//                return NotFound(new { success = false, message = $"Không tìm thấy hồ sơ cho User ID = {userId}" });
-//            }
+        return int.TryParse(userIdStr, out userId) && userId > 0;
+    }
 
-//            return Ok(new { success = true, data = profile });
-//        }
+    [HttpPut("basic")]
+    public async Task<IActionResult> UpdateBasicInfo([FromBody] UpdateBasicInfoRequest request)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
 
-//        // 2. GET: Lấy thông tin hồ sơ của chính user đang đăng nhập (dùng Cookie)
-//        // GET: https://localhost:7098/api/user/profile/me
-//        [HttpGet("me")]
-//        public async Task<IActionResult> GetMyProfile()
-//        {
-//            var userId = GetCurrentUserId();
-//            if (userId == null)
-//            {
-//                return Unauthorized(new { success = false, message = "Chưa đăng nhập hoặc phiên đăng nhập hết hạn." });
-//            }
+        if (!TryGetCurrentUserId(out int userId))
+        {
+            return Unauthorized();
+        }
 
-//            var profile = await _profileService.GetProfileAsync(userId.Value);
-//            if (profile == null)
-//            {
-//                return NotFound(new { success = false, message = "Không tìm thấy hồ sơ người dùng." });
-//            }
+        try
+        {
+            await _userProfileService.UpdateBasicInfoAsync(userId, request);
+            await _signInService.RefreshSignInAsync(userId);
+            return NoContent();
+        }
+        catch (KeyNotFoundException)
+        {
+            return NotFound();
+        }
+    }
 
-//            return Ok(new { success = true, data = profile });
-//        }
+    [HttpPut("avatar")]
+    [Consumes("multipart/form-data")]
+    public async Task<IActionResult> UpdateAvatar(IFormFile file)
+    {
+        if (!TryGetCurrentUserId(out int userId))
+        {
+            return Unauthorized();
+        }
 
-//        // 3. PUT/POST: Cập nhật thông tin cá nhân (hỗ trợ multipart/form-data upload file)
-//        // POST: https://localhost:7098/api/user/profile/update/{userId}
-//        [HttpPost("update/{userId:int}")]
-//        [Consumes("multipart/form-data")]
-//        public async Task<IActionResult> UpdateProfile(int userId, [FromForm] UpdateBasicInfoRequest request)
-//        {
-//            if (!ModelState.IsValid)
-//            {
-//                return BadRequest(ModelState);
-//            }
+        try
+        {
+            var avatarUrl = await _userProfileService.UpdateAvatarAsync(userId, file);
+            await _signInService.RefreshSignInAsync(userId);
+            return Ok(new { avatarUrl });
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (KeyNotFoundException)
+        {
+            return NotFound();
+        }
+    }
 
-//            try
-//            {
-//                await _profileService.UpdateBasicInfoAsync(userId, request);
-//                return Ok(new { success = true, message = "Cập nhật thông tin cá nhân thành công!" });
-//            }
-//            catch (KeyNotFoundException ex)
-//            {
-//                return NotFound(new { success = false, message = ex.Message });
-//            }
-//            catch (InvalidOperationException ex)
-//            {
-//                return BadRequest(new { success = false, message = ex.Message });
-//            }
-//            catch (Exception ex)
-//            {
-//                return StatusCode(StatusCodes.Status500InternalServerError, new
-//                {
-//                    success = false,
-//                    message = "Đã xảy ra lỗi máy chủ nội bộ.",
-//                    detail = ex.Message
-//                });
-//            }
-//        }
-//    }
-//}
+    [HttpPut("freelancer")]
+    public async Task<IActionResult> UpdateFreelancerProfile([FromBody] UpdateFreelancerProfileRequest request)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        if (!TryGetCurrentUserId(out int userId))
+        {
+            return Unauthorized();
+        }
+
+        try
+        {
+            await _userProfileService.UpdateFreelancerProfileAsync(userId, request);
+            return NoContent();
+        }
+        catch (KeyNotFoundException)
+        {
+            return NotFound();
+        }
+    }
+
+    [HttpPut("client")]
+    public async Task<IActionResult> UpdateClientProfile([FromBody] UpdateClientProfileRequest request)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        if (!TryGetCurrentUserId(out int userId))
+        {
+            return Unauthorized();
+        }
+
+        try
+        {
+            await _userProfileService.UpdateClientProfileAsync(userId, request);
+            return NoContent();
+        }
+        catch (KeyNotFoundException)
+        {
+            return NotFound();
+        }
+    }
+}

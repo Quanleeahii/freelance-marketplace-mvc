@@ -29,7 +29,7 @@ public class JobService : IJobService
             clientProfile = new ClientProfile
             {
                 UserId = userId,
-                DisplayName = userProfile?.FullName,
+                DisplayName = null,
                 CreatedAt = DateTime.UtcNow
             };
 

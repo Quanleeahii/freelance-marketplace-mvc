@@ -1,52 +1,36 @@
-﻿@model FreelanceMarketplace.Models.UserProfile
-@{
-    var defaultAvatar = "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=300&q=80";
-    var currentAvatar = !string.IsNullOrEmpty(Model?.AvatarUrl) ? Model.AvatarUrl : defaultAvatar;
-}
+﻿@model FreelanceMarketplace.ViewModels.UserProfileViewModel
+@using FreelanceMarketplace.ViewModels
 
-<form asp-controller="Profile" asp-action="UpdateProfile" method="post" enctype="multipart/form-data" id="profileForm">
-    @Html.AntiForgeryToken()
-    <!-- Các trường ẩn ràng buộc trực tiếp tới Model -->
-    <input type="hidden" asp-for="Id" />
-    <input type="hidden" asp-for="UserId" />
-    <input type="hidden" asp-for="CreatedAt" />
-    <input type="hidden" asp-for="UpdatedAt" />
+<div class="section-header">
+    <span class="badge-step">1</span>
+    <h6 class="section-title">THÔNG TIN CÁ NHÂN CƠ BẢN</h6>
+</div>
 
-    <!-- ========================================== -->
-    <!-- BƯỚC 1: THÔNG TIN CHUNG                     -->
-    <!-- ========================================== -->
-    <div class="section-header">
-        <span class="badge-step">1</span>
-        <h6 class="section-title">THÔNG TIN CHUNG &amp; HỒ SƠ</h6>
-    </div>
-
-    <!-- Avatar & Upload ảnh -->
+<form id="form-user-profile" novalidate>
+    <!-- Ảnh đại diện -->
     <div class="row mb-4 align-items-center">
-        <label class="col-md-3 col-form-label text-md-end form-label-custom">
-            Ảnh đại diện <span class="text-danger">*</span>
-        </label>
-        <div class="col-md-9">
-            <div class="d-flex flex-wrap align-items-center gap-3">
-                <div class="avatar-preview-wrapper">
-                    <img src="@currentAvatar" alt="Avatar Preview" id="avatarPreview" class="avatar-preview-img" />
+        <label class="col-sm-3 form-label-custom">Ảnh đại diện</label>
+        <div class="col-sm-9">
+            <div class="d-flex align-items-center gap-3">
+                <div class="avatar-preview-wrapper position-relative" style="border: none !important;">
+                    <img id="avatar-preview" 
+                         src="@(string.IsNullOrEmpty(Model?.AvatarUrl) 
+                                ? $"https://ui-avatars.com/api/?name={Uri.EscapeDataString(string.IsNullOrWhiteSpace(Model?.FullName) ? "User" : Model.FullName)}&background=0f172a&color=fff&size=128" 
+                                : Model.AvatarUrl)" 
+                         alt="Avatar" 
+                         class="avatar-preview-img" 
+                         style="border: none !important; box-shadow: none !important;" />
+                    <span id="avatar-spinner" class="spinner-border spinner-border-sm text-success position-absolute top-50 start-50 translate-middle d-none"></span>
                 </div>
-                <div class="avatar-upload-actions flex-grow-1">
-                    <div class="d-flex flex-wrap gap-2">
-                        <label class="btn btn-outline-brand btn-sm avatar-custom-btn mb-0" id="btnChooseAvatar">
-                            <i class="bi bi-upload me-1"></i> Chọn ảnh từ máy tính
-                            <input type="file" name="avatarFile" id="avatarFileInput" accept="image/png, image/jpeg, image/gif, image/webp" />
-                        </label>
-                        <button type="button" class="btn btn-outline-secondary btn-sm" id="btnResetAvatar">
-                            <i class="bi bi-arrow-counterclockwise me-1"></i> Khôi phục ảnh gốc
-                        </button>
-                    </div>
-                    <div class="input-group input-group-sm mt-2">
-                        <span class="input-group-text"><i class="bi bi-link-45deg"></i> Link ảnh</span>
-                        <input asp-for="AvatarUrl" class="form-control" id="avatarUrlInput" placeholder="Hoặc dán link URL ảnh trực tiếp..." />
-                    </div>
-                    <div class="form-text text-muted small mt-1">
-                        <i class="bi bi-info-circle me-1"></i> Định dạng: JPG, PNG, GIF, WebP. Kích thước tối đa: 2MB.
-                    </div>
+                
+                <div>
+                    <label class="btn btn-sm btn-outline-brand avatar-custom-btn mb-1">
+                        Đổi ảnh mới
+                        <input type="file" id="avatar-file-input" accept="image/png, image/jpeg, image/jpg, image/webp" />
+                    </label>
+                    <small class="text-muted d-block" style="font-size: 0.78rem;">Định dạng: JPG, JPEG, PNG, WEBP (Tối đa 1MB)</small>
+                    <span class="field-error-msg text-danger small d-block" data-valmsg-for="AvatarUrl"></span>
+                    <input type="hidden" id="AvatarUrl" name="AvatarUrl" value="@Model?.AvatarUrl" />
                 </div>
             </div>
         </div>
@@ -54,125 +38,73 @@
 
     <!-- Họ và tên -->
     <div class="row mb-3">
-        <label asp-for="FullName" class="col-md-3 col-form-label text-md-end form-label-custom">
-            Họ và tên <span class="text-danger">*</span>
-        </label>
-        <div class="col-md-8">
-            <div class="input-group">
-                <span class="input-group-text input-group-text-custom"><i class="bi bi-person"></i></span>
-                <input asp-for="FullName" class="form-control form-control-custom" placeholder="Nhập đầy đủ họ và tên..." />
-            </div>
-            <span asp-validation-for="FullName" class="text-danger small"></span>
+        <label for="FullName" class="col-sm-3 form-label-custom">Họ và tên <span class="text-danger">*</span></label>
+        <div class="col-sm-9">
+            <input type="text" id="FullName" name="FullName" class="form-control form-control-custom" 
+                   value="@Model?.FullName" placeholder="Họ và tên" maxlength="100" />
+            <span class="field-error-msg text-danger small d-block mt-1" data-valmsg-for="FullName"></span>
         </div>
     </div>
 
-    <!-- Email tài khoản -->
+    <!-- Email (Readonly) -->
     <div class="row mb-3">
-        <label class="col-md-3 col-form-label text-md-end form-label-custom">
-            Email tài khoản <span class="text-danger">*</span>
-        </label>
-        <div class="col-md-8">
-            <div class="input-group">
-                <span class="input-group-text input-group-text-custom"><i class="bi bi-envelope"></i></span>
-                <input type="email" class="form-control form-control-custom bg-light" value="@(Model?.User?.Email ?? User.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.Email)?.Value ?? "")" readonly />
-                <span class="input-group-text bg-light border-start-0">
-                    <span class="badge-verified"><i class="bi bi-patch-check-fill"></i> Đã xác thực</span>
-                </span>
-            </div>
-            <div class="form-text text-muted small">Email đăng nhập cố định để đảm bảo tính an toàn cho tài khoản.</div>
+        <label for="Email" class="col-sm-3 form-label-custom">Email đăng ký</label>
+        <div class="col-sm-9">
+            <input type="email" id="Email" name="Email" class="form-control form-control-custom bg-light text-muted" 
+                   value="@Model?.Email" readonly tabindex="-1" />
+            <small class="text-muted" style="font-size: 0.78rem;">Email dùng để xác thực hệ thống và không thể thay đổi tại đây.</small>
         </div>
     </div>
 
-    <!-- Số điện thoại -->
+    <!-- Điện thoại -->
     <div class="row mb-3">
-        <label asp-for="Phone" class="col-md-3 col-form-label text-md-end form-label-custom">
-            Điện thoại <span class="text-danger">*</span>
-        </label>
-        <div class="col-md-8">
-            <div class="input-group">
-                <span class="input-group-text input-group-text-custom"><i class="bi bi-telephone"></i></span>
-                <input asp-for="Phone" class="form-control form-control-custom" placeholder="Ví dụ: 0912345678" />
-            </div>
-            <span asp-validation-for="Phone" class="text-danger small"></span>
+        <label for="Phone" class="col-sm-3 form-label-custom">Điện thoại</label>
+        <div class="col-sm-9">
+            <input type="tel" id="Phone" name="Phone" class="form-control form-control-custom" 
+                   value="@Model?.Phone" placeholder="Số điện thoại" />
+            <span class="field-error-msg text-danger small d-block mt-1" data-valmsg-for="Phone"></span>
         </div>
     </div>
 
-    <!-- Thành phố -->
+    <!-- Tỉnh / Thành phố: Custom Dropdown Menu -->
     <div class="row mb-3">
-        <label asp-for="City" class="col-md-3 col-form-label text-md-end form-label-custom">
-            Thành phố <span class="text-danger">*</span>
-        </label>
-        <div class="col-md-8">
-            <div class="input-group">
-                <span class="input-group-text input-group-text-custom"><i class="bi bi-geo-alt"></i></span>
-                <select asp-for="City" class="form-select form-select-custom">
-                    <option value="">-- Chọn Tỉnh / Thành phố --</option>
-                    <option value="Hà Nội">Hà Nội</option>
-                    <option value="TP. Hồ Chí Minh">TP. Hồ Chí Minh</option>
-                    <option value="Đà Nẵng">Đà Nẵng</option>
-                    <option value="Hải Phòng">Hải Phòng</option>
-                    <option value="Cần Thơ">Cần Thơ</option>
-                    <option value="Bình Dương">Bình Dương</option>
-                    <option value="Đồng Nai">Đồng Nai</option>
-                    <option value="Khánh Hòa">Khánh Hòa</option>
-                    <option value="Quảng Ninh">Quảng Ninh</option>
-                    <option value="Huế">Thừa Thiên Huế</option>
-                </select>
+        <label for="locationCityInput" class="col-sm-3 form-label-custom">Tỉnh / Thành phố</label>
+        <div class="col-sm-9 position-relative">
+            <input type="text" id="locationCityInput" class="form-control form-control-custom" 
+                   value="@Model?.City" placeholder="Thành phố" autocomplete="off" />
+
+            <div id="locationCityMenu" class="custom-dropdown-list shadow-sm" style="display: none;">
+                @foreach (var city in VietnameseProvinces.List.Where(p => p != "Toàn quốc"))
+                {
+                    <div class="dropdown-item-vlance" data-id="@city">@city</div>
+                }
             </div>
-            <span asp-validation-for="City" class="text-danger small"></span>
+
+            <input type="hidden" id="City" name="City" value="@Model?.City" />
+            <span class="field-error-msg text-danger small d-block mt-1" data-valmsg-for="City"></span>
         </div>
     </div>
 
     <!-- Địa chỉ chi tiết -->
-    <div class="row mb-3">
-        <label asp-for="Address" class="col-md-3 col-form-label text-md-end form-label-custom">
-            Địa chỉ chi tiết <span class="text-danger">*</span>
-        </label>
-        <div class="col-md-8">
-            <div class="input-group">
-                <span class="input-group-text input-group-text-custom"><i class="bi bi-house-door"></i></span>
-                <input asp-for="Address" class="form-control form-control-custom" placeholder="Số nhà, tên đường, phường/xã..." />
-            </div>
-            <span asp-validation-for="Address" class="text-danger small"></span>
+    <div class="row mb-4">
+        <label for="Address" class="col-sm-3 form-label-custom">Địa chỉ</label>
+        <div class="col-sm-9">
+            <input type="text" id="Address" name="Address" class="form-control form-control-custom" 
+                   value="@Model?.Address" placeholder="Số nhà, đường phố, phường/xã" maxlength="255" />
+            <span class="field-error-msg text-danger small d-block mt-1" data-valmsg-for="Address"></span>
         </div>
     </div>
 
-    <!-- ========================================== -->
-    <!-- BƯỚC 2: BẢO MẬT TÀI KHOẢN                  -->
-    <!-- ========================================== -->
-    <div class="section-header mt-4">
-        <span class="badge-step">2</span>
-        <h6 class="section-title">BẢO MẬT TÀI KHOẢN</h6>
-    </div>
-
-    <div class="profile-subcard">
-        <div class="row mb-3">
-            <label class="col-md-3 col-form-label text-md-end form-label-custom">Thay đổi mật khẩu</label>
-            <div class="col-md-8">
-                <div class="mb-2">
-                    <input type="password" name="newPassword" class="form-control form-control-custom" placeholder="Nhập mật khẩu mới (để trống nếu không đổi)" />
-                </div>
-                <div>
-                    <input type="password" name="confirmPassword" class="form-control form-control-custom" placeholder="Nhập lại mật khẩu mới" />
-                </div>
-                <div class="form-text text-muted small mt-1">
-                    Mật khẩu nên chứa tối thiểu 8 ký tự, bao gồm chữ hoa, chữ thường và chữ số.
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- ========================================== -->
-    <!-- NÚT BẤM HÀNH ĐỘNG                          -->
-    <!-- ========================================== -->
-    <div class="row pt-4 border-top mt-4">
-        <div class="col-md-8 offset-md-3 d-flex flex-wrap gap-2">
-            <button type="submit" class="btn btn-brand-primary" id="btnSubmitProfile">
-                <i class="bi bi-check2-circle fs-5"></i> Lưu các thay đổi
+    <!-- Nút Submit -->
+    <div class="row">
+        <div class="col-sm-9 offset-sm-3 d-flex align-items-center gap-3">
+            <button type="submit" id="btn-submit-profile" class="btn-brand-primary">
+                <span id="btn-spinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                <span>Lưu thông tin cá nhân</span>
             </button>
-            <button type="button" class="btn btn-brand-secondary" id="btnCancel">
-                <i class="bi bi-x-circle me-1"></i> Hủy bỏ
-            </button>
+            <span id="save-success-msg" class="text-success fw-semibold small d-none">
+                Đã lưu thay đổi thành công!
+            </span>
         </div>
     </div>
 </form>

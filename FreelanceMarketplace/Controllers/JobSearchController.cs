@@ -18,7 +18,7 @@ public class JobSearchController : Controller
         _jobService = jobService;
     }
 
-    [HttpGet]
+    [HttpGet("", Name = "JobList")]
     public async Task<IActionResult> Index([FromQuery] JobFilterRequest request)
     {
         var result = await _jobSearchService.GetJobsAsync(request);
@@ -27,7 +27,7 @@ public class JobSearchController : Controller
         return View("~/Views/Job/SearchJob.cshtml", result);
     }
 
-    [HttpGet("{id:int}")]
+    [HttpGet("{id:int}", Name = "JobDetails")]
     public async Task<IActionResult> Details(int id)
     {
         var job = await _jobSearchService.GetJobByIdAsync(id);

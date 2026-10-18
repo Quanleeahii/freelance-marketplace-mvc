@@ -15,13 +15,18 @@ public class AccountController : Controller
         _signInService = signInService;
     }
 
-    [HttpGet]
+    [HttpGet("/register", Name = "Register")]
+    [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
     public IActionResult Register()
     {
+        if (User.Identity != null && User.Identity.IsAuthenticated)
+        {
+            return RedirectToAction("Index", "Home");
+        }
         return View();
     }
 
-    [HttpPost]
+    [HttpPost("/register")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Register(RegisterViewModel model)
     {
@@ -49,17 +54,26 @@ public class AccountController : Controller
             return RedirectToAction("Index", "Home");
         }
 
-        return RedirectToAction("Login", "Account");
+        return RedirectToRoute("Login");
     }
 
-    [HttpGet]
+    [HttpGet("/login", Name = "Login")]
+    [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
     public IActionResult Login(string? returnUrl = null)
     {
+        if (User.Identity != null && User.Identity.IsAuthenticated)
+        {
+            if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+            {
+                return Redirect(returnUrl);
+            }
+            return RedirectToAction("Index", "Home");
+        }
         ViewData["ReturnUrl"] = returnUrl;
         return View();
     }
 
-    [HttpPost]
+    [HttpPost("/login")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Login(LoginViewModel model, string? returnUrl = null)
     {
@@ -85,7 +99,7 @@ public class AccountController : Controller
         return RedirectToAction("Index", "Home");
     }
 
-    [HttpPost]
+    [HttpPost("/logout", Name = "Logout")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Logout()
     {

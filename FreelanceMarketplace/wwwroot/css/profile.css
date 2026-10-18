@@ -1,12 +1,14 @@
-/* Tông màu thương hiệu chính */
 :root {
-    --brand-primary: #059669; /* Xanh ngọc chính */
-    --brand-primary-hover: #047857; /* Xanh đậm khi hover */
-    --brand-light: #ecfdf5; /* Nền xanh nhạt */
-    --brand-border: #a7f3d0; /* Viền xanh nhạt */
+    --primary-color: #0f172a;
+    --primary-hover: #334155;
+    --primary-light: #f1f5f9;
+    --primary-border: #cbd5e1;
+    --brand-primary: #0f172a;
+    --brand-primary-hover: #334155;
+    --brand-light: #f1f5f9;
+    --brand-border: #cbd5e1;
 }
 
-/* Khung layout */
 .profile-container {
     background-color: #ffffff;
     border-radius: 12px;
@@ -96,7 +98,6 @@
         color: #9ca3af;
     }
 
-/* Sidebar navigation */
 .profile-sidebar {
     border-radius: 12px;
     overflow: hidden;
@@ -135,7 +136,6 @@
         font-weight: 600;
     }
 
-/* Nav Pills Tabs ngang */
 .profile-nav-pills .nav-link {
     color: #4b5563;
     font-weight: 600;
@@ -154,7 +154,6 @@
         color: #ffffff !important;
     }
 
-/* Step Header */
 .section-header {
     display: flex;
     align-items: center;
@@ -184,7 +183,6 @@
     font-size: 0.95rem;
 }
 
-/* Avatar Preview */
 .avatar-preview-wrapper {
     width: 82px;
     height: 82px;
@@ -215,7 +213,6 @@
         cursor: pointer;
     }
 
-/* Form Controls */
 .form-label-custom {
     font-weight: 600;
     font-size: 0.9rem;
@@ -226,11 +223,15 @@
     border-radius: 8px;
     border: 1px solid #d1d5db;
     padding: 9px 12px;
+    outline: none !important;
+    box-shadow: none !important;
+    transition: border-color 0.15s ease;
 }
 
     .form-control-custom:focus, .form-select-custom:focus {
-        border-color: var(--brand-primary);
-        box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.15);
+        outline: none !important;
+        border-color: #0f172a !important;
+        box-shadow: none !important;
     }
 
 .input-group-text-custom {
@@ -246,7 +247,6 @@
     font-weight: 600;
 }
 
-/* Buttons */
 .btn-brand-primary {
     background-color: var(--brand-primary);
     color: #ffffff;
@@ -257,6 +257,7 @@
     display: inline-flex;
     align-items: center;
     gap: 8px;
+    transition: background-color 0.2s ease;
 }
 
     .btn-brand-primary:hover {
@@ -271,6 +272,7 @@
     padding: 9px 22px;
     border-radius: 8px;
     border: none;
+    transition: background-color 0.2s ease;
 }
 
     .btn-brand-secondary:hover {
@@ -280,6 +282,8 @@
 .btn-outline-brand {
     border: 1px solid var(--brand-primary);
     color: var(--brand-primary);
+    background-color: transparent;
+    transition: all 0.2s ease;
 }
 
     .btn-outline-brand:hover {
@@ -302,4 +306,44 @@
     padding: 5px 12px;
     border-radius: 20px;
     font-weight: 500;
+}
+
+.custom-dropdown-list {
+    position: absolute;
+    top: 100%;
+    left: 12px;
+    right: 12px;
+    max-height: 220px;
+    overflow-y: auto;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    z-index: 1050;
+    margin-top: 4px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.dropdown-item-vlance {
+    padding: 10px 14px;
+    font-size: 14px;
+    color: #333333;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+    .dropdown-item-vlance:hover {
+        background-color: #f1f5f9;
+        color: var(--brand-primary);
+        font-weight: 600;
+    }
+
+.form-check-input:checked {
+    background-color: #0f172a !important;
+    border-color: #0f172a !important;
+}
+
+.form-check-input:focus {
+    border-color: #0f172a !important;
+    outline: none !important;
+    box-shadow: none !important;
 }

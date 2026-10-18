@@ -50,10 +50,22 @@ public class LocalFileStorageService : IFileStorageService
         if (string.IsNullOrWhiteSpace(relativeFilePath))
             return;
 
+        if (relativeFilePath.StartsWith("http://", StringComparison.OrdinalIgnoreCase) ||
+            relativeFilePath.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+        {
+            return;
+        }
+
         try
         {
             var cleanPath = relativeFilePath.TrimStart('/', '\\').Replace('/', Path.DirectorySeparatorChar);
-            var physicalPath = Path.Combine(_env.WebRootPath, cleanPath);
+            var physicalPath = Path.GetFullPath(Path.Combine(_env.WebRootPath, cleanPath));
+
+            var uploadsFolder = Path.GetFullPath(Path.Combine(_env.WebRootPath, "uploads"));
+            if (!physicalPath.StartsWith(uploadsFolder, StringComparison.OrdinalIgnoreCase))
+            {
+                return;
+            }
 
             if (File.Exists(physicalPath))
             {

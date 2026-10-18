@@ -9,6 +9,7 @@
         public string? City { get; set; }
         public string? Address { get; set; }
         public string? AvatarUrl { get; set; }
+        public bool IsVerified { get; set; }
         public DateTime? UpdatedAt { get; set; }
     }
 }
