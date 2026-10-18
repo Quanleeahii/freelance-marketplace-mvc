@@ -104,12 +104,11 @@ public class JobSearchService : IJobSearchService
             ClientProfile = new ClientBriefDto
             {
                 Id = j.ClientProfileId,
-                // Fallback nghiệp vụ rõ ràng: DisplayName -> FullName -> "Khách hàng"
                 DisplayName = !string.IsNullOrWhiteSpace(j.ClientProfile.DisplayName)
-                    ? j.ClientProfile.DisplayName
-                    : (!string.IsNullOrWhiteSpace(j.ClientProfile.User.UserProfile.FullName)
-                        ? j.ClientProfile.User.UserProfile.FullName
-                        : "Khách hàng")
+        ? j.ClientProfile.DisplayName
+        : (j.ClientProfile.User.UserProfile != null && !string.IsNullOrWhiteSpace(j.ClientProfile.User.UserProfile.FullName)
+            ? j.ClientProfile.User.UserProfile.FullName
+            : "Khách hàng")
             }
         })
         .ToListAsync();
