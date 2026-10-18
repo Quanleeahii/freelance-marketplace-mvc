@@ -1,6 +1,7 @@
-using FreelanceMarketplace.Models;
-using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
+using FreelanceMarketplace.Models;
+using FreelanceMarketplace.ViewModels;
+using Microsoft.AspNetCore.Mvc;
 
 namespace FreelanceMarketplace.Controllers
 {
@@ -15,7 +16,11 @@ namespace FreelanceMarketplace.Controllers
 
         public IActionResult Index()
         {
-            return View();
+            // Khởi tạo ViewModel cho trang chủ
+            var viewModel = new HomeIndexViewModel();
+
+
+            return View(viewModel);
         }
 
         public IActionResult Privacy()
