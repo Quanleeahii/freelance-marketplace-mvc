@@ -4,108 +4,116 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - FreelanceMarketplace</title>
+
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <!-- Thêm Bootstrap Icons để hiển thị toàn bộ icon tìm kiếm, ngôi sao, tick xanh -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/FreelanceMarketplace.styles.css" asp-append-version="true" />
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Khai báo để trang con có thể nhúng CSS riêng khi cần -->
+    @await RenderSectionAsync("Styles", required: false)
 </head>
 <body>
     <header>
-            <nav class="navbar navbar-expand-sm navbar-light bg-white border-bottom py-2">
-                <div class="container-fluid px-4">
-                    <a class="navbar-brand fw-semibold text-dark fs-5" asp-area="" asp-controller="Home" asp-action="Index">
-                        FreelanceMarketplace
-                    </a>
+        <nav class="navbar navbar-expand-sm navbar-light bg-white border-bottom py-2">
+            <div class="container-fluid px-4">
+                <a class="navbar-brand fw-semibold text-dark fs-5" asp-area="" asp-controller="Home" asp-action="Index">
+                    FreelanceMarketplace
+                </a>
 
-                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse"
-                            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                        <span class="navbar-toggler-icon"></span>
-                    </button>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse"
+                        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
 
-                    <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between align-items-center">
-                        <ul class="navbar-nav mx-auto mb-2 mb-sm-0">
-                            <li class="nav-item">
-                                <a class="nav-link custom-nav-link" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link custom-nav-link" asp-area="" asp-controller="Job" asp-action="Index">Dự án</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link custom-nav-link" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                            </li>
-                        </ul>
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between align-items-center">
+                    <ul class="navbar-nav mx-auto mb-2 mb-sm-0">
+                        <li class="nav-item">
+                            <a class="nav-link custom-nav-link" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link custom-nav-link" asp-area="" asp-controller="Job" asp-action="Index">Dự án</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link custom-nav-link" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                        </li>
+                    </ul>
 
-                        <div class="d-flex align-items-center gap-3">
-                            @if (User.Identity != null && User.Identity.IsAuthenticated)
-                            {
-                                <!-- Đã đăng nhập: nút Đăng dự án + Dropdown avatar (Ảnh 2) -->
-                                <a class="btn btn-post-job" asp-area="" asp-controller="Job" asp-action="CreateJob">
-                                    Đăng dự án
-                                </a>
+                    <div class="d-flex align-items-center gap-3">
+                        @if (User.Identity != null && User.Identity.IsAuthenticated)
+                        {
+                            <!-- Đã đăng nhập -->
+                            <a class="btn btn-post-job" asp-area="" asp-controller="Job" asp-action="CreateJob">
+                                Đăng dự án
+                            </a>
 
-                                <div class="dropdown">
-                                    <button class="user-dropdown-btn dropdown-toggle" type="button" id="userMenuDropdown"
-                                            data-bs-toggle="dropdown" aria-expanded="false">
-                                        <img src="https://ui-avatars.com/api/?name=@(User.Identity.Name)&background=0D8ABC&color=fff&rounded=true"
-                                             alt="Avatar" class="user-avatar" />
-                                        <div class="user-info d-none d-md-block">
-                                            <span class="user-name">@(User.Identity.Name ?? "Jane Pearson")</span>
-                                            <span class="user-role">@(User.IsInRole("Admin") ? "Administrator" : "Thành viên")</span>
-                                        </div>
-                                    </button>
+                            <div class="dropdown">
+                                <button class="user-dropdown-btn dropdown-toggle" type="button" id="userMenuDropdown"
+                                        data-bs-toggle="dropdown" aria-expanded="false">
+                                    <img src="https://ui-avatars.com/api/?name=@(User.Identity.Name)&background=0D8ABC&color=fff&rounded=true"
+                                         alt="Avatar" class="user-avatar" />
+                                    <div class="user-info d-none d-md-block">
+                                        <span class="user-name">@(User.Identity.Name ?? "Jane Pearson")</span>
+                                        <span class="user-role">@(User.IsInRole("Admin") ? "Administrator" : "Thành viên")</span>
+                                    </div>
+                                </button>
 
-                                    <ul class="dropdown-menu dropdown-menu-end custom-dropdown-menu" aria-labelledby="userMenuDropdown">
-                                        <li><a class="dropdown-item" asp-controller="Account" asp-action="Profile">Profile</a></li>
-                                        <li><a class="dropdown-item" asp-controller="Account" asp-action="Settings">Settings</a></li>
-                                        <li>
-                                            <a class="dropdown-item" asp-controller="Message" asp-action="Inbox">
-                                                <span>Inbox</span>
-                                                <span class="badge bg-primary rounded-pill">6</span>
-                                            </a>
-                                        </li>
-                                        <li><a class="dropdown-item" asp-controller="Message" asp-action="Index">Message</a></li>
-                                        <li><hr class="dropdown-divider my-2"></li>
-                                        <li><a class="dropdown-item" asp-controller="Home" asp-action="Help">Need help?</a></li>
-                                        <li>
-                                            <form asp-controller="Account" asp-action="Logout" method="post" class="m-0 p-0">
-                                                @Html.AntiForgeryToken()
-                                                <button type="submit" class="dropdown-item text-danger border-0 bg-transparent w-100 text-start">
-                                                    Sign out
-                                                </button>
-                                            </form>
-                                        </li>
-                                    </ul>
-                                </div>
-                            }
-                            else
-                            {
-                                <!-- Chưa đăng nhập: Sign In mảnh + Nút Đăng dự án màu xanh (Ảnh 1) -->
-                                <a class="custom-nav-link" asp-area="" asp-controller="Account" asp-action="Register">
-                                    Sign Up
-                                </a>
-                                <a class="btn btn-post-job" asp-area="" asp-controller="Account" asp-action="Login" asp-route-returnUrl="/Job/CreateJob">
-                                    Đăng dự án
-                                </a>
-                            }
-                        </div>
+                                <ul class="dropdown-menu dropdown-menu-end custom-dropdown-menu" aria-labelledby="userMenuDropdown">
+                                    <li><a class="dropdown-item" asp-controller="Account" asp-action="Profile">Profile</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Account" asp-action="Settings">Settings</a></li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Message" asp-action="Inbox">
+                                            <span>Inbox</span>
+                                            <span class="badge bg-primary rounded-pill">6</span>
+                                        </a>
+                                    </li>
+                                    <li><a class="dropdown-item" asp-controller="Message" asp-action="Index">Message</a></li>
+                                    <li><hr class="dropdown-divider my-2"></li>
+                                    <li><a class="dropdown-item" asp-controller="Home" asp-action="Help">Need help?</a></li>
+                                    <li>
+                                        <form asp-controller="Account" asp-action="Logout" method="post" class="m-0 p-0">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" class="dropdown-item text-danger border-0 bg-transparent w-100 text-start">
+                                                Sign out
+                                            </button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </div>
+                        }
+                        else
+                        {
+                            <!-- Chưa đăng nhập -->
+                            <a class="custom-nav-link" asp-area="" asp-controller="Account" asp-action="Register">
+                                Sign Up
+                            </a>
+                            <a class="btn btn-post-job" asp-area="" asp-controller="Account" asp-action="Login" asp-route-returnUrl="/Job/CreateJob">
+                                Đăng dự án
+                            </a>
+                        }
                     </div>
                 </div>
-            </nav>
+            </div>
+        </nav>
     </header>
 
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
+    <!-- Bỏ thẻ div container bọc ngoài để Hero Banner tràn viền 100% màn hình -->
+    <main role="main">
+        @RenderBody()
+    </main>
 
     @if (ViewData["HideFooter"] == null)
     {
-        <footer class="border-top footer text-muted">
-            <div class="container">
-                &copy; 2026 - FreelanceMarketplace - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+        <footer class="border-top footer text-muted py-3 bg-white mt-auto">
+            <div class="container text-center text-md-start d-flex flex-column flex-md-row justify-content-between align-items-center">
+                <div>&copy; 2026 - FreelanceMarketplace - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a></div>
+                <div class="small text-muted mt-2 mt-md-0">Nền tảng kết nối việc làm Freelance chất lượng cao</div>
             </div>
         </footer>
     }

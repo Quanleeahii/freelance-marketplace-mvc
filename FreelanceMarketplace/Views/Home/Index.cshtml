@@ -1,1 +1,728 @@
-﻿
+﻿@model FreelanceMarketplace.ViewModels.HomeIndexViewModel
+@{
+    ViewData["Title"] = "NextHub - Sàn giao dịch việc làm Freelance hàng đầu";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link rel="stylesheet" href="~/css/home.css" asp-append-version="true" />
+
+<!-- 1. HERO BANNER CHUẨN KỲ LÂN CÔNG NGHỆ -->
+<section class="vlance-hero">
+    <div class="container text-center position-relative" style="z-index: 2;">
+        <div class="hero-pill-badge">
+            <i class="bi bi-patch-check-fill text-success me-2"></i>Nền tảng kết nối Freelance hàng đầu Việt Nam
+        </div>
+
+        <h1 class="mb-4">Phá vỡ giới hạn nhân sự.<br />Kết nối tinh hoa Freelancer.</h1>
+        <p class="lead mb-5">Những chuyên gia công nghệ, thiết kế và marketing hàng đầu đã sẵn sàng biến ý tưởng của bạn thành hiện thực với sự bảo chứng an toàn tuyệt đối từ NextHub.</p>
+
+        <div class="mb-5">
+            <a asp-controller="Job" asp-action="CreateJob" class="btn-vlance-post text-decoration-none">
+                ĐĂNG DỰ ÁN NGAY MIỄN PHÍ
+            </a>
+        </div>
+
+        <div class="d-flex justify-content-center align-items-center gap-4 text-white-50 small fw-semibold">
+            <span><i class="bi bi-check-circle-fill text-success me-1"></i> Đăng tin 0đ</span>
+            <span><i class="bi bi-check-circle-fill text-success me-1"></i> Báo giá trong 30p</span>
+            <span><i class="bi bi-check-circle-fill text-success me-1"></i> Hoàn tiền 100% nếu lỗi</span>
+        </div>
+    </div>
+</section>
+
+<!-- 2. DẢI ĐỐI TÁC TRUYỀN THÔNG -->
+<section class="partner-strip shadow-sm position-relative" style="z-index: 3;">
+    <div class="container text-center">
+        <div class="d-flex flex-wrap justify-content-center align-items-center gap-4 gap-md-5">
+            <span class="partner-logo-item"><i class="bi bi-newspaper fs-4 text-primary"></i> VNEXPRESS</span>
+            <span class="partner-logo-item"><i class="bi bi-broadcast fs-4 text-danger"></i> DÂN TRÍ</span>
+            <span class="partner-logo-item"><i class="bi bi-graph-up-arrow fs-4 text-success"></i> CAFEBIZ</span>
+            <span class="partner-logo-item"><i class="bi bi-award fs-4 text-warning"></i> FORBES VN</span>
+            <span class="partner-logo-item"><i class="bi bi-shield-lock-fill fs-4 text-info"></i> ESCROW SECURED</span>
+        </div>
+    </div>
+</section>
+
+<!-- 3. TẠI SAO CHỌN NEXTHUB? -->
+<section class="py-5" style="background-color: #f8fafc;">
+    <div class="container py-4">
+        <div class="text-center mb-5">
+            <h2 class="section-title">Giải pháp nhân sự linh hoạt toàn diện</h2>
+            <p class="section-subtitle">Loại bỏ rào cản tuyển dụng truyền thống, bứt tốc dự án của bạn.</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="feature-box-premium text-center">
+                    <div class="feature-icon-wrapper"><i class="bi bi-lightning-charge-fill"></i></div>
+                    <h4 class="fw-bold fs-5 mb-3">Tốc độ kết nối kỷ lục</h4>
+                    <p class="text-muted small mb-0">Thuật toán AI ghép nối thông minh giúp bạn nhận những đề xuất báo giá chất lượng đầu tiên chỉ sau 15-30 phút đăng tải yêu cầu.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-box-premium text-center">
+                    <div class="feature-icon-wrapper" style="background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%); color: var(--nh-success);"><i class="bi bi-shield-check"></i></div>
+                    <h4 class="fw-bold fs-5 mb-3">Thanh toán an toàn 100%</h4>
+                    <p class="text-muted small mb-0">Tiền của bạn được hệ thống giữ an toàn và chỉ giải ngân cho Freelancer khi bạn nghiệm thu hài lòng.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-box-premium text-center">
+                    <div class="feature-icon-wrapper" style="background: linear-gradient(135deg, #fef08a 0%, #fde047 100%); color: #ca8a04;"><i class="bi bi-star-fill"></i></div>
+                    <h4 class="fw-bold fs-5 mb-3">Chất lượng được bảo chứng</h4>
+                    <p class="text-muted small mb-0">Chỉ 3% freelancer vượt qua bài kiểm tra kỹ năng đầu vào. Xem trước đánh giá thật và điểm uy tín trước khi quyết định thuê.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 4. VIỆC LÀM ĐƯỢC QUAN TÂM NHẤT (TAB FILTER CÓ SỐ LƯỢNG) -->
+<section class="py-5 bg-white border-top border-bottom">
+    <div class="container py-4">
+        <div class="text-center mb-5">
+            <h2 class="section-title">Các công việc được quan tâm nhất</h2>
+            <p class="section-subtitle">Hàng trăm dự án mới được cập nhật liên tục mỗi giờ</p>
+
+            <ul class="nav job-filter-pills justify-content-center mt-4 gap-2" id="jobFilterTabs">
+                <li class="nav-item">
+                    <button class="nav-link active" type="button" data-filter="all">Tất cả <span class="badge bg-primary text-white ms-1 rounded-pill">3</span></button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" type="button" data-filter="it">IT & Lập trình <span class="badge bg-secondary text-white ms-1 rounded-pill">1</span></button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" type="button" data-filter="design">Thiết kế UI/UX <span class="badge bg-secondary text-white ms-1 rounded-pill">1</span></button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" type="button" data-filter="content">Viết lách & SEO <span class="badge bg-secondary text-white ms-1 rounded-pill">1</span></button>
+                </li>
+            </ul>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="job-list-card" id="jobListContainer">
+
+                    <!-- Job 1 -->
+                    <div class="job-item-row" data-category="design">
+                        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-start gap-2">
+                            <div>
+                                <div class="d-flex align-items-center gap-2 mb-2">
+                                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-2 py-1 small fw-semibold">
+                                        <i class="bi bi-fire me-1"></i> Tuyển gấp
+                                    </span>
+                                    <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2 py-1 small fw-semibold">
+                                        <i class="bi bi-shield-check me-1"></i> Đã ký quỹ
+                                    </span>
+                                </div>
+                                <div>
+                                    <a asp-controller="JobSearch" asp-action="Details" asp-route-id="1" class="job-link-title">
+                                        Thiết kế Landing Page bán hàng mỹ phẩm Organic cao cấp
+                                    </a>
+                                </div>
+                                <div class="d-flex align-items-center gap-3 my-2 small text-muted flex-wrap">
+                                    <span class="text-primary fw-medium"><i class="bi bi-patch-check-fill me-1"></i>Hồng Hạnh (Client uy tín)</span>
+                                    <span><i class="bi bi-geo-alt me-1"></i>Hà Nội</span>
+                                    <span><i class="bi bi-clock me-1"></i>2 giờ trước</span>
+                                    <span class="badge bg-light text-secondary border">6 chào thầu</span>
+                                </div>
+                                <p class="text-secondary small mb-3">
+                                    Cần tìm Designer có kinh nghiệm thiết kế UI/UX trên Figma. Tối ưu tỷ lệ chuyển đổi, chuẩn responsive mobile. Đã có sẵn tài liệu thiết kế...
+                                </p>
+                                <div>
+                                    <a asp-controller="JobSearch" asp-action="Index" asp-route-keyword="Figma" class="vlance-tag">Figma</a>
+                                    <a asp-controller="JobSearch" asp-action="Index" asp-route-keyword="UI/UX" class="vlance-tag">UI/UX Design</a>
+                                    <a asp-controller="JobSearch" asp-action="Index" asp-route-keyword="Landing Page" class="vlance-tag">Landing Page</a>
+                                </div>
+                            </div>
+
+                            <div class="text-md-end flex-shrink-0 mt-3 mt-md-0 d-flex flex-md-column align-items-end justify-content-between gap-3">
+                                <button type="button" class="btn-bookmark bookmark-btn shadow-sm" title="Lưu công việc">
+                                    <i class="bi bi-bookmark"></i>
+                                </button>
+                                <div>
+                                    <div class="job-budget mb-1">5.000.000 đ</div>
+                                    <div class="text-muted small mb-2">Hạn nộp: Còn 20 ngày</div>
+                                    <a asp-controller="JobSearch" asp-action="Details" asp-route-id="1" class="btn btn-outline-primary btn-sm rounded-pill px-4 py-2 fw-semibold">
+                                        Chào giá ngay
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Job 2 -->
+                    <div class="job-item-row" data-category="it">
+                        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-start gap-2">
+                            <div>
+                                <div class="d-flex align-items-center gap-2 mb-2">
+                                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-2 py-1 small fw-semibold">
+                                        <i class="bi bi-stars me-1"></i> Dự án lớn
+                                    </span>
+                                    <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2 py-1 small fw-semibold">
+                                        <i class="bi bi-shield-check me-1"></i> Đã ký quỹ
+                                    </span>
+                                </div>
+                                <div>
+                                    <a asp-controller="JobSearch" asp-action="Details" asp-route-id="2" class="job-link-title">
+                                        Xây dựng module RESTful API đồng bộ đơn hàng với TikTok Shop
+                                    </a>
+                                </div>
+                                <div class="d-flex align-items-center gap-3 my-2 small text-muted flex-wrap">
+                                    <span class="text-primary fw-medium"><i class="bi bi-patch-check-fill me-1"></i>TechVn Corporation</span>
+                                    <span><i class="bi bi-laptop me-1"></i>Làm từ xa (Remote)</span>
+                                    <span><i class="bi bi-clock me-1"></i>4 giờ trước</span>
+                                    <span class="badge bg-light text-secondary border">12 chào thầu</span>
+                                </div>
+                                <p class="text-secondary small mb-3">
+                                    Xây dựng RESTful API bằng C# và ASP.NET Core để đồng bộ trạng thái đơn hàng, tồn kho tự động với ERP. Database PostgreSQL có sẵn...
+                                </p>
+                                <div>
+                                    <a asp-controller="JobSearch" asp-action="Index" asp-route-keyword="C#" class="vlance-tag">C# / .NET</a>
+                                    <a asp-controller="JobSearch" asp-action="Index" asp-route-keyword="PostgreSQL" class="vlance-tag">PostgreSQL</a>
+                                    <a asp-controller="JobSearch" asp-action="Index" asp-route-keyword="Docker" class="vlance-tag">Docker</a>
+                                </div>
+                            </div>
+
+                            <div class="text-md-end flex-shrink-0 mt-3 mt-md-0 d-flex flex-md-column align-items-end justify-content-between gap-3">
+                                <button type="button" class="btn-bookmark bookmark-btn shadow-sm" title="Lưu công việc">
+                                    <i class="bi bi-bookmark"></i>
+                                </button>
+                                <div>
+                                    <div class="job-budget mb-1">12.000.000 đ</div>
+                                    <div class="text-muted small mb-2">Hạn nộp: Còn 7 ngày</div>
+                                    <a asp-controller="JobSearch" asp-action="Details" asp-route-id="2" class="btn btn-outline-primary btn-sm rounded-pill px-4 py-2 fw-semibold">
+                                        Chào giá ngay
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Job 3 -->
+                    <div class="job-item-row" data-category="content">
+                        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-start gap-2">
+                            <div>
+                                <div class="d-flex align-items-center gap-2 mb-2">
+                                    <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2 py-1 small fw-semibold">
+                                        <i class="bi bi-shield-check me-1"></i> Đã ký quỹ
+                                    </span>
+                                </div>
+                                <div>
+                                    <a asp-controller="JobSearch" asp-action="Details" asp-route-id="3" class="job-link-title">
+                                        Viết chuỗi 15 bài chuẩn SEO lĩnh vực Bất động sản căn hộ cao cấp
+                                    </a>
+                                </div>
+                                <div class="d-flex align-items-center gap-3 my-2 small text-muted flex-wrap">
+                                    <span class="text-primary fw-medium"><i class="bi bi-patch-check-fill me-1"></i>Nguyễn Đình Nam</span>
+                                    <span><i class="bi bi-geo-alt me-1"></i>Hồ Chí Minh</span>
+                                    <span><i class="bi bi-clock me-1"></i>6 giờ trước</span>
+                                    <span class="badge bg-light text-secondary border">8 chào thầu</span>
+                                </div>
+                                <p class="text-secondary small mb-3">
+                                    Cần 15 bài SEO 1.500 từ. Yêu cầu bài tự viết 100%, unique > 95%, từ khóa tự nhiên và hình ảnh dự án chỉn chu...
+                                </p>
+                                <div>
+                                    <a asp-controller="JobSearch" asp-action="Index" asp-route-keyword="SEO" class="vlance-tag">SEO Content</a>
+                                    <a asp-controller="JobSearch" asp-action="Index" asp-route-keyword="Copywriting" class="vlance-tag">Copywriting</a>
+                                </div>
+                            </div>
+
+                            <div class="text-md-end flex-shrink-0 mt-3 mt-md-0 d-flex flex-md-column align-items-end justify-content-between gap-3">
+                                <button type="button" class="btn-bookmark bookmark-btn shadow-sm" title="Lưu công việc">
+                                    <i class="bi bi-bookmark"></i>
+                                </button>
+                                <div>
+                                    <div class="job-budget mb-1">2.500.000 đ</div>
+                                    <div class="text-muted small mb-2">Hạn nộp: Còn 12 ngày</div>
+                                    <a asp-controller="JobSearch" asp-action="Details" asp-route-id="3" class="btn btn-outline-primary btn-sm rounded-pill px-4 py-2 fw-semibold">
+                                        Chào giá ngay
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="noJobAlert" class="p-5 text-center d-none">
+                        <i class="bi bi-search display-4 text-muted opacity-50 mb-3 d-block"></i>
+                        <h5 class="fw-bold text-dark">Rất tiếc! Không có dự án nào.</h5>
+                        <p class="text-muted mb-0">Chưa có công việc nào thuộc danh mục này trong thời điểm hiện tại.</p>
+                    </div>
+                </div>
+
+                <div class="text-center mt-5">
+                    <a asp-controller="JobSearch" asp-action="Index" class="btn btn-primary px-5 py-3 rounded-pill fw-bold shadow-sm" style="font-size: 1.05rem;">
+                        Khám phá tất cả 1.420 việc làm <i class="bi bi-arrow-right ms-2"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 5. QUY TRÌNH 4 BƯỚC -->
+<section class="py-5" style="background-color: #f8fafc;">
+    <div class="container py-4">
+        <div class="text-center mb-5">
+            <h2 class="section-title">Quy trình hợp tác cực kỳ đơn giản</h2>
+            <p class="section-subtitle">Chỉ 4 bước để hoàn thành dự án an toàn và hiệu quả trên NextHub</p>
+        </div>
+
+        <div class="row g-4 position-relative">
+            <div class="col-md-3 col-6">
+                <div class="process-step-card shadow-sm">
+                    <div class="step-number-badge">1</div>
+                    <h5 class="fw-bold mb-2">Đăng yêu cầu</h5>
+                    <p class="small text-muted mb-0">Viết mô tả dự án và ngân sách dự kiến của bạn hoàn toàn miễn phí.</p>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="process-step-card shadow-sm">
+                    <div class="step-number-badge">2</div>
+                    <h5 class="fw-bold mb-2">Chọn ứng viên</h5>
+                    <p class="small text-muted mb-0">Xem báo giá, so sánh hồ sơ năng lực và trao đổi để chọn người giỏi nhất.</p>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="process-step-card shadow-sm">
+                    <div class="step-number-badge">3</div>
+                    <h5 class="fw-bold mb-2">Làm việc & Quản lý</h5>
+                    <p class="small text-muted mb-0">Đặt cọc an toàn. Theo dõi tiến độ và nhận sản phẩm trực tuyến.</p>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="process-step-card shadow-sm">
+                    <div class="step-number-badge">4</div>
+                    <h5 class="fw-bold mb-2">Thanh toán</h5>
+                    <p class="small text-muted mb-0">Chỉ phê duyệt thanh toán khi bạn đã hoàn toàn hài lòng với kết quả.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 6. NGÀNH NGHỀ ĐƯỢC THUÊ NHIỀU NHẤT (BLOCK TĨNH ĐỔ MÀU FULL CARD) -->
+<section class="py-5 bg-white border-top border-bottom">
+    <div class="container py-4">
+        <div class="text-center mb-5">
+            <h2 class="section-title">Ngành nghề được thuê nhiều nhất</h2>
+            <p class="section-subtitle">Các chuyên môn đa dạng đáp ứng mọi nhu cầu dự án của doanh nghiệp</p>
+        </div>
+
+        <div class="row row-cols-2 row-cols-md-4 g-4">
+            <!-- 1. Lập trình (Xanh biển) -->
+            <div class="col">
+                <div class="cat-card-modern bg-cat-blue">
+                    <div class="cat-icon-circle"><i class="bi bi-code-slash"></i></div>
+                    <div class="cat-title">Lập trình Web & App</div>
+                    <div class="cat-count">485 việc đang mở</div>
+                </div>
+            </div>
+            <!-- 2. Thiết kế (Xanh lá) -->
+            <div class="col">
+                <div class="cat-card-modern bg-cat-green">
+                    <div class="cat-icon-circle"><i class="bi bi-palette"></i></div>
+                    <div class="cat-title">Thiết kế đồ họa & Logo</div>
+                    <div class="cat-count">360 việc đang mở</div>
+                </div>
+            </div>
+            <!-- 3. Dịch thuật (Vàng) -->
+            <div class="col">
+                <div class="cat-card-modern bg-cat-yellow">
+                    <div class="cat-icon-circle"><i class="bi bi-translate"></i></div>
+                    <div class="cat-title">Dịch thuật & Biên tập</div>
+                    <div class="cat-count">190 việc đang mở</div>
+                </div>
+            </div>
+            <!-- 4. Marketing (Xanh Cyan) -->
+            <div class="col">
+                <div class="cat-card-modern bg-cat-cyan">
+                    <div class="cat-icon-circle"><i class="bi bi-megaphone"></i></div>
+                    <div class="cat-title">Marketing & Chạy Ads</div>
+                    <div class="cat-count">240 việc đang mở</div>
+                </div>
+            </div>
+            <!-- 5. Video (Đỏ hồng) -->
+            <div class="col">
+                <div class="cat-card-modern bg-cat-red">
+                    <div class="cat-icon-circle"><i class="bi bi-camera-video"></i></div>
+                    <div class="cat-title">Làm Video & Animation</div>
+                    <div class="cat-count">135 việc đang mở</div>
+                </div>
+            </div>
+            <!-- 6. Viết lách (Xám nhạt) -->
+            <div class="col">
+                <div class="cat-card-modern bg-cat-gray">
+                    <div class="cat-icon-circle"><i class="bi bi-pencil-square"></i></div>
+                    <div class="cat-title">Viết bài chuẩn SEO</div>
+                    <div class="cat-count">310 việc đang mở</div>
+                </div>
+            </div>
+            <!-- 7. Mobile App (Xanh chàm) -->
+            <div class="col">
+                <div class="cat-card-modern bg-cat-indigo">
+                    <div class="cat-icon-circle"><i class="bi bi-phone"></i></div>
+                    <div class="cat-title">Mobile App</div>
+                    <div class="cat-count">95 việc đang mở</div>
+                </div>
+            </div>
+            <!-- 8. Trợ lý ảo (Xanh Teal) -->
+            <div class="col">
+                <div class="cat-card-modern bg-cat-teal">
+                    <div class="cat-icon-circle"><i class="bi bi-headset"></i></div>
+                    <div class="cat-title">Trợ lý ảo & Nhập liệu</div>
+                    <div class="cat-count">115 việc đang mở</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 7. CHUYÊN GIA / FREELANCER TIÊU BIỂU (AVATAR BO TRÒN 100% CÂN ĐỐI) -->
+<section class="py-5" style="background-color: #f8fafc;">
+    <div class="container py-4">
+        <div class="text-center mb-5">
+            <h2 class="section-title mb-2">Chuyên gia nổi bật nhất tuần</h2>
+            <p class="section-subtitle">Hồ sơ năng lực xuất sắc được đánh giá 5 sao từ hàng trăm khách hàng.</p>
+        </div>
+
+        <div class="row row-cols-1 row-cols-md-4 g-4">
+            <!-- Freelancer 1 -->
+            <div class="col">
+                <div class="freelancer-box">
+                    <div class="avatar-wrapper">
+                        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80" class="freelancer-avatar" alt="Avatar" />
+                        <span class="online-dot" title="Đang trực tuyến"></span>
+                    </div>
+                    <h5 class="fw-bold mb-1 fs-5">Trần Vũ Tuấn</h5>
+                    <p class="text-primary small fw-bold mb-3">Senior UI/UX Designer</p>
+
+                    <div class="freelancer-skills">
+                        <span class="skill-badge">Figma</span>
+                        <span class="skill-badge">Web Design</span>
+                    </div>
+
+                    <div class="text-warning small mb-4 d-flex justify-content-center align-items-center">
+                        <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-half"></i>
+                        <span class="text-dark ms-2 fw-bold">4.9</span> <span class="text-muted ms-1">(42)</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center text-muted small border-top pt-3 w-100 mb-4 mt-auto">
+                        <span>Giá đề xuất:</span>
+                        <strong class="text-dark fs-6">250k/h</strong>
+                    </div>
+                    <a href="javascript:void(0)" class="btn btn-outline-dark w-100 rounded-pill fw-bold py-2">Xem hồ sơ</a>
+                </div>
+            </div>
+
+            <!-- Freelancer 2 -->
+            <div class="col">
+                <div class="freelancer-box">
+                    <div class="avatar-wrapper">
+                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80" class="freelancer-avatar" alt="Avatar" />
+                        <span class="online-dot" title="Đang trực tuyến"></span>
+                    </div>
+                    <h5 class="fw-bold mb-1 fs-5">Nguyễn Mai Anh</h5>
+                    <p class="text-primary small fw-bold mb-3">Fullstack .NET Developer</p>
+
+                    <div class="freelancer-skills">
+                        <span class="skill-badge">C# / .NET</span>
+                        <span class="skill-badge">PostgreSQL</span>
+                    </div>
+
+                    <div class="text-warning small mb-4 d-flex justify-content-center align-items-center">
+                        <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                        <span class="text-dark ms-2 fw-bold">5.0</span> <span class="text-muted ms-1">(65)</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center text-muted small border-top pt-3 w-100 mb-4 mt-auto">
+                        <span>Giá đề xuất:</span>
+                        <strong class="text-dark fs-6">350k/h</strong>
+                    </div>
+                    <a href="javascript:void(0)" class="btn btn-outline-dark w-100 rounded-pill fw-bold py-2">Xem hồ sơ</a>
+                </div>
+            </div>
+
+            <!-- Freelancer 3 -->
+            <div class="col">
+                <div class="freelancer-box">
+                    <div class="avatar-wrapper">
+                        <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=200&q=80" class="freelancer-avatar" alt="Avatar" />
+                        <span class="online-dot" title="Đang trực tuyến"></span>
+                    </div>
+                    <h5 class="fw-bold mb-1 fs-5">Lê Minh Tuấn</h5>
+                    <p class="text-primary small fw-bold mb-3">Chuyên gia SEO & Ads</p>
+
+                    <div class="freelancer-skills">
+                        <span class="skill-badge">Google Ads</span>
+                        <span class="skill-badge">SEO</span>
+                    </div>
+
+                    <div class="text-warning small mb-4 d-flex justify-content-center align-items-center">
+                        <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star"></i>
+                        <span class="text-dark ms-2 fw-bold">4.8</span> <span class="text-muted ms-1">(30)</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center text-muted small border-top pt-3 w-100 mb-4 mt-auto">
+                        <span>Giá đề xuất:</span>
+                        <strong class="text-dark fs-6">200k/h</strong>
+                    </div>
+                    <a href="javascript:void(0)" class="btn btn-outline-dark w-100 rounded-pill fw-bold py-2">Xem hồ sơ</a>
+                </div>
+            </div>
+
+            <!-- Freelancer 4 -->
+            <div class="col">
+                <div class="freelancer-box">
+                    <div class="avatar-wrapper">
+                        <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=200&q=80" class="freelancer-avatar" alt="Avatar" />
+                        <span class="online-dot" title="Đang trực tuyến"></span>
+                    </div>
+                    <h5 class="fw-bold mb-1 fs-5">Hoàng Hà My</h5>
+                    <p class="text-primary small fw-bold mb-3">Biên dịch viên HSK 6</p>
+
+                    <div class="freelancer-skills">
+                        <span class="skill-badge">Tiếng Trung</span>
+                        <span class="skill-badge">Phiên dịch</span>
+                    </div>
+
+                    <div class="text-warning small mb-4 d-flex justify-content-center align-items-center">
+                        <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-half"></i>
+                        <span class="text-dark ms-2 fw-bold">4.9</span> <span class="text-muted ms-1">(53)</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center text-muted small border-top pt-3 w-100 mb-4 mt-auto">
+                        <span>Giá đề xuất:</span>
+                        <strong class="text-dark fs-6">180k/h</strong>
+                    </div>
+                    <a href="javascript:void(0)" class="btn btn-outline-dark w-100 rounded-pill fw-bold py-2">Xem hồ sơ</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 8. THỐNG KÊ SÀN CÔNG NGHỆ CAO CẤP (THẾ CHỖ CHO NEWSLETTER) -->
+<section class="py-5 bg-white border-top">
+    <div class="container py-3">
+        <div class="stats-premium-banner" id="statsSection">
+            <div class="text-center mb-5 position-relative" style="z-index: 2;">
+                <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-1 mb-2 fw-semibold small">
+                    <i class="bi bi-shield-fill-check me-1"></i> Số liệu thực tế theo thời gian thực
+                </span>
+                <h3 class="fw-bold text-white fs-3 mb-1">Nền tảng Freelance phát triển thần tốc</h3>
+                <p class="text-white-50 small mb-0">Niềm tin được khẳng định qua hàng chục nghìn hợp đồng thành công mỗi năm</p>
+            </div>
+
+            <div class="row g-4 position-relative" style="z-index: 2;">
+                <!-- Thống kê 1: Freelancer -->
+                <div class="col-6 col-lg-3">
+                    <div class="stat-card-glass">
+                        <div class="stat-icon-glow text-info" style="background: rgba(14, 165, 233, 0.15);">
+                            <i class="bi bi-people-fill"></i>
+                        </div>
+                        <div class="stat-num counter" data-target="2115596">0</div>
+                        <div class="stat-label">Freelancer Gia Nhập</div>
+                    </div>
+                </div>
+
+                <!-- Thống kê 2: Dự án -->
+                <div class="col-6 col-lg-3">
+                    <div class="stat-card-glass">
+                        <div class="stat-icon-glow text-success" style="background: rgba(16, 185, 129, 0.15);">
+                            <i class="bi bi-check2-circle"></i>
+                        </div>
+                        <div class="stat-num counter" data-target="72840">0</div>
+                        <div class="stat-label">Dự Án Đã Nghiệm Thu</div>
+                    </div>
+                </div>
+
+                <!-- Thống kê 3: Hài lòng -->
+                <div class="col-6 col-lg-3">
+                    <div class="stat-card-glass">
+                        <div class="stat-icon-glow text-warning" style="background: rgba(234, 179, 8, 0.15);">
+                            <i class="bi bi-heart-pulse-fill"></i>
+                        </div>
+                        <div class="stat-num counter" data-target="99">0</div>
+                        <div class="stat-label">% Khách Hài Lòng</div>
+                    </div>
+                </div>
+
+                <!-- Thống kê 4: Hỗ trợ -->
+                <div class="col-6 col-lg-3">
+                    <div class="stat-card-glass">
+                        <div class="stat-icon-glow text-danger" style="background: rgba(244, 63, 94, 0.15);">
+                            <i class="bi bi-headset"></i>
+                        </div>
+                        <div class="stat-num">24/7</div>
+                        <div class="stat-label">Hỗ Trợ Kỹ Thuật</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 9. CALL TO ACTION BANNER KÉP -->
+<section class="py-5 bg-white">
+    <div class="container pb-4">
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="cta-box-client d-flex flex-column justify-content-between">
+                    <div>
+                        <span class="badge bg-white text-primary fw-bold px-3 py-2 rounded-pill mb-4 shadow-sm">Dành cho Doanh nghiệp</span>
+                        <h3 class="fw-bold fs-3 mb-3">Tìm kiếm mảnh ghép hoàn hảo?</h3>
+                        <p class="text-white-50 mb-5 fs-6">Đăng tin miễn phí và nhận báo giá từ những chuyên gia đã qua kiểm định ngay lập tức.</p>
+                    </div>
+                    <div>
+                        <a asp-controller="Job" asp-action="CreateJob" class="btn btn-light text-primary fw-bold px-5 py-3 rounded-pill">
+                            Tuyển chuyên gia <i class="bi bi-arrow-right ms-2"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="cta-box-freelancer d-flex flex-column justify-content-between">
+                    <div>
+                        <span class="badge bg-white text-success fw-bold px-3 py-2 rounded-pill mb-4 shadow-sm">Dành cho Freelancer</span>
+                        <h3 class="fw-bold fs-3 mb-3">Làm chủ sự nghiệp của bạn!</h3>
+                        <p class="text-white-50 mb-5 fs-6">Xây dựng hồ sơ, chọn công việc bạn yêu thích và nhận thanh toán an toàn, sòng phẳng.</p>
+                    </div>
+                    <div>
+                        <a asp-controller="Account" asp-action="Register" class="btn btn-light text-success fw-bold px-5 py-3 rounded-pill">
+                            Bắt đầu kiếm tiền <i class="bi bi-arrow-right ms-2"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- TOAST NOTIFICATION -->
+<div class="toast-container position-fixed bottom-0 end-0 p-4" style="z-index: 1050">
+    <div id="bookmarkToast" class="toast align-items-center text-bg-dark border-0 shadow-lg" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body fw-medium" id="toastMessage">
+                <i class="bi bi-check-circle-fill text-success me-2"></i> Đã lưu công việc thành công!
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // 1. Logic Lọc Tab Ngành Nghề
+            const tabs = document.querySelectorAll("#jobFilterTabs button");
+            const jobRows = document.querySelectorAll("#jobListContainer .job-item-row");
+            const noJobAlert = document.getElementById("noJobAlert");
+
+            tabs.forEach(tab => {
+                tab.addEventListener("click", function () {
+                    tabs.forEach(t => {
+                        t.classList.remove("active");
+                        const badge = t.querySelector('.badge');
+                        if (badge) { badge.classList.remove('bg-primary'); badge.classList.add('bg-secondary'); }
+                    });
+
+                    this.classList.add("active");
+                    const activeBadge = this.querySelector('.badge');
+                    if (activeBadge) { activeBadge.classList.remove('bg-secondary'); activeBadge.classList.add('bg-primary'); }
+
+                    const filter = this.getAttribute("data-filter");
+                    let visibleCount = 0;
+
+                    jobRows.forEach(row => {
+                        const category = row.getAttribute("data-category");
+                        if (filter === "all" || category === filter) {
+                            row.style.display = "block";
+                            row.style.opacity = 0;
+                            setTimeout(() => { row.style.transition = "opacity 0.4s ease"; row.style.opacity = 1; }, 10);
+                            visibleCount++;
+                        } else {
+                            row.style.display = "none";
+                        }
+                    });
+
+                    if (visibleCount === 0) {
+                        noJobAlert.classList.remove("d-none");
+                    } else {
+                        noJobAlert.classList.add("d-none");
+                    }
+                });
+            });
+
+            // 2. Logic Nút Bookmark kèm Toast Notification
+            const bookmarkButtons = document.querySelectorAll(".bookmark-btn");
+            const toastEl = document.getElementById('bookmarkToast');
+            const toastMessage = document.getElementById('toastMessage');
+            const toast = new bootstrap.Toast(toastEl, { delay: 3000 });
+
+            bookmarkButtons.forEach(btn => {
+                btn.addEventListener("click", function (e) {
+                    e.preventDefault();
+                    this.classList.toggle("active");
+                    const icon = this.querySelector("i");
+
+                    if (this.classList.contains("active")) {
+                        icon.classList.remove("bi-bookmark");
+                        icon.classList.add("bi-bookmark-fill");
+                        toastMessage.innerHTML = '<i class="bi bi-check-circle-fill text-success me-2"></i> Đã lưu công việc vào danh sách yêu thích!';
+                    } else {
+                        icon.classList.remove("bi-bookmark-fill");
+                        icon.classList.add("bi-bookmark");
+                        toastMessage.innerHTML = '<i class="bi bi-info-circle-fill text-info me-2"></i> Đã bỏ lưu công việc.';
+                    }
+                    toast.show();
+                });
+            });
+
+            // 3. Logic Hiệu ứng chạy số tự động (Counter Animation)
+            const counters = document.querySelectorAll(".counter");
+            let hasRunCounter = false;
+
+            const runCounters = () => {
+                counters.forEach(counter => {
+                    const target = +counter.getAttribute("data-target");
+                    let count = 0;
+                    const speed = target / 50;
+
+                    const updateCount = () => {
+                        count += speed;
+                        if (count < target) {
+                            counter.innerText = Math.ceil(count).toLocaleString('vi-VN');
+                            requestAnimationFrame(updateCount);
+                        } else {
+                            counter.innerText = target.toLocaleString('vi-VN');
+                        }
+                    };
+                    updateCount();
+                });
+            };
+
+            const statsSection = document.getElementById("statsSection");
+            window.addEventListener("scroll", function () {
+                if (!hasRunCounter && statsSection) {
+                    const rect = statsSection.getBoundingClientRect();
+                    if (rect.top <= window.innerHeight - 50) {
+                        hasRunCounter = true;
+                        runCounters();
+                    }
+                }
+
+                // 4. Logic Nút Back To Top
+                const backToTopBtn = document.getElementById("backToTopBtn");
+                if (window.scrollY > 500) {
+                    backToTopBtn.style.display = "flex";
+                } else {
+                    backToTopBtn.style.display = "none";
+                }
+            });
+
+            const backToTopBtn = document.getElementById("backToTopBtn");
+            backToTopBtn.addEventListener("click", function () {
+                window.scrollTo({ top: 0, behavior: "smooth" });
+            });
+        });
+    </script>
+}
