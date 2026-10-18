@@ -13,7 +13,7 @@ public class JobListItemDto
     public WorkType WorkType { get; set; }
     public WorkMode WorkMode { get; set; }
     public PaymentType PaymentType { get; set; }
-    public string LocationCity { get; set; } = string.Empty;
+    public string? LocationCity { get; set; } = string.Empty;
     public decimal? BudgetMin { get; set; }
     public decimal? BudgetMax { get; set; }
     public DateTime? Deadline { get; set; }

@@ -41,7 +41,7 @@
                                     @if (hasChildren)
                                     {
                                         <div class="sub-category-list ps-3 mt-1 @(isExpanded ? "" : "d-none")" id="sub-@parent.Id">
-                                            @foreach (var sub in parent.SubCategories)
+                                            @foreach (var sub in parent.SubCategories ?? Enumerable.Empty<FreelanceMarketplace.Models.Category>())
                                             {
                                                 <div class="sub-category-item @(filter.SubCategoryId == sub.Id ? "active" : "")" 
                                                      data-parent-id="@parent.Id" data-sub-id="@sub.Id">
