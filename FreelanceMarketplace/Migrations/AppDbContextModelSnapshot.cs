@@ -102,8 +102,8 @@ namespace FreelanceMarketplace.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("ExperienceLevel")
-                        .HasColumnType("text");
+                    b.Property<int?>("ExperienceLevel")
+                        .HasColumnType("integer");
 
                     b.Property<bool>("IsAvailable")
                         .HasColumnType("boolean");
@@ -117,8 +117,8 @@ namespace FreelanceMarketplace.Migrations
                     b.Property<int>("UserId")
                         .HasColumnType("integer");
 
-                    b.Property<string>("WorkingCapacity")
-                        .HasColumnType("text");
+                    b.Property<int?>("WorkType")
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -135,6 +135,9 @@ namespace FreelanceMarketplace.Migrations
                         .HasColumnType("integer");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AttachmentUrl")
+                        .HasColumnType("text");
 
                     b.Property<decimal?>("BudgetMax")
                         .HasColumnType("numeric(18,2)");

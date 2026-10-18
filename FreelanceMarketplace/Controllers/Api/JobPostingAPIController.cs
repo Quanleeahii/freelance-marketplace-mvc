@@ -44,15 +44,14 @@ public class JobPostingAPIController : ControllerBase
         var subCategories = await _jobService.GetSubCategoriesByParentIdAsync(parentId);
         return Ok(subCategories);
     }
-    [HttpPost("create")]
-    public async Task<IActionResult> CreateJob([FromBody] JobCreateViewModel model)
+    [HttpPost]
+    [Consumes("multipart/form-data")]
+    public async Task<IActionResult> CreateJob([FromForm] JobCreateViewModel model)
     {
         if (!ModelState.IsValid)
         {
             return BadRequest(ModelState);
         }
-
-        // 1. Đọc UserId từ Cookie Claims hoặc Session
         int currentUserId = 0;
         var idClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (!int.TryParse(idClaim, out currentUserId) || currentUserId <= 0)
@@ -61,13 +60,13 @@ public class JobPostingAPIController : ControllerBase
             int.TryParse(sessionUserId, out currentUserId);
         }
 
-        // Kiểm tra chuẩn: Nếu không có Cookie/Session hợp lệ thì chặn lại
         if (currentUserId <= 0)
         {
             return Unauthorized(new { message = "Vui lòng đăng nhập để đăng bài" });
         }
 
         var createdJob = await _jobService.CreateJobAsync(model, currentUserId, model.SkillIds);
+
         return StatusCode(StatusCodes.Status201Created, new
         {
             message = "Đăng dự án thành công",

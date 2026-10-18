@@ -1,0 +1,94 @@
+@model FreelanceMarketplace.ViewModels.ManageProfileViewModel
+
+@{
+    ViewData["Title"] = "Quản lý hồ sơ cá nhân";
+}
+
+<link rel="stylesheet" href="~/css/profile.css" asp-append-version="true" />
+
+<div class="container-fluid px-4 py-4">
+    <div class="row">
+        <!-- SIDEBAR TRÁI -->
+        <div class="col-lg-3 col-md-4 mb-4">
+            <div class="user-summary-card">
+                <div class="summary-avatar-wrapper mb-3">
+                    <img id="sidebar-avatar-img"
+                         src="@(string.IsNullOrEmpty(Model.BasicInfo?.AvatarUrl)
+                                                        ? $"https://ui-avatars.com/api/?name={Uri.EscapeDataString(string.IsNullOrWhiteSpace(Model.BasicInfo?.FullName) ? "User" : Model.BasicInfo.FullName)}&background=0f172a&color=fff&size=128"
+                                                        : Model.BasicInfo.AvatarUrl)"
+                         alt="Avatar"
+                         class="summary-avatar"
+                         style="border: none !important; box-shadow: none !important;" />
+                </div>
+                <h5 id="sidebar-user-name" class="user-name">
+                    @(string.IsNullOrEmpty(Model.BasicInfo?.FullName) ? "Chưa cập nhật tên" : Model.BasicInfo.FullName)
+                </h5>
+                <p class="user-email">@Model.BasicInfo?.Email</p>
+
+                <span class="badge-role">
+                    <i class="bi bi-shield-check me-1"></i>
+                    @(Model.BasicInfo?.IsVerified == true ? "Tài khoản đã xác thực" : "Thành viên")
+                </span>
+
+                <div class="profile-sidebar text-start mt-3">
+                    <div class="list-group-header">CÀI ĐẶT TÀI KHOẢN</div>
+                    <a href="javascript:void(0)" class="list-group-item active">
+                        <i class="bi bi-person"></i> Hồ sơ cá nhân
+                    </a>
+                    <a href="/account/change-password" class="list-group-item">
+                        <i class="bi bi-shield-lock"></i> Đổi mật khẩu
+                    </a>
+                    <form asp-controller="Account" asp-action="Logout" method="post" id="logoutForm" class="d-inline">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="list-group-item w-100 text-danger border-0 bg-transparent text-start">
+                            <i class="bi bi-box-arrow-right"></i> Đăng xuất
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- KHU VỰC NỘI DUNG CHÍNH (BÊN PHẢI) -->
+        <div class="col-lg-9 col-md-8">
+            <div class="profile-container">
+                <!-- TABS NGANG -->
+                <ul class="nav profile-nav-pills gap-2 mb-4" id="profileTab" role="tablist">
+                    <li class="nav-item">
+                        <button class="nav-link active" id="basic-tab" data-bs-toggle="tab" data-bs-target="#basic-info" type="button" role="tab">
+                            1. Thông tin chung
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link" id="freelancer-tab" data-bs-toggle="tab" data-bs-target="#freelancer-info" type="button" role="tab">
+                            2. Hồ sơ Freelancer
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link" id="client-tab" data-bs-toggle="tab" data-bs-target="#client-info" type="button" role="tab">
+                            3. Hồ sơ nhà tuyển dụng
+                        </button>
+                    </li>
+                </ul>
+
+                <!-- TAB CONTENT -->
+                <div class="tab-content" id="profileTabContent">
+                    <div class="tab-pane fade show active" id="basic-info" role="tabpanel" aria-labelledby="basic-tab">
+                        <partial name="_UserProfilePartial" model="Model.BasicInfo" />
+                    </div>
+
+                    <div class="tab-pane fade" id="freelancer-info" role="tabpanel" aria-labelledby="freelancer-tab">
+                        <partial name="_FreelancerProfilePartial" model="Model.FreelancerInfo" />
+                    </div>
+
+                    <div class="tab-pane fade" id="client-info" role="tabpanel" aria-labelledby="client-tab">
+                        <partial name="_ClientProfilePartial" model="Model.ClientInfo" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/profile.js" asp-append-version="true"></script>
+}

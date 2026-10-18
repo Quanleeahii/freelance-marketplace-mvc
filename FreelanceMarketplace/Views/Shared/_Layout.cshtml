@@ -1,57 +1,222 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+﻿@using FreelanceMarketplace.Data
+@using Microsoft.EntityFrameworkCore
+@inject AppDbContext DbContext
+
+<!DOCTYPE html>
+<html lang="vi">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - FreelanceMarketplace</title>
-    <script type="importmap"></script>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/FreelanceMarketplace.styles.css" asp-append-version="true" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">FreelanceMarketplace</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
+        <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom py-2">
+            <div class="container-fluid px-4">
+                <a class="navbar-brand d-flex align-items-center" asp-area="" asp-controller="Home" asp-action="Index">
+                    <img src="~/images/Freelance.png" alt="Logo" class="navbar-logo" asp-append-version="true" />
+                </a>
+
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse"
+                        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
+
+                <div class="navbar-collapse collapse d-lg-inline-flex justify-content-between align-items-center">
+                    <ul class="navbar-nav mx-auto mb-2 mb-lg-0 navbar-nav-center">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                            <a class="nav-link custom-nav-link" asp-area="" asp-controller="Home" asp-action="Index">Trang chủ</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
-                    <!-- Thêm 2 nút Đăng nhập / Đăng ký ở góc phải Navbar -->
-                    <ul class="navbar-nav">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark fw-bold" asp-area="" asp-controller="Account" asp-action="Login">Đăng nhập</a>
+                            <a class="nav-link custom-nav-link" asp-route="JobList">Dự án</a>
                         </li>
                         <li class="nav-item">
-                            <a class="btn btn-outline-success ms-2" asp-area="" asp-controller="Account" asp-action="Register">Đăng ký</a>
+                            <a class="nav-link custom-nav-link" asp-area="" asp-controller="Home" asp-action="About">Về chúng tôi</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link custom-nav-link" asp-area="" asp-controller="Home" asp-action="Contact">Liên hệ</a>
                         </li>
                     </ul>
+
+                    <div class="d-flex align-items-center gap-3">
+                        @if (User.Identity != null && User.Identity.IsAuthenticated)
+                        {
+                            var userEmail = User.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.Email)?.Value
+                                            ?? User.Identity.Name;
+
+                            var dbUser = await DbContext.Users
+                                .AsNoTracking()
+                                .Include(u => u.UserProfile)
+                                .FirstOrDefaultAsync(u => u.Email == userEmail);
+
+                            var displayName = dbUser?.UserProfile?.FullName ?? User.Identity.Name ?? "Thành viên";
+                            var avatarPath = dbUser?.UserProfile?.AvatarUrl;
+
+                            if (!string.IsNullOrEmpty(avatarPath) && !avatarPath.StartsWith("/") && !avatarPath.StartsWith("http"))
+                            {
+                                avatarPath = "/" + avatarPath;
+                            }
+
+                            var defaultAvatar = $"https://ui-avatars.com/api/?name={Uri.EscapeDataString(displayName)}&background=0f172a&color=fff&rounded=true";
+                            var finalAvatar = !string.IsNullOrEmpty(avatarPath) ? avatarPath : defaultAvatar;
+
+                            <a class="btn btn-post-job" href="/jobs/create">
+                                Đăng dự án
+                            </a>
+
+                            <div class="dropdown">
+                                <button class="user-dropdown-btn dropdown-toggle" type="button" id="userMenuDropdown"
+                                        data-bs-toggle="dropdown" aria-expanded="false">
+                                    <img src="@finalAvatar" alt="Avatar" class="user-avatar" id="navbarUserAvatar" asp-append-version="true" />
+                                    <div class="user-info d-none d-md-block">
+                                        <span class="user-name" id="navbarUserName">@displayName</span>
+                                        <span class="user-role">@(User.IsInRole("Admin") ? "Administrator" : "Thành viên")</span>
+                                    </div>
+                                </button>
+
+                                <ul class="dropdown-menu dropdown-menu-end custom-dropdown-menu" aria-labelledby="userMenuDropdown">
+                                    <li><a class="dropdown-item" asp-route="ManageProfile">Profile</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Account" asp-action="Settings">Settings</a></li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Message" asp-action="Inbox">
+                                            <span>Inbox</span>
+                                            <span class="badge bg-primary rounded-pill">6</span>
+                                        </a>
+                                    </li>
+                                    <li><a class="dropdown-item" asp-controller="Message" asp-action="Index">Message</a></li>
+                                    <li><hr class="dropdown-divider my-2"></li>
+                                    <li><a class="dropdown-item" asp-controller="Home" asp-action="Help">Need help?</a></li>
+                                    <li>
+                                        <form asp-route="Logout"  method="post" class="m-0 p-0">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" class="dropdown-item text-danger border-0 bg-transparent w-100 text-start">
+                                                Sign out
+                                            </button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </div>
+                        }
+                        else
+                        {
+                            <a class="custom-nav-link" asp-route="Register">
+                                Sign Up
+                            </a>
+                            <a class="btn btn-post-job" asp-route="Login" asp-route-returnUrl="/jobs/create">
+                                Đăng dự án
+                            </a>
+                        }
+                    </div>
                 </div>
             </div>
         </nav>
     </header>
+
     <div class="container">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
     </div>
 
-    <!-- Chỉ hiển thị Footer khi trang không yêu cầu ẩn (ViewData["HideFooter"] == null) -->
     @if (ViewData["HideFooter"] == null)
     {
-        <footer class="border-top footer text-muted">
+        <footer class="footer-container">
             <div class="container">
-                &copy; 2026 - FreelanceMarketplace - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                <div class="footer-card">
+                    <div class="row g-4">
+                        <div class="col-lg-4 col-md-6">
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                <span class="footer-logo-badge">FM</span>
+                                <span class="footer-brand-title">FreelanceMarketplace</span>
+                            </div>
+                            <p class="footer-desc pe-lg-4">
+                                Nền tảng kết nối chuyên gia độc lập và doanh nghiệp hàng đầu, kiến tạo giá trị thông qua từng dự án hoàn hảo.
+                            </p>
+                            <div class="footer-status-badge">
+                                <span class="footer-status-dot"></span>
+                                <span>Sẵn sàng kết nối dự án mới</span>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-2 col-md-6 col-6">
+                            <h6 class="footer-col-title">Liên kết</h6>
+                            <ul class="footer-list">
+                                <li><a asp-controller="Home" asp-action="Index">Trang chủ</a></li>
+                                <li><a asp-route="JobList">Dự án</a></li>
+                                <li><a asp-controller="Home" asp-action="About">Về chúng tôi</a></li>
+                                <li><a asp-controller="Home" asp-action="Contact">Liên hệ</a></li>
+                            </ul>
+                        </div>
+
+                        <div class="col-lg-3 col-md-6 col-6">
+                            <h6 class="footer-col-title">Lĩnh vực nổi bật</h6>
+                            <ul class="footer-list">
+                                <li><a href="/jobs?category=web">Thiết kế & Lập trình Web</a></li>
+                                <li><a href="/jobs?category=mobile">Phát triển ứng dụng Mobile</a></li>
+                                <li><a href="/jobs?category=uiux">Thiết kế UI / UX Design</a></li>
+                                <li><a href="/jobs?category=marketing">Digital Marketing & SEO</a></li>
+                                <li><a href="/jobs?category=content">Viết bài & Dịch thuật</a></li>
+                            </ul>
+                        </div>
+
+                        <div class="col-lg-3 col-md-6">
+                            <h6 class="footer-col-title">Kết nối với chúng tôi</h6>
+                            <a href="mailto:contact@freelancemarketplace.vn" class="footer-contact-item">
+                                <i class="bi bi-envelope"></i>
+                                <span>contact@freelancemarketplace.vn</span>
+                            </a>
+                            <div class="footer-contact-item">
+                                <i class="bi bi-telephone"></i>
+                                <span>+84 (0) 987 654 321</span>
+                            </div>
+                            <div class="footer-contact-item">
+                                <i class="bi bi-geo-alt"></i>
+                                <span>Hà Nội, Việt Nam</span>
+                            </div>
+                            <div class="footer-social-icons">
+                                <a href="#" class="footer-social-btn"><i class="bi bi-facebook"></i></a>
+                                <a href="#" class="footer-social-btn"><i class="bi bi-linkedin"></i></a>
+                                <a href="#" class="footer-social-btn"><i class="bi bi-github"></i></a>
+                                <a href="#" class="footer-social-btn"><i class="bi bi-instagram"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="footer-cta-card">
+                    <div class="row align-items-center g-3">
+                        <div class="col-lg-7 text-center text-lg-start">
+                            <h5 class="footer-cta-title">Sẵn sàng bắt đầu dự án tiếp theo của bạn?</h5>
+                            <p class="footer-cta-desc mb-0">Tham gia ngay cùng hàng ngàn doanh nghiệp và freelancer chuyên nghiệp trên toàn quốc.</p>
+                        </div>
+                        <div class="col-lg-5 d-flex flex-wrap justify-content-center justify-content-lg-end gap-2">
+                            <a asp-route="JobList" class="btn btn-cta-outline">
+                                <i class="bi bi-search me-1"></i> Tìm việc làm
+                            </a>
+                            <a asp-route="CreateJob" class="btn btn-cta-primary">
+                                <i class="bi bi-plus-circle me-1"></i> Đăng dự án ngay
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="footer-bottom-bar flex-column flex-md-row gap-2">
+                    <div>
+                        &copy; 2026 FreelanceMarketplace. Tất cả các quyền được bảo lưu.
+                    </div>
+                    <ul class="footer-bottom-links">
+                        <li><a asp-controller="Home" asp-action="Privacy">Chính sách bảo mật</a></li>
+                        <li><a href="#">Điều khoản sử dụng</a></li>
+                        <li><a href="#">Chính sách Cookie</a></li>
+                    </ul>
+                </div>
             </div>
         </footer>
     }

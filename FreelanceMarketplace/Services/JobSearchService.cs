@@ -14,20 +14,15 @@ public class JobSearchService : IJobSearchService
         _context = context;
     }
 
-    public async Task<PagedResult<Job>> GetJobsAsync(JobFilterRequest request)
+    public async Task<PagedResult<JobListItemDto>> GetJobsAsync(JobFilterRequest request)
     {
         var query = _context.Jobs
-            .AsNoTracking()
-            .Include(j => j.Category)
-            .Include(j => j.Proposals)
-            .Include(j => j.Skills)
-            .Where(j => j.Status == "Open")
-            .AsQueryable();
+        .AsNoTracking()
+        .Where(j => j.Status == "Open");
         if (!string.IsNullOrWhiteSpace(request.Keyword))
         {
             string keyword = request.Keyword.Trim().ToLower();
-            query = query.Where(j => j.Title.ToLower().Contains(keyword) ||
-                                     j.Description.ToLower().Contains(keyword) ||
+            query = query.Where(j => j.Title.ToLower().Contains(keyword) ||                           
                                      j.Skills.Any(s => s.Name.ToLower().Contains(keyword)));
         }
         if (!string.IsNullOrWhiteSpace(request.LocationCity))
@@ -51,17 +46,20 @@ public class JobSearchService : IJobSearchService
 
         if (request.WorkType.HasValue)
         {
-            query = query.Where(j => j.WorkType == request.WorkType.Value);
+            var workTypeValue = (int)request.WorkType.Value;
+            query = query.Where(j => (int)j.WorkType == workTypeValue);
         }
 
         if (request.WorkMode.HasValue)
         {
-            query = query.Where(j => j.WorkMode == request.WorkMode.Value);
+            var workModeValue = (int)request.WorkMode.Value;
+            query = query.Where(j => (int)j.WorkMode == workModeValue);
         }
 
         if (request.PaymentType.HasValue)
         {
-            query = query.Where(j => j.PaymentType == request.PaymentType.Value);
+            var paymentTypeValue = (int)request.PaymentType.Value;
+            query = query.Where(j => (int)j.PaymentType == paymentTypeValue);
         }
         query = query.OrderByDescending(j => j.CreatedAt);
         int totalCount = await query.CountAsync();
@@ -69,10 +67,52 @@ public class JobSearchService : IJobSearchService
         int pageSize = request.PageSize > 0 ? request.PageSize : 10;
         int totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
         var items = await query
-            .Skip((pageNumber - 1) * pageSize)
-            .Take(pageSize)
-            .ToListAsync();
-        return new PagedResult<Job>
+        .OrderByDescending(j => j.CreatedAt)
+        .Skip((pageNumber - 1) * pageSize)
+        .Take(pageSize)
+        .Select(j => new JobListItemDto
+        {
+            Id = j.Id,
+            ClientProfileId = j.ClientProfileId,
+            CategoryId = j.CategoryId,
+            Title = j.Title,
+            Description = j.Description,
+            Status = j.Status,
+            WorkType = j.WorkType,      
+            WorkMode = j.WorkMode,      
+            PaymentType = j.PaymentType,
+            LocationCity = j.LocationCity,
+            BudgetMin = j.BudgetMin,
+            BudgetMax = j.BudgetMax,
+            Deadline = j.Deadline,
+            CreatedAt = j.CreatedAt,
+            UpdatedAt = j.UpdatedAt,
+            AttachmentUrl = j.AttachmentUrl,
+            Category = j.Category != null ? new CategoryBriefDto
+            {
+                Id = j.Category.Id,
+                Name = j.Category.Name,
+                Slug = j.Category.Slug,
+                DisplayOrder = j.Category.DisplayOrder,
+                ParentId = j.Category.ParentId
+            } : null,
+            Skills = j.Skills.Select(s => new SkillBriefDto
+            {
+                Id = s.Id,
+                Name = s.Name
+            }).ToList(),
+            ClientProfile = new ClientBriefDto
+            {
+                Id = j.ClientProfileId,
+                DisplayName = !string.IsNullOrWhiteSpace(j.ClientProfile.DisplayName)
+        ? j.ClientProfile.DisplayName
+        : (j.ClientProfile.User.UserProfile != null && !string.IsNullOrWhiteSpace(j.ClientProfile.User.UserProfile.FullName)
+            ? j.ClientProfile.User.UserProfile.FullName
+            : "Khách hàng")
+            }
+        })
+        .ToListAsync();
+        return new PagedResult<JobListItemDto>
         {
             Items = items,
             CurrentPage = pageNumber,

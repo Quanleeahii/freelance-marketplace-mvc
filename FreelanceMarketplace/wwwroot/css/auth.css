@@ -1,35 +1,63 @@
 :root {
-    --primary-color: #00b14f;
-    --primary-hover: #009643;
-    --bg-color: #f4f5f7;
-    --text-color: #333333;
+    --primary-color: #0f172a;
+    --primary-hover: #334155;
+    --bg-color: #f8fafc;
+    --text-color: #0f172a;
     --border-color: #e2e8f0;
     --error-color: #e53e3e;
+}
+
+/* Triệt tiêu thanh cuộn và căn khớp toàn trang */
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow-y: hidden;
 }
 
 body {
     background-color: var(--bg-color);
     font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
     color: var(--text-color);
-    margin: 0;
-    padding: 0;
+    display: flex;
+    flex-direction: column;
 }
 
+    /* Khử khoảng đệm dư thừa của Layout mặc định */
+    body > .container {
+        padding: 0 !important;
+        max-width: 100% !important;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+main.pb-3 {
+    padding-bottom: 0 !important;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Canh giữa card đăng nhập trong khoảng trống còn lại */
 .auth-container {
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: calc(100vh - 80px);
-    padding: 24px 16px;
+    flex: 1;
+    padding: 16px;
+    box-sizing: border-box;
+    min-height: 0;
 }
 
 .auth-card {
     width: 100%;
-    max-width: 460px;
+    max-width: 440px;
     background: #ffffff;
     border-radius: 12px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-    padding: 32px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+    border: 1px solid #e2e8f0;
+    padding: 28px 32px;
     box-sizing: border-box;
 }
 
@@ -39,7 +67,7 @@ body {
 }
 
     .auth-header .brand-logo {
-        font-size: 28px;
+        font-size: 26px;
         font-weight: 800;
         color: var(--primary-color);
         text-decoration: none;
@@ -54,15 +82,14 @@ body {
     }
 
     .auth-header p {
-        color: #666;
+        color: #64748b;
         font-size: 13px;
         margin: 0;
     }
 
-/* Tab Switcher */
 .auth-tabs {
     display: flex;
-    background: #f0f2f5;
+    background: #f1f5f9;
     border-radius: 8px;
     padding: 4px;
     margin-bottom: 20px;
@@ -74,7 +101,7 @@ body {
     padding: 8px 0;
     font-weight: 600;
     font-size: 14px;
-    color: #666;
+    color: #64748b;
     border-radius: 6px;
     text-decoration: none;
     transition: all 0.2s ease;
@@ -83,35 +110,37 @@ body {
     .auth-tab.active {
         background: #ffffff;
         color: var(--primary-color);
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     }
 
 .form-group {
-    margin-bottom: 16px;
+    margin-bottom: 14px;
 }
 
     .form-group > label {
         display: block;
         font-size: 13px;
         font-weight: 600;
-        margin-bottom: 6px;
+        margin-bottom: 5px;
+        color: #334155;
     }
 
 .form-control-custom {
     width: 100%;
-    height: 42px;
+    height: 40px;
     padding: 8px 12px;
     border: 1px solid var(--border-color);
     border-radius: 8px;
     font-size: 14px;
     box-sizing: border-box;
+    outline: none !important;
     transition: border-color 0.2s;
 }
 
     .form-control-custom:focus {
-        outline: none;
-        border-color: var(--primary-color);
-        box-shadow: 0 0 0 3px rgba(0, 177, 79, 0.15);
+        outline: none !important;
+        border-color: #0f172a !important;
+        box-shadow: none !important;
     }
 
 .pw-wrapper {
@@ -126,14 +155,14 @@ body {
     background: none;
     border: none;
     cursor: pointer;
-    color: #777;
+    color: #64748b;
     font-size: 13px;
     font-weight: 600;
 }
 
 .auth-btn-submit {
     width: 100%;
-    height: 44px;
+    height: 42px;
     background-color: var(--primary-color);
     color: #ffffff;
     border: none;
@@ -142,7 +171,7 @@ body {
     font-weight: 700;
     cursor: pointer;
     transition: background-color 0.2s ease;
-    margin-top: 8px;
+    margin-top: 6px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -154,10 +183,10 @@ body {
     }
 
 .auth-footer {
-    margin-top: 18px;
+    margin-top: 16px;
     text-align: center;
     font-size: 13px;
-    color: #666;
+    color: #64748b;
 }
 
     .auth-footer a {
@@ -166,11 +195,22 @@ body {
         font-weight: 600;
     }
 
+        .auth-footer a:hover {
+            text-decoration: underline;
+        }
+
 .field-error-msg {
     color: var(--error-color);
     font-size: 12px;
     margin-top: 4px;
     display: block;
+}
+
+/* Trường hợp màn hình quá thấp (laptop nhỏ xoay ngang hoặc mở bàn phím ảo) */
+@media (max-height: 640px) {
+    html, body {
+        overflow-y: auto;
+    }
 }
 
 @media (max-width: 576px) {

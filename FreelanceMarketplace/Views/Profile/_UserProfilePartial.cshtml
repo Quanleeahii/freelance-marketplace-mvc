@@ -1,0 +1,110 @@
+﻿@model FreelanceMarketplace.ViewModels.UserProfileViewModel
+@using FreelanceMarketplace.ViewModels
+
+<div class="section-header">
+    <span class="badge-step">1</span>
+    <h6 class="section-title">THÔNG TIN CÁ NHÂN CƠ BẢN</h6>
+</div>
+
+<form id="form-user-profile" novalidate>
+    <!-- Ảnh đại diện -->
+    <div class="row mb-4 align-items-center">
+        <label class="col-sm-3 form-label-custom">Ảnh đại diện</label>
+        <div class="col-sm-9">
+            <div class="d-flex align-items-center gap-3">
+                <div class="avatar-preview-wrapper position-relative" style="border: none !important;">
+                    <img id="avatar-preview" 
+                         src="@(string.IsNullOrEmpty(Model?.AvatarUrl) 
+                                ? $"https://ui-avatars.com/api/?name={Uri.EscapeDataString(string.IsNullOrWhiteSpace(Model?.FullName) ? "User" : Model.FullName)}&background=0f172a&color=fff&size=128" 
+                                : Model.AvatarUrl)" 
+                         alt="Avatar" 
+                         class="avatar-preview-img" 
+                         style="border: none !important; box-shadow: none !important;" />
+                    <span id="avatar-spinner" class="spinner-border spinner-border-sm text-success position-absolute top-50 start-50 translate-middle d-none"></span>
+                </div>
+                
+                <div>
+                    <label class="btn btn-sm btn-outline-brand avatar-custom-btn mb-1">
+                        Đổi ảnh mới
+                        <input type="file" id="avatar-file-input" accept="image/png, image/jpeg, image/jpg, image/webp" />
+                    </label>
+                    <small class="text-muted d-block" style="font-size: 0.78rem;">Định dạng: JPG, JPEG, PNG, WEBP (Tối đa 1MB)</small>
+                    <span class="field-error-msg text-danger small d-block" data-valmsg-for="AvatarUrl"></span>
+                    <input type="hidden" id="AvatarUrl" name="AvatarUrl" value="@Model?.AvatarUrl" />
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Họ và tên -->
+    <div class="row mb-3">
+        <label for="FullName" class="col-sm-3 form-label-custom">Họ và tên <span class="text-danger">*</span></label>
+        <div class="col-sm-9">
+            <input type="text" id="FullName" name="FullName" class="form-control form-control-custom" 
+                   value="@Model?.FullName" placeholder="Họ và tên" maxlength="100" />
+            <span class="field-error-msg text-danger small d-block mt-1" data-valmsg-for="FullName"></span>
+        </div>
+    </div>
+
+    <!-- Email (Readonly) -->
+    <div class="row mb-3">
+        <label for="Email" class="col-sm-3 form-label-custom">Email đăng ký</label>
+        <div class="col-sm-9">
+            <input type="email" id="Email" name="Email" class="form-control form-control-custom bg-light text-muted" 
+                   value="@Model?.Email" readonly tabindex="-1" />
+            <small class="text-muted" style="font-size: 0.78rem;">Email dùng để xác thực hệ thống và không thể thay đổi tại đây.</small>
+        </div>
+    </div>
+
+    <!-- Điện thoại -->
+    <div class="row mb-3">
+        <label for="Phone" class="col-sm-3 form-label-custom">Điện thoại</label>
+        <div class="col-sm-9">
+            <input type="tel" id="Phone" name="Phone" class="form-control form-control-custom" 
+                   value="@Model?.Phone" placeholder="Số điện thoại" />
+            <span class="field-error-msg text-danger small d-block mt-1" data-valmsg-for="Phone"></span>
+        </div>
+    </div>
+
+    <!-- Tỉnh / Thành phố: Custom Dropdown Menu -->
+    <div class="row mb-3">
+        <label for="locationCityInput" class="col-sm-3 form-label-custom">Tỉnh / Thành phố</label>
+        <div class="col-sm-9 position-relative">
+            <input type="text" id="locationCityInput" class="form-control form-control-custom" 
+                   value="@Model?.City" placeholder="Thành phố" autocomplete="off" />
+
+            <div id="locationCityMenu" class="custom-dropdown-list shadow-sm" style="display: none;">
+                @foreach (var city in VietnameseProvinces.List.Where(p => p != "Toàn quốc"))
+                {
+                    <div class="dropdown-item-vlance" data-id="@city">@city</div>
+                }
+            </div>
+
+            <input type="hidden" id="City" name="City" value="@Model?.City" />
+            <span class="field-error-msg text-danger small d-block mt-1" data-valmsg-for="City"></span>
+        </div>
+    </div>
+
+    <!-- Địa chỉ chi tiết -->
+    <div class="row mb-4">
+        <label for="Address" class="col-sm-3 form-label-custom">Địa chỉ</label>
+        <div class="col-sm-9">
+            <input type="text" id="Address" name="Address" class="form-control form-control-custom" 
+                   value="@Model?.Address" placeholder="Số nhà, đường phố, phường/xã" maxlength="255" />
+            <span class="field-error-msg text-danger small d-block mt-1" data-valmsg-for="Address"></span>
+        </div>
+    </div>
+
+    <!-- Nút Submit -->
+    <div class="row">
+        <div class="col-sm-9 offset-sm-3 d-flex align-items-center gap-3">
+            <button type="submit" id="btn-submit-profile" class="btn-brand-primary">
+                <span id="btn-spinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                <span>Lưu thông tin cá nhân</span>
+            </button>
+            <span id="save-success-msg" class="text-success fw-semibold small d-none">
+                Đã lưu thay đổi thành công!
+            </span>
+        </div>
+    </div>
+</form>

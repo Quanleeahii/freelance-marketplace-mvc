@@ -5,6 +5,6 @@ namespace FreelanceMarketplace.Services;
 
 public interface IJobSearchService
 {
-    Task<PagedResult<Job>> GetJobsAsync(JobFilterRequest request);
+    Task<PagedResult<JobListItemDto>> GetJobsAsync(JobFilterRequest request);
     Task<Job?> GetJobByIdAsync(int id);
 }

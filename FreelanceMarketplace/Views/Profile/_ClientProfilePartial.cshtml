@@ -1,0 +1,52 @@
+﻿@model FreelanceMarketplace.ViewModels.ClientProfileViewModel
+
+<div class="section-header">
+    <span class="badge-step">3</span>
+    <h6 class="section-title">THÔNG TIN NHÀ TUYỂN DỤNG</h6>
+</div>
+
+<form id="form-client-profile" novalidate>
+    <!-- Tên hiển thị / Tên công ty -->
+    <div class="row mb-3">
+        <label for="ClientDisplayName" class="col-sm-3 form-label-custom">Tên Cá nhân, Công ty hay Tổ chức</label>
+        <div class="col-sm-9">
+            <input type="text" id="ClientDisplayName" name="DisplayName" class="form-control form-control-custom" 
+                   value="@Model?.DisplayName" placeholder="VD: Công ty TNHH Giải pháp Công nghệ..." maxlength="150" />
+            <span class="field-error-msg text-danger small d-block mt-1" data-valmsg-for="DisplayName"></span>
+        </div>
+    </div>
+
+    <!-- Website doanh nghiệp -->
+    <div class="row mb-3">
+        <label for="ClientWebsite" class="col-sm-3 form-label-custom">Website doanh nghiệp</label>
+        <div class="col-sm-9">
+            <input type="url" id="ClientWebsite" name="Website" class="form-control form-control-custom" 
+                   value="@Model?.Website" placeholder="https://congty.vn" maxlength="255" />
+            <span class="field-error-msg text-danger small d-block mt-1" data-valmsg-for="Website"></span>
+        </div>
+    </div>
+
+    <!-- Giới thiệu doanh nghiệp / Description -->
+    <div class="row mb-4">
+        <label for="ClientDescription" class="col-sm-3 form-label-custom">Giới thiệu công ty</label>
+        <div class="col-sm-9">
+            <textarea id="ClientDescription" name="Description" class="form-control form-control-custom" rows="5" 
+                      placeholder="Mô tả về lĩnh vực hoạt động, quy mô công ty, văn hóa làm việc..." 
+                      maxlength="2000">@Model?.Description</textarea>
+            <span class="field-error-msg text-danger small d-block mt-1" data-valmsg-for="Description"></span>
+        </div>
+    </div>
+
+    <!-- Nút Submit -->
+    <div class="row">
+        <div class="col-sm-9 offset-sm-3 d-flex align-items-center gap-3">
+            <button type="submit" id="btn-submit-client" class="btn-brand-primary">
+                <span id="btn-client-spinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                <span>Lưu thông tin</span>
+            </button>
+            <span id="client-success-msg" class="text-success fw-semibold small d-none">
+                Đã lưu thông tin thành công!
+            </span>
+        </div>
+    </div>
+</form>
