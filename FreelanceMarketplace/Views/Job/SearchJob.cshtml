@@ -1,4 +1,4 @@
-﻿@model FreelanceMarketplace.ViewModels.PagedResult<FreelanceMarketplace.Models.Job>
+﻿@model FreelanceMarketplace.ViewModels.PagedResult<FreelanceMarketplace.ViewModels.JobListItemDto>
 @{
     ViewData["Title"] = "Tìm việc freelancer - NextHub";
     var filter = ViewBag.Filter as FreelanceMarketplace.ViewModels.JobFilterRequest ?? new FreelanceMarketplace.ViewModels.JobFilterRequest();
@@ -41,7 +41,7 @@
                                     @if (hasChildren)
                                     {
                                         <div class="sub-category-list ps-3 mt-1 @(isExpanded ? "" : "d-none")" id="sub-@parent.Id">
-                                            @foreach (var sub in parent.SubCategories)
+                                            @foreach (var sub in parent.SubCategories ?? Enumerable.Empty<FreelanceMarketplace.Models.Category>())
                                             {
                                                 <div class="sub-category-item @(filter.SubCategoryId == sub.Id ? "active" : "")" 
                                                      data-parent-id="@parent.Id" data-sub-id="@sub.Id">
@@ -63,7 +63,7 @@
                         <h6 class="fw-bold text-dark m-0">Kỹ năng</h6>
                         @if (selectedSkillIds.Any())
                         {
-                            <a href="javascript:void(0)" id="btnClearSkills" class="small text-success text-decoration-none">
+                            <a href="javascript:void(0)" id="btnClearSkills" class="small btn-clear-skills text-decoration-none">
                                 Xóa chọn
                             </a>
                         }
@@ -146,10 +146,10 @@
                     <button class="nav-link @(!filter.WorkType.HasValue ? "active" : "")" data-work-type="">Tất cả công việc</button>
                 </li>
                 <li class="nav-item">
-                    <button class="nav-link @(filter.WorkType == FreelanceMarketplace.Enums.WorkType.PartTime ? "active" : "")" data-work-type="PartTime">Việc bán thời gian</button>
+                    <button class="nav-link @(filter.WorkType == FreelanceMarketplace.Enums.WorkType.PartTime ? "active" : "")" data-work-type="1">Việc bán thời gian</button>
                 </li>
                 <li class="nav-item">
-                    <button class="nav-link @(filter.WorkType == FreelanceMarketplace.Enums.WorkType.FullTime ? "active" : "")" data-work-type="FullTime">Việc toàn thời gian</button>
+                    <button class="nav-link @(filter.WorkType == FreelanceMarketplace.Enums.WorkType.FullTime ? "active" : "")" data-work-type="2">Việc toàn thời gian</button>
                 </li>
             </ul>
 
@@ -177,7 +177,7 @@
                         <input type="hidden" id="cityHidden" value="@(filter.LocationCity ?? "")" />
                     </div>
                     <div class="col-md-2">
-                        <button type="button" id="btnSearch" class="btn btn-success w-100 fw-bold">Tìm kiếm</button>
+                        <button type="button" id="btnSearch" class="btn btn-search-primary w-100 fw-bold">Tìm kiếm</button>
                     </div>
                 </div>
             </div>
@@ -214,7 +214,7 @@
         </div>
         <p class="text-muted small mb-3">
             <span class="job-desc"></span>
-            <a href="#" class="job-link text-decoration-none ms-1 fw-semibold text-primary d-none">Xem thêm</a>
+            <a href="#" class="job-link text-decoration-none ms-1 fw-semibold text-dark d-none">Xem thêm</a>
         </p>
         <div class="d-flex justify-content-between align-items-center">
             <div class="skills-list d-flex flex-wrap gap-1"></div>

@@ -1,16 +1,20 @@
-﻿using System.Security.Claims;
+﻿using FreelanceMarketplace.Data;
 using FreelanceMarketplace.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace FreelanceMarketplace.Services;
 
 public class SignInService : ISignInService
 {
     private readonly IHttpContextAccessor _httpContextAccessor;
-    public SignInService(IHttpContextAccessor httpContextAccessor)
+    private readonly AppDbContext _context;
+    public SignInService(IHttpContextAccessor httpContextAccessor, AppDbContext context)
     {
         _httpContextAccessor = httpContextAccessor;
+        _context = context;
     }
     public async Task SignInUserAsync(User user, bool isPersistent = false)
     {
@@ -41,6 +45,18 @@ public class SignInService : ISignInService
         if (!string.IsNullOrEmpty(user.UserProfile?.FullName))
         {
             httpContext.Session.SetString("FullName", user.UserProfile.FullName);
+        }
+    }
+    public async Task RefreshSignInAsync(int userId)
+    {
+        var user = await _context.Users
+            .AsNoTracking()
+            .Include(u => u.UserProfile)
+            .FirstOrDefaultAsync(u => u.Id == userId);
+
+        if (user != null)
+        {
+            await SignInUserAsync(user, isPersistent: true);
         }
     }
     public async Task SignOutUserAsync()

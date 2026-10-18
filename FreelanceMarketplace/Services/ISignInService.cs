@@ -6,5 +6,6 @@ namespace FreelanceMarketplace.Services
     {
         Task SignInUserAsync(User user, bool isPersistent = false);
         Task SignOutUserAsync();
+        Task RefreshSignInAsync(int userId);
     }
 }

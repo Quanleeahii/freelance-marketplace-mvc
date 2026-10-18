@@ -1,5 +1,80 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-}
+﻿@model FreelanceMarketplace.ViewModels.FreelancerProfileViewModel
+@using FreelanceMarketplace.Enums
+
+<div class="section-header">
+    <span class="badge-step">2</span>
+    <h6 class="section-title">HỒ SƠ FREELANCER</h6>
+</div>
+
+<form id="form-freelancer-profile" novalidate>
+    @Html.AntiForgeryToken()
+
+    <div class="row mb-4 align-items-center">
+        <label class="col-sm-3 form-label-custom">Trạng thái nhận việc</label>
+        <div class="col-sm-9">
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="IsAvailable" name="IsAvailable" value="true" @(Model?.IsAvailable == true ? "checked" : "") style="cursor: pointer;" />
+                <label class="form-check-label ms-2 small fw-semibold text-secondary" for="IsAvailable">
+                    Sẵn sàng nhận dự án mới
+                </label>
+            </div>
+            <span class="field-error-msg text-danger small d-block mt-1" data-valmsg-for="IsAvailable"></span>
+        </div>
+    </div>
+
+    <!-- Mức độ kinh nghiệm -->
+<div class="row mb-3">
+    <label for="ExperienceLevel" class="col-sm-3 form-label-custom">Mức độ kinh nghiệm</label>
+    <div class="col-sm-9">
+        <select id="ExperienceLevel" name="ExperienceLevel" class="form-select form-select-custom"
+                asp-for="ExperienceLevel"
+                asp-items="Html.GetEnumSelectList<ExperienceLevel>()">
+            <option value="" disabled selected hidden>Mức kinh nghiệm phù hợp</option>
+        </select>
+        <span class="field-error-msg text-danger small d-block mt-1" data-valmsg-for="ExperienceLevel"></span>
+    </div>
+</div>
+
+<!-- Thời gian làm việc -->
+<div class="row mb-3">
+    <label for="WorkType" class="col-sm-3 form-label-custom">Thời gian làm việc</label>
+    <div class="col-sm-9">
+        <select id="WorkType" name="WorkType" class="form-select form-select-custom"
+                asp-for="WorkType"
+                asp-items="Html.GetEnumSelectList<WorkType>()">
+            <option value="" disabled selected hidden>Hình thức làm việc</option>
+        </select>
+        <span class="field-error-msg text-danger small d-block mt-1" data-valmsg-for="WorkType"></span>
+    </div>
+</div>
+
+    <div class="row mb-3">
+        <label for="PersonalWebsite" class="col-sm-3 form-label-custom">Website / Portfolio</label>
+        <div class="col-sm-9">
+            <input type="url" id="PersonalWebsite" name="PersonalWebsite" class="form-control form-control-custom" 
+                   value="@Model?.PersonalWebsite" placeholder="https://myportfolio.com hoặc GitHub..." />
+            <span class="field-error-msg text-danger small d-block mt-1" data-valmsg-for="PersonalWebsite"></span>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <label for="Bio" class="col-sm-3 form-label-custom">Giới thiệu bản thân</label>
+        <div class="col-sm-9">
+            <textarea id="Bio" name="Bio" class="form-control form-control-custom" rows="5" 
+                      placeholder="Bản giới thiệu bản thân đầy đủ sẽ giúp người xem hiểu rõ hơn về bạn...">@Model?.Bio</textarea>
+            <span class="field-error-msg text-danger small d-block mt-1" data-valmsg-for="Bio"></span>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-9 offset-sm-3 d-flex align-items-center gap-3">
+            <button type="submit" id="btn-submit-freelancer" class="btn-brand-primary">
+                <span id="btn-freelancer-spinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                <span>Lưu hồ sơ Freelancer</span>
+            </button>
+            <span id="freelancer-success-msg" class="text-success fw-semibold small d-none">
+                Đã lưu hồ sơ Freelancer thành công!
+            </span>
+        </div>
+    </div>
+</form>

@@ -16,7 +16,7 @@ public class JobController : Controller
         _jobService = jobService;
     }
 
-    [HttpGet("create")]
+    [HttpGet("create", Name = "CreateJob")]
     public async Task<IActionResult> CreateJob()
     {
         var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier)
@@ -39,7 +39,7 @@ public class JobController : Controller
         //return View(new JobCreateViewModel());
         if (string.IsNullOrEmpty(userIdStr))
         {
-            return RedirectToAction("Login", "Account", new { returnUrl = "/Job/CreateJob" });
+            return RedirectToAction("Login", "Account", new { returnUrl = "/jobs/create" });
         }
         await LoadFormDataAsync();
         return View(new JobCreateViewModel());

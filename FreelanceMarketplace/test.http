@@ -1,8 +1,19 @@
+
+@FreelanceMarketplace_HostAddress = https://localhost:7098
 @baseUrl = https://localhost:7098
 
-# ==============================================================================
-# LUỒNG 1: CHUẨN BỊ TÀI KHOẢN (ĐĂNG KÝ & LẤY SESSION)
-# ==============================================================================
+### ===================================================================
+### 1. AUTHENTICATION & TÀI KHOẢN
+### ===================================================================
+
+### 1.1 Kiểm tra email
+GET {{baseUrl}}/api/auth/check-email?email=test@gmail.com
+
+###
+
+### 1.2 Đăng ký tài khoản mới
+@baseUrl = https://localhost:7098
+
 
 ### 1.1. Đăng ký tài khoản Freelancer (Chỉ cần chạy 1 lần)
 POST {{baseUrl}}/api/auth/register
@@ -10,11 +21,121 @@ Content-Type: application/json
 
 {
   "fullName": "Lê Anh Quân",
+
+  "email": "quan1@gmail.com",
+
   "email": "freelancer1@example.com",
+
   "password": "Password123@",
   "confirmPassword": "Password123@"
 }
 
+
+
+### ===================================================================
+### 2. MODULE USER PROFILE (PHẦN BẠN PHỤ TRÁCH)
+### ===================================================================
+
+### 2.1 Lấy thông tin cá nhân theo UserId (ví dụ UserId = 1)
+GET {{baseUrl}}/api/user/profile/1
+Accept: application/json
+
+###
+
+### 2.2 Cập nhật thông tin cá nhân (Text thuần - Không kèm Avatar)
+POST {{baseUrl}}/api/user/profile/update/1
+Content-Type: multipart/form-data; boundary=boundary
+
+--boundary
+Content-Disposition: form-data; name="FullName"
+
+Lê Minh Quít
+--boundary
+Content-Disposition: form-data; name="Email"
+
+quan2@gmail.com
+--boundary
+Content-Disposition: form-data; name="Phone"
+
+0912345678
+--boundary
+Content-Disposition: form-data; name="City"
+
+Quảng Ninh
+--boundary
+Content-Disposition: form-data; name="Address"
+
+Hạ Long, Quảng Ninh
+--boundary--
+
+###
+
+### 2.3 Cập nhật thông tin cá nhân KÈM UPLOAD ẢNH ĐẠI DIỆN
+# (Lưu ý: Thay đường dẫn ảnh thật trên máy bạn, ví dụ: d:/avatar.png)
+POST {{baseUrl}}/api/user/profile/update/1
+Content-Type: multipart/form-data; boundary=boundary
+
+--boundary
+Content-Disposition: form-data; name="FullName"
+
+Lê Minh Quân
+--boundary
+Content-Disposition: form-data; name="Email"
+
+quan2@gmail.com
+--boundary
+Content-Disposition: form-data; name="Phone"
+
+0987654321
+--boundary
+Content-Disposition: form-data; name="City"
+
+Hà Nội
+--boundary
+Content-Disposition: form-data; name="Address"
+
+Cầu Giấy, Hà Nội
+--boundary
+Content-Disposition: form-data; name="AvatarFile"; filename="avatar.png"
+Content-Type: image/png
+
+< d:/avatar.png
+--boundary--
+
+###
+
+### 2.4 Test bắt lỗi Validation: Sai định dạng số điện thoại
+POST {{baseUrl}}/api/user/profile/update/1
+Content-Type: multipart/form-data; boundary=boundary
+
+--boundary
+Content-Disposition: form-data; name="FullName"
+
+Lê Minh Quân
+--boundary
+Content-Disposition: form-data; name="Email"
+
+quan2@gmail.com
+--boundary
+Content-Disposition: form-data; name="Phone"
+
+123456
+--boundary--
+
+
+### ===================================================================
+### 3. MODULE ĐĂNG VIỆC (JOB POSTING)
+### ===================================================================
+
+### 3.1 Lấy danh sách danh mục con theo ParentId (ví dụ ParentId = 1)
+GET {{baseUrl}}/api/jobs/subcategories/1
+Accept: application/json
+
+###
+
+### 3.2 Đăng việc mới (Tạo Job)
+POST {{baseUrl}}/api/jobs/create
+=======
 ### 1.2. Đăng nhập để lấy Cookie Session (Bắt buộc chạy trước khi nộp proposal)
 # Chạy xong, chuyển qua tab Response Headers copy chuỗi Cookie nếu Visual Studio không tự lưu
 POST {{baseUrl}}/api/auth/login
@@ -34,6 +155,106 @@ Content-Type: application/json
   "title": "Xây dựng website Freelance Marketplace",
   "description": "Cần tuyển lập trình viên backend ASP.NET Core và PostgreSQL hoàn thiện tính năng đấu thầu.",
   "parentCategoryId": 1,
+  "categoryId": 2,
+  "workType": 1,
+  "workMode": 1,
+  "paymentType": 1,
+  "locationCity": "Hà Nội",
+  "budgetMin": 500000,
+  "budgetMax": 2000000,
+  "deadline": "2026-11-30T23:59:59Z",
+  "skillIds": [1, 2]
+}
+
+###
+
+### 3.3 Kiểm tra endpoint subcategories qua route job-posting
+GET {{baseUrl}}/api/job-posting/subcategories/1
+Accept: application/json
+
+
+### ===================================================================
+### 4. MODULE TÌM KIẾM & DANH SÁCH VIỆC LÀM (JOB SEARCH)
+### ===================================================================
+
+### 4.1 Danh sách việc làm trang 1 (Mặc định)
+GET {{baseUrl}}/api/jobs
+Accept: application/json
+
+###
+
+### 4.2 Phân trang (Paging)
+GET {{baseUrl}}/api/jobs?pageNumber=1&pageSize=2
+Accept: application/json
+
+###
+
+### 4.3 Phân trang sang trang 2
+GET {{baseUrl}}/api/jobs?pageNumber=2&pageSize=2
+Accept: application/json
+
+###
+
+### 4.4 Phân trang với số trang quá lớn (Trả về rỗng [], 200 OK)
+GET {{baseUrl}}/api/jobs?pageNumber=9999&pageSize=5
+
+###
+
+### 4.5 Tìm kiếm theo từ khóa
+GET {{baseUrl}}/api/jobs?keyword=web
+Accept: application/json
+
+###
+
+### 4.6 Tìm kiếm từ khóa không tồn tại
+GET {{baseUrl}}/api/jobs?keyword=TuKhoaKhongTonTaiXYZ
+
+###
+
+### 4.7 Lọc theo danh mục cha
+GET {{baseUrl}}/api/jobs?categoryId=1
+Accept: application/json
+
+###
+
+### 4.8 Lọc theo danh mục con
+GET {{baseUrl}}/api/jobs?subCategoryId=2
+Accept: application/json
+
+###
+
+### 4.9 Lọc theo nhiều kỹ năng (Skill IDs)
+GET {{baseUrl}}/api/jobs?skillIds=1&skillIds=2
+Accept: application/json
+
+###
+
+### 4.10 Lọc theo Enum: Hình thức làm việc (WorkType)
+GET {{baseUrl}}/api/jobs?workType=FullTime
+Accept: application/json
+
+###
+
+### 4.11 Lọc theo Enum: Chế độ làm việc (WorkMode)
+GET {{baseUrl}}/api/jobs?workMode=Online
+Accept: application/json
+
+###
+
+### 4.12 Kết hợp nhiều bộ lọc cùng lúc
+GET {{baseUrl}}/api/jobs?keyword=Test&categoryId=99999&status=TrangThaiAo
+
+###
+
+### 4.13 Xem chi tiết dự án theo ID tồn tại
+GET {{baseUrl}}/api/jobs/1
+Accept: application/json
+
+###
+
+### 4.14 Xem chi tiết dự án theo ID không tồn tại (Trả về 404 Not Found)
+GET {{baseUrl}}/api/jobs/999999
+Accept: application/json
   "categoryId": 1,
   "budgetMin": 1000000,
   "budgetMax": 5000000,
@@ -114,3 +335,4 @@ Content-Disposition: form-data; name="CoverLetter"
 
 Toi cap nhat lai muc gia va thoi gian thuc hien.
 --boundary123--
+

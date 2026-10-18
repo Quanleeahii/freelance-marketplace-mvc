@@ -1,23 +1,23 @@
-﻿html {
-    overflow-y: scroll !important;
-}
-
-#jobListContainer {
-    min-height: 450px;
-}
-
-:root {
-    --auth-bg: #f8fafc;
+﻿:root {
+    --auth-bg: #f1f5f9;
     --card-bg: #ffffff;
     --border-color: #cbd5e1;
-    --primary-green: #00b14f;
-    --primary-green-hover: #009643;
+    --primary-color: #0f172a;
+    --primary-hover: #334155;
     --text-dark: #0f172a;
-    --text-muted: #475569;
+    --text-muted: #64748b;
+}
+
+html {
+    overflow-y: scroll !important;
 }
 
 body {
     background-color: var(--auth-bg) !important;
+}
+
+#jobListContainer {
+    min-height: 450px;
 }
 
 .job-search-container {
@@ -28,11 +28,22 @@ body {
 }
 
 .filter-sidebar {
-    background: var(--card-bg);
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    padding: 18px;
+    position: sticky;
+    top: 24px;
+    z-index: 10;
+    align-self: flex-start;
+    max-height: calc(100vh - 48px);
+    overflow-y: auto;
 }
+
+    .filter-sidebar::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    .filter-sidebar::-webkit-scrollbar-thumb {
+        background-color: #cbd5e1;
+        border-radius: 4px;
+    }
 
 .filter-group h6 {
     font-size: 14px;
@@ -59,13 +70,13 @@ body {
 }
 
     .category-parent-item:hover {
-        background-color: #f0fdf4;
-        color: var(--primary-green);
+        background-color: #f1f5f9;
+        color: var(--primary-color);
     }
 
     .category-parent-item.active {
-        background-color: #e8f8ee !important;
-        color: var(--primary-green) !important;
+        background-color: #e2e8f0 !important;
+        color: var(--primary-color) !important;
         font-weight: 700;
     }
 
@@ -103,9 +114,19 @@ body {
 
     .sub-category-item:hover,
     .sub-category-item.active {
-        color: var(--primary-green);
-        background-color: #f0fdf4;
+        color: var(--primary-color);
+        background-color: #f1f5f9;
         font-weight: 600;
+    }
+
+.btn-clear-skills {
+    color: #64748b;
+    font-weight: 600;
+}
+
+    .btn-clear-skills:hover {
+        color: #0f172a;
+        text-decoration: underline !important;
     }
 
 .work-type-tabs .nav-link {
@@ -119,25 +140,37 @@ body {
 }
 
     .work-type-tabs .nav-link.active {
-        color: var(--primary-green) !important;
-        border-bottom: 2.5px solid var(--primary-green) !important;
+        color: var(--primary-color) !important;
+        border-bottom: 2.5px solid var(--primary-color) !important;
     }
 
-.btn-success, #btnSearch {
-    background-color: var(--primary-green) !important;
-    border-color: var(--primary-green) !important;
+.btn-search-primary {
+    background-color: var(--primary-color) !important;
+    border-color: var(--primary-color) !important;
+    color: #ffffff !important;
+    border-radius: 6px;
     font-weight: 700;
+    transition: background-color 0.15s ease;
 }
 
-    #btnSearch:hover {
-        background-color: var(--primary-green-hover) !important;
-        border-color: var(--primary-green-hover) !important;
+    .btn-search-primary:hover {
+        background-color: var(--primary-hover) !important;
+        border-color: var(--primary-hover) !important;
     }
 
-.form-check-input:checked {
-    background-color: var(--primary-green) !important;
-    border-color: var(--primary-green) !important;
+.form-check-input {
+    cursor: pointer;
 }
+
+    .form-check-input:checked {
+        background-color: var(--primary-color) !important;
+        border-color: var(--primary-color) !important;
+    }
+
+    .form-check-input:focus {
+        box-shadow: none !important;
+        border-color: var(--primary-color) !important;
+    }
 
 .pagination .page-item .page-link {
     width: 34px;
@@ -155,7 +188,7 @@ body {
 }
 
 .pagination .page-item.active .page-link {
-    background-color: var(--primary-green) !important;
+    background-color: var(--primary-color) !important;
     color: #ffffff !important;
 }
 
@@ -166,12 +199,13 @@ body {
 }
 
     .job-title:hover {
-        color: var(--primary-green) !important;
+        color: var(--primary-hover) !important;
     }
 
 .badge-work-type {
-    background-color: #d1fae5;
-    color: #065f46;
+    background-color: #f1f5f9;
+    color: #1e293b;
+    border: 1px solid #cbd5e1;
     font-size: 0.75rem;
     font-weight: 600;
     padding: 0.2rem 0.55rem;
@@ -208,8 +242,7 @@ body {
     padding-left: 38px !important;
 }
 
-.input-vlance,
-.custom-search-box {
+.input-vlance, .custom-search-box {
     width: 100%;
     background-color: #ffffff;
     border: 1.5px solid var(--border-color);
@@ -218,16 +251,17 @@ body {
     color: var(--text-dark);
     font-size: 14px;
     outline: none !important;
-    transition: all 0.15s ease;
+    box-shadow: none !important;
+    transition: border-color 0.15s ease;
 }
 
     .input-vlance:focus,
     .custom-search-box:focus,
     #keywordInput:focus,
     #cityInput:focus {
-        border-color: var(--primary-green) !important;
-        box-shadow: 0 0 0 3px rgba(0, 177, 79, 0.15) !important;
         outline: none !important;
+        border-color: #0f172a !important;
+        box-shadow: none !important;
     }
 
 #cityDropdownMenu.custom-dropdown-list {
@@ -240,7 +274,7 @@ body {
     background-color: #ffffff !important;
     border: 1.5px solid #e2e8f0 !important;
     border-radius: 6px !important;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
     z-index: 1050 !important;
     margin-top: 4px !important;
     padding: 0 !important;
@@ -262,7 +296,7 @@ body {
     }
 
     #cityDropdownMenu .dropdown-item-vlance:hover {
-        background-color: #f0fdf4 !important;
-        color: var(--primary-green) !important;
+        background-color: #f1f5f9 !important;
+        color: var(--primary-color) !important;
         font-weight: 600 !important;
     }

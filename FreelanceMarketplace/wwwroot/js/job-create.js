@@ -113,7 +113,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         } catch (err) {
-            console.error('Lỗi tải danh mục con:', err);
+            console.error(err);
         }
     });
 
@@ -143,10 +143,18 @@ document.addEventListener('DOMContentLoaded', () => {
         toggleError(skillInput, 'SkillIdsErr', true);
 
         const badge = document.createElement('span');
-        badge.className = 'badge bg-primary text-white p-2 d-inline-flex align-items-center gap-2 me-2 mb-2';
-        badge.innerHTML = `<span>${name}</span> <span role="button" class="text-white fw-bold" style="cursor:pointer; font-size:14px;">&times;</span>`;
+        badge.className = 'badge text-white p-2 d-inline-flex align-items-center gap-2 me-2 mb-2';
+        badge.style.backgroundColor = '#0f172a';
+        badge.style.border = '1px solid #0f172a';
+        badge.style.borderRadius = '6px';
+        badge.style.fontSize = '13px';
+        badge.style.fontWeight = '500';
+        badge.innerHTML = `<span>${name}</span> <span role="button" class="fw-bold" style="cursor:pointer; font-size:14px; color:#94a3b8;">&times;</span>`;
 
-        badge.querySelector('span[role="button"]').onclick = () => {
+        const removeBtn = badge.querySelector('span[role="button"]');
+        removeBtn.onmouseenter = () => removeBtn.style.color = '#ffffff';
+        removeBtn.onmouseleave = () => removeBtn.style.color = '#94a3b8';
+        removeBtn.onclick = () => {
             selectedSkills.delete(id);
             badge.remove();
         };
@@ -362,7 +370,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             if (res.status === 401) {
-                window.location.href = '/Account/Login?returnUrl=/jobs/create';
+                window.location.href = '/login?returnUrl=/jobs/create';
                 return;
             }
 
@@ -381,7 +389,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         } catch (err) {
-            console.error('Lỗi gửi dữ liệu:', err);
+            console.error(err);
         }
     }
 
