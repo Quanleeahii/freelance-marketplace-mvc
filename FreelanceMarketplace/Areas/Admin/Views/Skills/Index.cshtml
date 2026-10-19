@@ -1,17 +1,17 @@
 ﻿@model IEnumerable<FreelanceMarketplace.Models.Skill>
 @{
-    ViewData["Title"] = "Quản lý kỹ năng";
+    ViewData["Title"] = "Danh mục kỹ năng";
 }
 
 <div class="app-content-header">
     <div class="container-fluid">
         <div class="row">
             <div class="col-sm-6">
-                <h3 class="mb-0">Danh mục kỹ năng</h3>
+                <h3 class="mb-0">Quản lý danh mục kỹ năng</h3>
             </div>
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-end">
-                    <li class="breadcrumb-item"><a asp-action="Index" asp-controller="Home">Admin</a></li>
+                    <li class="breadcrumb-item"><a asp-area="Admin" asp-controller="Home" asp-action="Index">Admin</a></li>
                     <li class="breadcrumb-item active">Skills</li>
                 </ol>
             </div>
@@ -21,68 +21,92 @@
 
 <div class="app-content">
     <div class="container-fluid">
+        <!-- Thông báo trạng thái -->
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                @TempData["SuccessMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                @TempData["ErrorMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+
         <div class="row">
-            <!-- Form thêm mới kỹ năng -->
+            <!-- Cột trái: Thêm kỹ năng mới -->
             <div class="col-md-4">
-                <div class="card card-primary card-outline mb-4">
+                <div class="card mb-4">
                     <div class="card-header">
-                        <h4 class="card-title">Thêm kỹ năng mới</h4>
+                        <h5 class="card-title mb-0">Thêm kỹ năng mới</h5>
                     </div>
                     <form asp-action="Create" method="post">
                         <div class="card-body">
                             <div class="mb-3">
                                 <label class="form-label">Tên kỹ năng</label>
-                                <input type="text" name="Name" class="form-control" placeholder="Ví dụ: ASP.NET Core, Docker..." required />
+                                <input type="text" name="name" class="form-control" placeholder="Ví dụ: Tiếng Anh,..." required />
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Slug (tùy chọn)</label>
-                                <input type="text" name="Slug" class="form-control" placeholder="asp-net-core" />
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Thuộc danh mục</label>
-                                <select name="CategoryId" class="form-select" asp-items="ViewBag.Categories" required></select>
+                                <input type="text" name="slug" class="form-control" placeholder="tieng-anh" />
+                                <div class="form-text text-muted">Nếu để trống, hệ thống sẽ tự sinh slug</div>
                             </div>
                         </div>
                         <div class="card-footer">
-                            <button type="submit" class="btn btn-primary w-100">Lưu kỹ năng</button>
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="bi bi-plus-circle me-1"></i> Lưu kỹ năng
+                            </button>
                         </div>
                     </form>
                 </div>
             </div>
 
-            <!-- Bảng hiển thị danh sách kỹ năng -->
+            <!-- Cột phải: Bảng danh sách kỹ năng -->
             <div class="col-md-8">
                 <div class="card mb-4">
-                    <div class="card-header">
-                        <h3 class="card-title">Danh sách kỹ năng hiện có</h3>
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">Danh sách kỹ năng hiện có (@Model.Count())</h5>
                     </div>
-                    <div class="card-body table-responsive p-0" style="max-height: 500px;">
-                        <table class="table table-head-fixed table-hover align-middle">
+                    <div class="card-body table-responsive p-0" style="max-height: 550px;">
+                        <table class="table table-head-fixed table-hover align-middle mb-0">
                             <thead>
                                 <tr>
-                                    <th>ID</th>
+                                    <th style="width: 80px;">ID</th>
                                     <th>Tên kỹ năng</th>
                                     <th>Slug</th>
-                                    <th>Danh mục</th>
-                                    <th class="text-end">Thao tác</th>
+                                    <th class="text-end" style="width: 100px;">Thao tác</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach (var item in Model)
+                                @if (!Model.Any())
                                 {
                                     <tr>
-                                        <td>@item.Id</td>
-                                        <td><strong>@item.Name</strong></td>
-                                        <td><code>@item.Slug</code></td>
-                                        <td><span class="badge bg-secondary">@item.Category?.Name</span></td>
-                                        <td class="text-end">
-                                            <form asp-action="Delete" asp-route-id="@item.Id" method="post" class="d-inline">
-                                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Xóa kỹ năng này?')">
-                                                    Xóa
-                                                </button>
-                                            </form>
-                                        </td>
+                                        <td colspan="4" class="text-center py-4 text-muted">Chưa có kỹ năng nào.</td>
                                     </tr>
+                                }
+                                else
+                                {
+                                    @foreach (var item in Model)
+                                    {
+                                        <tr>
+                                            <td>#@item.Id</td>
+                                            <td><strong>@item.Name</strong></td>
+                                            <td><code>@item.Slug</code></td>
+                                            <td class="text-end">
+                                                <form asp-action="Delete" asp-route-id="@item.Id" method="post" class="d-inline m-0 p-0">
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger" 
+                                                            title="Xóa kỹ năng" 
+                                                            onclick="return confirm('Bạn có chắc chắn muốn xóa kỹ năng \'@item.Name\'?')">
+                                                        <i class="bi bi-trash"></i> Xóa
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    }
                                 }
                             </tbody>
                         </table>

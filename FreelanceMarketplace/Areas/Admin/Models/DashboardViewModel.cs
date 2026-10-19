@@ -4,8 +4,8 @@
     {
         public int PendingJobsCount { get; set; }
         public int TotalJobsCount { get; set; }
-        public int TotalFreelancersCount { get; set; }
-        public int TotalProposalsCount { get; set; }
+        public int VerifiedUsersCount { get; set; }
+        public int InProgressJobsCount { get; set; }
         public int TotalUsersCount { get; set; }
     }
 }

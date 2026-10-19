@@ -1,48 +1,39 @@
-﻿using FreelanceMarketplace.Data;
+﻿using FreelanceMarketplace.Areas.Admin.Services; // Hoặc FreelanceMarketplace.Services tùy nơi bạn đặt file
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace FreelanceMarketplace.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Route("admin/jobs")]
+    [Authorize(Roles = "Admin")]
     public class JobsController : Controller
     {
-        private readonly AppDbContext _context;
+        // 1. Đổi IJobService thành IAdminJobService
+        private readonly IAdminJobService _adminJobService;
 
-        public JobsController(AppDbContext context)
+        public JobsController(IAdminJobService adminJobService)
         {
-            _context = context;
+            _adminJobService = adminJobService;
         }
 
-        // GET: /Admin/Jobs
-        public async Task<IActionResult> Index(string? status)
+        // GET: /admin/jobs
+        [HttpGet("")]
+        public async Task<IActionResult> Index(string? status, string? keyword, int page = 1)
         {
-            var query = _context.Jobs
-                .Include(j => j.Category)
-                .Include(j => j.ClientProfile)
-                    .ThenInclude(cp => cp.User)
-                .AsQueryable();
+            var model = await _adminJobService.GetJobsAsync(status, keyword, page);
 
-            if (!string.IsNullOrEmpty(status))
-            {
-                query = query.Where(j => j.Status == status);
-            }
-
-            var jobs = await query.OrderByDescending(j => j.CreatedAt).ToListAsync();
             ViewBag.CurrentStatus = status;
-            return View(jobs);
+            ViewBag.Keyword = keyword;
+
+            return View(model);
         }
 
-        // GET: /Admin/Jobs/Details/5
+        // GET: /admin/jobs/details/5
+        [HttpGet("details/{id:int}")]
         public async Task<IActionResult> Details(int id)
         {
-            var job = await _context.Jobs
-                .Include(j => j.Category)
-                .Include(j => j.Skills)
-                .Include(j => j.ClientProfile)
-                    .ThenInclude(cp => cp.User)
-                .FirstOrDefaultAsync(j => j.Id == id);
-
+            var job = await _adminJobService.GetJobByIdAsync(id);
             if (job == null)
             {
                 return NotFound();
@@ -51,33 +42,18 @@ namespace FreelanceMarketplace.Areas.Admin.Controllers
             return View(job);
         }
 
-        // POST: /Admin/Jobs/Approve/5
-        [HttpPost]
+        // POST: /admin/jobs/toggle-hide/5
+        [HttpPost("toggle-hide/{id:int}")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Approve(int id)
+        public async Task<IActionResult> ToggleHide(int id)
         {
-            var job = await _context.Jobs.FindAsync(id);
-            if (job != null)
+            var success = await _adminJobService.ToggleJobStatusAsync(id);
+            if (!success)
             {
-                job.Status = "Approved"; // hoặc "Active" theo quy ước enum/chuỗi của bạn
-                job.UpdatedAt = DateTime.UtcNow;
-                await _context.SaveChangesAsync();
+                return NotFound();
             }
-            return RedirectToAction(nameof(Index));
-        }
 
-        // POST: /Admin/Jobs/Reject/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Reject(int id)
-        {
-            var job = await _context.Jobs.FindAsync(id);
-            if (job != null)
-            {
-                job.Status = "Rejected";
-                job.UpdatedAt = DateTime.UtcNow;
-                await _context.SaveChangesAsync();
-            }
+            TempData["SuccessMessage"] = "Cập nhật trạng thái bài đăng thành công!";
             return RedirectToAction(nameof(Index));
         }
     }

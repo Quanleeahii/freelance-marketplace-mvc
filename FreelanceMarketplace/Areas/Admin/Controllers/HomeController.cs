@@ -1,149 +1,66 @@
-﻿using System.Security.Claims;
-using FreelanceMarketplace.Areas.Admin.Models;
+﻿using FreelanceMarketplace.Areas.Admin.Models;
 using FreelanceMarketplace.Data;
-using FreelanceMarketplace.Models;
+using FreelanceMarketplace.Services;
+using FreelanceMarketplace.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-
+using System.Security.Claims;
+using FreelanceMarketplace.Enums;
 namespace FreelanceMarketplace.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Route("admin")]
+    [Authorize(Roles = "Admin")]
     public class HomeController : Controller
     {
         private readonly AppDbContext _context;
-        private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly IUserProfileService _userProfileService;
 
-        public HomeController(AppDbContext context, IWebHostEnvironment webHostEnvironment)
+        public HomeController(AppDbContext context, IUserProfileService userProfileService)
         {
             _context = context;
-            _webHostEnvironment = webHostEnvironment;
+            _userProfileService = userProfileService;
         }
 
-        // GET: /Admin/Home/Index hoặc /Admin
+        [HttpGet("")]
         public async Task<IActionResult> Index()
         {
             var viewModel = new DashboardViewModel
             {
-                PendingJobsCount = await _context.Jobs.CountAsync(j => j.Status == "Pending" || j.Status == "WaitingApproval"),
+                PendingJobsCount = await _context.Jobs.CountAsync(j => j.Status == JobStatusConstants.Open),
                 TotalJobsCount = await _context.Jobs.CountAsync(),
-                TotalFreelancersCount = await _context.FreelancerProfiles.CountAsync(),
-                TotalProposalsCount = await _context.Proposals.CountAsync(),
-                TotalUsersCount = await _context.Users.CountAsync()
+                VerifiedUsersCount = await _context.Users.CountAsync(u => u.Role != "Admin" && u.IsVerified),
+                InProgressJobsCount = await _context.Jobs.CountAsync(j => j.Status == JobStatusConstants.InProgress),
+                TotalUsersCount = await _context.Users.CountAsync(u => u.Role != "Admin")
             };
 
             return View(viewModel);
         }
 
-        // GET: /Admin/Home/Profile
+        [HttpGet("profile")]
         public async Task<IActionResult> Profile()
         {
-            // Lấy UserId từ Cookie/Claims của user đang đăng nhập
-            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-            User? user = null;
-            if (!string.IsNullOrEmpty(userIdClaim) && int.TryParse(userIdClaim, out int userId))
-            {
-                user = await _context.Users
-                    .Include(u => u.UserProfile)
-                    .FirstOrDefaultAsync(u => u.Id == userId);
-            }
-
-            // Fallback nếu đang chạy thử hoặc chưa có phiên đăng nhập
-            if (user == null)
-            {
-                user = await _context.Users
-                    .Include(u => u.UserProfile)
-                    .FirstOrDefaultAsync();
-            }
-
-            if (user == null)
-            {
-                return NotFound("Không tìm thấy thông tin tài khoản admin.");
-            }
-
-            return View(user);
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var profileData = await _userProfileService.GetManageProfileAsync(userId);
+            return View(profileData.BasicInfo);
         }
 
-        // POST: /Admin/Home/UpdateProfile
-        [HttpPost]
+        [HttpPost("profile")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> UpdateProfile(string fullName, string phone, string city, string address, IFormFile? avatarFile)
+        public async Task<IActionResult> UpdateProfile(UpdateBasicInfoRequest request, IFormFile? avatarFile)
         {
-            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            int userId = 1;
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
-            if (!string.IsNullOrEmpty(userIdClaim) && int.TryParse(userIdClaim, out int parsedId))
-            {
-                userId = parsedId;
-            }
-            else
-            {
-                var defaultUser = await _context.Users.FirstOrDefaultAsync();
-                if (defaultUser != null)
-                {
-                    userId = defaultUser.Id;
-                }
-            }
-
-            // Xử lý upload ảnh đại diện nếu có file tải lên
-            string? newAvatarPath = null;
             if (avatarFile != null && avatarFile.Length > 0)
             {
-                var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".webp" };
-                var ext = Path.GetExtension(avatarFile.FileName).ToLowerInvariant();
-
-                if (allowedExtensions.Contains(ext))
-                {
-                    var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "uploads", "avatars");
-                    if (!Directory.Exists(uploadsFolder))
-                    {
-                        Directory.CreateDirectory(uploadsFolder);
-                    }
-
-                    var uniqueFileName = $"avatar_{userId}_{Guid.NewGuid():N}{ext}";
-                    var filePath = Path.Combine(uploadsFolder, uniqueFileName);
-
-                    using (var stream = new FileStream(filePath, FileMode.Create))
-                    {
-                        await avatarFile.CopyToAsync(stream);
-                    }
-
-                    newAvatarPath = $"/uploads/avatars/{uniqueFileName}";
-                }
+                var avatarUrl = await _userProfileService.UpdateAvatarAsync(userId, avatarFile);
+                request.AvatarUrl = avatarUrl;
             }
 
-            var userProfile = await _context.UserProfiles.FirstOrDefaultAsync(up => up.UserId == userId);
+            await _userProfileService.UpdateBasicInfoAsync(userId, request);
 
-            if (userProfile == null)
-            {
-                userProfile = new UserProfile
-                {
-                    UserId = userId,
-                    FullName = fullName,
-                    Phone = phone,
-                    City = city,
-                    Address = address,
-                    AvatarUrl = newAvatarPath,
-                    CreatedAt = DateTime.UtcNow
-                };
-                _context.UserProfiles.Add(userProfile);
-            }
-            else
-            {
-                userProfile.FullName = fullName;
-                userProfile.Phone = phone;
-                userProfile.City = city;
-                userProfile.Address = address;
-                if (!string.IsNullOrEmpty(newAvatarPath))
-                {
-                    userProfile.AvatarUrl = newAvatarPath;
-                }
-                userProfile.UpdatedAt = DateTime.UtcNow;
-            }
-
-            await _context.SaveChangesAsync();
-
-            TempData["SuccessMessage"] = "Cập nhật hồ sơ và ảnh đại diện thành công!";
+            TempData["SuccessMessage"] = "Cập nhật hồ sơ thành công!";
             return RedirectToAction(nameof(Profile));
         }
     }

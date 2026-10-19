@@ -1,61 +1,64 @@
-﻿using FreelanceMarketplace.Data;
-using FreelanceMarketplace.Models;
+﻿using FreelanceMarketplace.Areas.Admin.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using System.Text.RegularExpressions;
 
 namespace FreelanceMarketplace.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Route("admin/skills")]
+    [Authorize(Roles = "Admin")]
     public class SkillsController : Controller
     {
-        private readonly AppDbContext _context;
+        private readonly IAdminSkillService _adminSkillService;
 
-        public SkillsController(AppDbContext context)
+        public SkillsController(IAdminSkillService adminSkillService)
         {
-            _context = context;
+            _adminSkillService = adminSkillService;
         }
 
-        // GET: /Admin/Skills
+        // GET: /admin/skills
+        [HttpGet("")]
         public async Task<IActionResult> Index()
         {
-            var skills = await _context.Skills
-                .Include(s => s.Category)
-                .OrderBy(s => s.CategoryId)
-                .ThenBy(s => s.Name)
-                .ToListAsync();
-
-            ViewBag.Categories = new SelectList(await _context.Categories.ToListAsync(), "Id", "Name");
+            var skills = await _adminSkillService.GetAllSkillsAsync();
             return View(skills);
         }
 
-        // POST: /Admin/Skills/Create
-        [HttpPost]
+        // POST: /admin/skills/create
+        [HttpPost("create")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Skill skill)
+        public async Task<IActionResult> Create(string name, string? slug)
         {
-            if (string.IsNullOrWhiteSpace(skill.Slug))
+            var result = await _adminSkillService.CreateSkillAsync(name, slug);
+
+            if (result.Success)
             {
-                skill.Slug = Regex.Replace(skill.Name.ToLower().Trim(), @"\s+", "-");
+                TempData["SuccessMessage"] = result.Message;
+            }
+            else
+            {
+                TempData["ErrorMessage"] = result.Message;
             }
 
-            _context.Skills.Add(skill);
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        // POST: /Admin/Skills/Delete/5
-        [HttpPost]
+        // POST: /admin/skills/delete/5
+        [HttpPost("delete/{id:int}")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
         {
-            var skill = await _context.Skills.FindAsync(id);
-            if (skill != null)
+            var result = await _adminSkillService.DeleteSkillAsync(id);
+
+            if (result.Success)
             {
-                _context.Skills.Remove(skill);
-                await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = result.Message;
             }
+            else
+            {
+                TempData["ErrorMessage"] = result.Message;
+            }
+
             return RedirectToAction(nameof(Index));
         }
     }

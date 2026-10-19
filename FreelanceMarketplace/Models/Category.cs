@@ -10,7 +10,6 @@
         public int? ParentId { get; set; }
         public Category? Parent { get; set; }
         public List<Category> SubCategories { get; set; } = new();
-        public List<Skill> Skills { get; set; } = new();
         public List<Job> Jobs { get; set; } = new();
 
     }

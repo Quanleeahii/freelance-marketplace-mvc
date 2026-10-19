@@ -93,6 +93,14 @@
                                     <li><a class="dropdown-item" asp-controller="Message" asp-action="Index">Message</a></li>
                                     <li><hr class="dropdown-divider my-2"></li>
                                     <li><a class="dropdown-item" asp-controller="Home" asp-action="Help">Need help?</a></li>
+                                    @if (User.IsInRole("Admin"))
+                                    {
+                                        <li>
+                                            <a class="dropdown-item" asp-area="Admin" asp-controller="Home" asp-action="Index">
+                                            Admin Panel
+                                            </a>
+                                        </li>
+                                    }
                                     <li>
                                         <form asp-route="Logout"  method="post" class="m-0 p-0">
                                             @Html.AntiForgeryToken()

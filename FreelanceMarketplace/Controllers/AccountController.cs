@@ -95,7 +95,10 @@ public class AccountController : Controller
         {
             return Redirect(returnUrl);
         }
-
+        if (user!.Role == "Admin")
+        {
+            return RedirectToAction("Index", "Home", new { area = "Admin" });
+        }
         return RedirectToAction("Index", "Home");
     }
 

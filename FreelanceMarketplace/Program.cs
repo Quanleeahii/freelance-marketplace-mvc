@@ -1,8 +1,9 @@
+using FreelanceMarketplace.Areas.Admin.Services;
 using FreelanceMarketplace.Data;
 using FreelanceMarketplace.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
-
+using FreelanceMarketplace.Areas.Admin.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -21,7 +22,10 @@ builder.Services.AddScoped<IJobSearchService, JobSearchService>();
 builder.Services.AddScoped<IUserProfileService, UserProfileService>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ISignInService, SignInService>();
-
+builder.Services.AddScoped<IAdminJobService, AdminJobService>();
+builder.Services.AddScoped<IAdminUserService, AdminUserService>();
+builder.Services.AddScoped<IAdminSkillService, AdminSkillService>();
+builder.Services.AddScoped<IAdminCategoryService, AdminCategoryService>();
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
@@ -80,14 +84,10 @@ app.UseAuthorization();
 app.UseSession();
 
 app.MapStaticAssets();
-
-// 1. Thêm Route cho Area Admin tại đây (luôn đứng TRƯỚC route mặc định)
 app.MapControllerRoute(
     name: "areas",
     pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
-
-// 2. Route mặc định cho người dùng ngoài
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}")

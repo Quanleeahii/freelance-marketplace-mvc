@@ -1,0 +1,155 @@
+﻿@model FreelanceMarketplace.Areas.Admin.ViewModels.AdminCategoryViewModel
+@{
+    ViewData["Title"] = "Quản lý lĩnh vực & chuyên môn";
+}
+
+<div class="app-content-header">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-6">
+                <h3 class="mb-0">Quản lý lĩnh vực & chuyên môn</h3>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-end">
+                    <li class="breadcrumb-item"><a asp-area="Admin" asp-controller="Home" asp-action="Index">Admin</a></li>
+                    <li class="breadcrumb-item active">Categories</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="app-content">
+    <div class="container-fluid">
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                @TempData["SuccessMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                @TempData["ErrorMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Thêm mục mới</h5>
+                    </div>
+                    <form asp-action="Create" method="post">
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label class="form-label">Cấp danh mục</label>
+                                <select name="parentId" class="form-select">
+                                    <option value="">-- Là lĩnh vực chính (Cấp 1) --</option>
+                                    @foreach (var parent in Model.ParentListForDropdown)
+                                    {
+                                        <option value="@parent.Id">Thuộc: @parent.Name</option>
+                                    }
+                                </select>
+                               
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Tên gọi</label>
+                                <input type="text" name="name" class="form-control" placeholder="Ví dụ: IT và lập trình,..." required />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Slug (tùy chọn)</label>
+                                <input type="text" name="slug" class="form-control" placeholder="it-va-lap-trinh" />
+                                <div class="form-text text-muted">Nếu để trống, hệ thống sẽ tự sinh slug</div>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="bi bi-plus-circle me-1"></i> Lưu danh mục
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="col-md-8">
+                <div class="card mb-4">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">Cấu trúc lĩnh vực & chuyên môn (@Model.ParentCategoriesWithSubs.Count lĩnh vực lớn)</h5>
+                    </div>
+                    <div class="card-body table-responsive p-0" style="max-height: 600px;">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th style="width: 80px;">ID</th>
+                                    <th>Tên lĩnh vực / Chuyên môn</th>
+                                    <th>Slug</th>
+                                    <th class="text-end" style="width: 100px;">Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (!Model.ParentCategoriesWithSubs.Any())
+                                {
+                                    <tr>
+                                        <td colspan="4" class="text-center py-4 text-muted">Chưa có danh mục nào được khởi tạo.</td>
+                                    </tr>
+                                }
+                                else
+                                {
+                                    @foreach (var parent in Model.ParentCategoriesWithSubs)
+                                    {
+                                        <tr class="table-active">
+                                            <td><strong>#@parent.Id</strong></td>
+                                            <td>
+                                                <i class="bi bi-folder2-open text-primary me-2"></i>
+                                                <strong>@parent.Name</strong>
+                                                <span class="badge bg-secondary ms-1">@(parent.SubCategories?.Count ?? 0) mục con</span>
+                                            </td>
+                                            <td><code>@parent.Slug</code></td>
+                                            <td class="text-end">
+                                                <form asp-action="Delete" asp-route-id="@parent.Id" method="post" class="d-inline m-0 p-0">
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger" 
+                                                            title="Xóa lĩnh vực" 
+                                                            onclick="return confirm('Bạn có chắc muốn xóa lĩnh vực cha \'@parent.Name\'?')">
+                                                        <i class="bi bi-trash"></i>
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+
+                                        @if (parent.SubCategories != null && parent.SubCategories.Any())
+                                        {
+                                            @foreach (var sub in parent.SubCategories.OrderBy(s => s.Name))
+                                            {
+                                                <tr>
+                                                    <td class="text-muted ps-4">#@sub.Id</td>
+                                                    <td class="ps-4">
+                                                        <span class="text-muted me-1">└─</span>
+                                                        <i class="bi bi-tag text-secondary me-1"></i>
+                                                        @sub.Name
+                                                    </td>
+                                                    <td><code>@sub.Slug</code></td>
+                                                    <td class="text-end">
+                                                        <form asp-action="Delete" asp-route-id="@sub.Id" method="post" class="d-inline m-0 p-0">
+                                                            <button type="submit" class="btn btn-sm btn-outline-danger" 
+                                                                    title="Xóa chuyên ngành con" 
+                                                                    onclick="return confirm('Bạn có chắc muốn xóa chuyên môn con \'@sub.Name\'?')">
+                                                                <i class="bi bi-trash"></i>
+                                                            </button>
+                                                        </form>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        }
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

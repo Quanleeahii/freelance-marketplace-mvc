@@ -1,60 +1,58 @@
-﻿using FreelanceMarketplace.Data;
+﻿using FreelanceMarketplace.Areas.Admin.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace FreelanceMarketplace.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Route("admin/users")]
+    [Authorize(Roles = "Admin")]
     public class UsersController : Controller
     {
-        private readonly AppDbContext _context;
+        private readonly IAdminUserService _adminUserService;
 
-        public UsersController(AppDbContext context)
+        public UsersController(IAdminUserService adminUserService)
         {
-            _context = context;
+            _adminUserService = adminUserService;
         }
 
-        // GET: /Admin/Users
-        public async Task<IActionResult> Index(string? role, string? search)
+        // GET: /admin/users
+        [HttpGet("")]
+        public async Task<IActionResult> Index(bool? isVerified, string? search, int page = 1)
         {
-            var query = _context.Users
-                .Include(u => u.UserProfile)
-                .Include(u => u.FreelancerProfile)
-                .Include(u => u.ClientProfile)
-                .AsQueryable();
+            var model = await _adminUserService.GetUsersAsync(isVerified, search, page);
 
-            if (!string.IsNullOrWhiteSpace(search))
-            {
-                query = query.Where(u => u.Email.Contains(search));
-            }
-
-            if (!string.IsNullOrWhiteSpace(role))
-            {
-                if (role == "Freelancer")
-                    query = query.Where(u => u.FreelancerProfile != null);
-                else if (role == "Client")
-                    query = query.Where(u => u.ClientProfile != null);
-            }
-
-            var users = await query.OrderByDescending(u => u.Id).ToListAsync();
-
-            ViewBag.CurrentRole = role;
+            ViewBag.CurrentVerified = isVerified;
             ViewBag.SearchTerm = search;
 
-            return View(users);
+            return View(model);
         }
 
-        // POST: /Admin/Users/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Delete(int id)
+        // GET: /admin/users/details/5
+        [HttpGet("details/{id:int}")]
+        public async Task<IActionResult> Details(int id)
         {
-            var user = await _context.Users.FindAsync(id);
-            if (user != null)
+            var user = await _adminUserService.GetUserByIdAsync(id);
+            if (user == null)
             {
-                _context.Users.Remove(user);
-                await _context.SaveChangesAsync();
+                return NotFound();
             }
+
+            return View(user);
+        }
+
+        // POST: /admin/users/toggle-status/5
+        [HttpPost("toggle-status/{id:int}")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ToggleStatus(int id)
+        {
+            var success = await _adminUserService.ToggleUserStatusAsync(id);
+            if (!success)
+            {
+                return NotFound();
+            }
+
+            TempData["SuccessMessage"] = "Cập nhật trạng thái tài khoản thành công!";
             return RedirectToAction(nameof(Index));
         }
     }

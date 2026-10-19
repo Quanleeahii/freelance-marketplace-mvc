@@ -134,7 +134,7 @@
                         <li class="nav-item">
                             <a asp-area="Admin" asp-controller="Jobs" asp-action="Index" class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Jobs" ? "active" : "")">
                                 <i class="nav-icon bi bi-briefcase-fill"></i>
-                                <p>Duyệt việc làm (Jobs)</p>
+                                <p>Bài dăng</p>
                             </a>
                         </li>
                         <li class="nav-item">
@@ -146,9 +146,15 @@
                         <li class="nav-item">
                             <a asp-area="Admin" asp-controller="Skills" asp-action="Index" class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Skills" ? "active" : "")">
                                 <i class="nav-icon bi bi-tag-fill"></i>
-                                <p>Danh mục kỹ năng</p>
+                                <p>Danh mục kĩ năng</p>
                             </a>
                         </li>
+                        <li class="nav-item">
+     <a asp-area="Admin" asp-controller="Categories" asp-action="Index" class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Categories" ? "active" : "")">
+         <i class="nav-icon bi bi-diagram-3-fill"></i>
+         <p>Lĩnh vực & Chuyên môn</p>
+     </a>
+ </li>
                     </ul>
                 </nav>
             </div>
