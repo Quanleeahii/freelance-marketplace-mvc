@@ -285,9 +285,6 @@ namespace FreelanceMarketplace.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("CategoryId")
-                        .HasColumnType("integer");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
@@ -297,8 +294,6 @@ namespace FreelanceMarketplace.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CategoryId");
 
                     b.ToTable("Skills");
                 });
@@ -480,17 +475,6 @@ namespace FreelanceMarketplace.Migrations
                     b.Navigation("Job");
                 });
 
-            modelBuilder.Entity("FreelanceMarketplace.Models.Skill", b =>
-                {
-                    b.HasOne("FreelanceMarketplace.Models.Category", "Category")
-                        .WithMany("Skills")
-                        .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Category");
-                });
-
             modelBuilder.Entity("FreelanceMarketplace.Models.UserProfile", b =>
                 {
                     b.HasOne("FreelanceMarketplace.Models.User", "User")
@@ -520,8 +504,6 @@ namespace FreelanceMarketplace.Migrations
             modelBuilder.Entity("FreelanceMarketplace.Models.Category", b =>
                 {
                     b.Navigation("Jobs");
-
-                    b.Navigation("Skills");
 
                     b.Navigation("SubCategories");
                 });

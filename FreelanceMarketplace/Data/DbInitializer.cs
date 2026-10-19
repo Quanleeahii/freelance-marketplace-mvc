@@ -1,5 +1,5 @@
 ﻿using FreelanceMarketplace.Models;
-
+using Microsoft.EntityFrameworkCore;
 namespace FreelanceMarketplace.Data
 {
     public class DbInitializer
@@ -43,17 +43,46 @@ namespace FreelanceMarketplace.Data
                 {
                     var skills = new List<Skill>
                     {
-                        new Skill { Name = "C#", CategoryId = itCat.Id },
-                        new Skill { Name = ".NET", CategoryId = itCat.Id },
-                        new Skill { Name = "PostgreSQL", CategoryId = itCat.Id },
-                        new Skill { Name = "React", CategoryId = itCat.Id },
-                        new Skill { Name = "Figma", CategoryId = designCat.Id },
-                        new Skill { Name = "Adobe Photoshop", CategoryId = designCat.Id }
+                        new Skill { Name = "C#", Slug = "c-sharp" },
+new Skill { Name = ".NET", Slug = "dotnet" },
+new Skill { Name = "PostgreSQL", Slug = "postgresql" },
+new Skill { Name = "React", Slug = "react" },
+new Skill { Name = "Figma", Slug = "figma" },
+new Skill { Name = "Adobe Photoshop", Slug = "adobe-photoshop" }
                     };
 
                     await context.Skills.AddRangeAsync(skills);
                     await context.SaveChangesAsync();
                 }
+            }
+            if (!await context.Users.AnyAsync(u => u.Role == "Admin"))
+            {
+                var adminUser = new User
+                {
+                    Email = "admin@freelance.com",
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("Admin@123"),
+                    Role = "Admin",
+                    IsVerified = true,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                };
+
+                await context.Users.AddAsync(adminUser);
+                await context.SaveChangesAsync();
+
+                var adminProfile = new UserProfile
+                {
+                    UserId = adminUser.Id,
+                    FullName = "Quản trị viên hệ thống",
+                    Phone = "0121212121",
+                    City = "Hà Nội",
+                    Address = "Trụ sở chính",
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                };
+
+                await context.UserProfiles.AddAsync(adminProfile);
+                await context.SaveChangesAsync();
             }
         }
     }

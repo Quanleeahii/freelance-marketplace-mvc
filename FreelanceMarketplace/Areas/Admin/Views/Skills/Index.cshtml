@@ -1,0 +1,118 @@
+﻿@model IEnumerable<FreelanceMarketplace.Models.Skill>
+@{
+    ViewData["Title"] = "Danh mục kỹ năng";
+}
+
+<div class="app-content-header">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-6">
+                <h3 class="mb-0">Quản lý danh mục kỹ năng</h3>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-end">
+                    <li class="breadcrumb-item"><a asp-area="Admin" asp-controller="Home" asp-action="Index">Admin</a></li>
+                    <li class="breadcrumb-item active">Skills</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="app-content">
+    <div class="container-fluid">
+        <!-- Thông báo trạng thái -->
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                @TempData["SuccessMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                @TempData["ErrorMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+
+        <div class="row">
+            <!-- Cột trái: Thêm kỹ năng mới -->
+            <div class="col-md-4">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Thêm kỹ năng mới</h5>
+                    </div>
+                    <form asp-action="Create" method="post">
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label class="form-label">Tên kỹ năng</label>
+                                <input type="text" name="name" class="form-control" placeholder="Ví dụ: Tiếng Anh,..." required />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Slug (tùy chọn)</label>
+                                <input type="text" name="slug" class="form-control" placeholder="tieng-anh" />
+                                <div class="form-text text-muted">Nếu để trống, hệ thống sẽ tự sinh slug</div>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="bi bi-plus-circle me-1"></i> Lưu kỹ năng
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Cột phải: Bảng danh sách kỹ năng -->
+            <div class="col-md-8">
+                <div class="card mb-4">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">Danh sách kỹ năng hiện có (@Model.Count())</h5>
+                    </div>
+                    <div class="card-body table-responsive p-0" style="max-height: 550px;">
+                        <table class="table table-head-fixed table-hover align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th style="width: 80px;">ID</th>
+                                    <th>Tên kỹ năng</th>
+                                    <th>Slug</th>
+                                    <th class="text-end" style="width: 100px;">Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (!Model.Any())
+                                {
+                                    <tr>
+                                        <td colspan="4" class="text-center py-4 text-muted">Chưa có kỹ năng nào.</td>
+                                    </tr>
+                                }
+                                else
+                                {
+                                    @foreach (var item in Model)
+                                    {
+                                        <tr>
+                                            <td>#@item.Id</td>
+                                            <td><strong>@item.Name</strong></td>
+                                            <td><code>@item.Slug</code></td>
+                                            <td class="text-end">
+                                                <form asp-action="Delete" asp-route-id="@item.Id" method="post" class="d-inline m-0 p-0">
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger" 
+                                                            title="Xóa kỹ năng" 
+                                                            onclick="return confirm('Bạn có chắc chắn muốn xóa kỹ năng \'@item.Name\'?')">
+                                                        <i class="bi bi-trash"></i> Xóa
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
