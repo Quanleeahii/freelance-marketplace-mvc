@@ -1,6 +1,4 @@
-﻿using System.Security.Claims;
-using FreelanceMarketplace.Services;
-using FreelanceMarketplace.ViewModels;
+﻿using FreelanceMarketplace.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,35 +14,10 @@ public class ProposalController : Controller
         _proposalService = proposalService;
     }
 
-    private int GetCurrentUserId()
-    {
-        var idClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        return int.TryParse(idClaim, out int id) ? id : 0;
-    }
-
-    [HttpGet]
+    [HttpGet("jobs/{jobId:int}/proposals/create")]
     public IActionResult Create(int jobId)
     {
         if (jobId <= 0) return BadRequest();
-
-        var model = new SubmitProposalViewModel
-        {
-            JobId = jobId
-        };
-        return View(model);
-    }
-
-    [HttpGet]
-    public async Task<IActionResult> Edit(int id)
-    {
-        if (id <= 0) return BadRequest();
-        int currentUserId = GetCurrentUserId();
-        var model = await _proposalService.GetProposalForEditAsync(id, currentUserId);
-        if (model == null)
-        {
-            return NotFound();
-        }
-
-        return View(model);
+        return RedirectToAction("Details", "JobSearch", new { id = jobId });
     }
 }

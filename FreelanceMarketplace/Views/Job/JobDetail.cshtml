@@ -1,0 +1,321 @@
+﻿@model FreelanceMarketplace.ViewModels.JobDetailViewModel
+@{
+    ViewData["Title"] = Model.Job.Title + " - NextHub";
+    var currentProposal = Model.CurrentUserProposal;
+}
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+<link rel="stylesheet" href="~/css/job-detail.css" asp-append-version="true" />
+
+<div class="nexthub-detail-container">
+    <nav class="nexthub-breadcrumb">
+        <a asp-controller="Home" asp-action="Index">Trang chủ</a>
+        <i class="bi bi-chevron-right"></i>
+        <a asp-controller="JobSearch" asp-action="Index">Việc Freelance</a>
+        <i class="bi bi-chevron-right"></i>
+        <span>@(Model.Job.Category?.Name ?? "Chung")</span>
+    </nav>
+
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="job-detail-main-card mb-4">
+                <div class="job-header-block">
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <span class="badge-status-new">MỚI</span>
+                        <span class="text-muted small">Mã dự án: <strong>#NH-@Model.Job.Id</strong></span>
+                    </div>
+                    <h1 class="job-title-text">@Model.Job.Title</h1>
+
+                    <div class="job-service-type">
+                        <i class="bi bi-briefcase-fill me-1"></i> Dịch vụ cần thuê:
+                        <span class="service-link">@(Model.Job.Category?.Name ?? "Chưa phân loại")</span>
+                    </div>
+                </div>
+
+                <div class="job-section-body">
+                    <h5 class="section-heading">Mô tả công việc</h5>
+                    <div class="job-description-content">
+                        @Html.Raw(Model.Job.Description)
+                    </div>
+
+                    @if (Model.Job.Skills != null && Model.Job.Skills.Any())
+                    {
+                        <h5 class="section-heading mt-4">Kỹ năng yêu cầu</h5>
+                        <div class="job-skills-tags">
+                            @foreach (var skill in Model.Job.Skills)
+                            {
+                                <span class="skill-tag">@skill.Name</span>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="applications-section-card" id="applicationsSectionRow">
+                <div class="vlance-bid-stats-bar d-flex justify-content-between align-items-center mb-4 p-3 rounded">
+                    <div class="stat-group">
+                        <span class="stat-label">Chào giá:</span>
+                        <strong class="stat-val" id="bidCount">@Model.TotalBids</strong>
+                    </div>
+                    <div class="stat-group text-center">
+                        <span class="stat-label">Thấp nhất:</span> <strong id="statMinPrice">@Model.MinBidAmount.ToString("N0") VNĐ</strong>
+                        <span class="mx-1 text-muted">|</span>
+                        <span class="stat-label">Trung bình:</span> <strong class="stat-val" id="statAvgPrice">@Model.AvgBidAmount.ToString("N0") VNĐ</strong>
+                        <span class="mx-1 text-muted">|</span>
+                        <span class="stat-label">Cao nhất:</span> <strong id="statMaxPrice">@Model.MaxBidAmount.ToString("N0") VNĐ</strong>
+                    </div>
+                    <div class="stat-group text-end">
+                        <span class="stat-label">Trung bình:</span> <strong id="statAvgDays">@Model.AvgDeliveryDays ngày</strong>
+                    </div>
+                </div>
+
+                <div class="bids-list-container" id="bidsList">
+                    <div class="bid-item-card is-my-bid @(currentProposal == null ? "d-none" : "")"
+                         id="myBidCard"
+                         data-price="@(currentProposal?.BidAmount ?? 0)"
+                         data-days="@(currentProposal?.DeliveryDays ?? 0)">
+                        <div class="d-flex align-items-start gap-3">
+                            <img src="@(currentProposal?.FreelancerProfile?.User?.UserProfile?.AvatarUrl ?? $"https://ui-avatars.com/api/?name={(currentProposal?.FreelancerProfile?.User?.UserProfile?.FullName ?? "Me")}&background=0f172a&color=fff&size=64")" class="freelancer-avatar" alt="Avatar" />
+                            <div class="flex-grow-1">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <h6 class="freelancer-name mb-0">
+                                        <span id="myBidAuthorName">@(currentProposal?.FreelancerProfile?.User?.UserProfile?.FullName ?? "Bạn")</span>
+                                        <span class="badge-my-bid ms-2"><i class="bi bi-star-fill"></i> Báo giá của bạn</span>
+                                    </h6>
+                                    <span class="bid-price-tag" id="myBidPriceTag">@(currentProposal?.BidAmount.ToString("N0") ?? "0") VNĐ</span>
+                                </div>
+                                <div class="d-flex align-items-center gap-3 small text-muted mb-2">
+                                    <span><i class="bi bi-telephone me-1"></i> SĐT: <strong id="myBidPhone">@(currentProposal?.PhoneNumber ?? "---")</strong></span>
+                                    <span><i class="bi bi-clock me-1"></i> Thời gian: <strong id="myBidDays">@(currentProposal?.DeliveryDays ?? 0) ngày</strong></span>
+                                    <span><i class="bi bi-paperclip me-1"></i> File: <strong id="myBidFileName">@(string.IsNullOrEmpty(currentProposal?.AttachmentUrl) ? "Không có" : "Tài liệu đính kèm")</strong></span>
+                                </div>
+                                <div class="bid-proposal-preview text-secondary small @(string.IsNullOrWhiteSpace(currentProposal?.CoverLetter) ? "d-none" : "")" id="myBidCoverLetterBox">
+                                    <span id="myBidCoverLetterText">@currentProposal?.CoverLetter</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    @foreach (var proposal in Model.Proposals.Where(p => currentProposal == null || p.Id != currentProposal.Id))
+                    {
+                        var freelancerUser = proposal.FreelancerProfile?.User;
+                        var freelancerProfile = freelancerUser?.UserProfile;
+
+                        <div class="bid-item-card" data-price="@proposal.BidAmount" data-days="@proposal.DeliveryDays">
+                            <div class="d-flex align-items-start gap-3">
+                                <img src="@(freelancerProfile?.AvatarUrl ?? $"https://ui-avatars.com/api/?name={(freelancerProfile?.FullName ?? "Freelancer")}&background=334155&color=fff&size=64")" class="freelancer-avatar" alt="Avatar" />
+                                <div class="flex-grow-1">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <h6 class="freelancer-name mb-0">@(freelancerProfile?.FullName ?? "Freelancer ẩn danh")</h6>
+                                    </div>
+                                    <div class="d-flex align-items-center gap-3 small text-muted">
+                                        <span><i class="bi bi-geo-alt me-1"></i> @(freelancerProfile?.City ?? "Toàn quốc")</span>
+                                        <span><i class="bi bi-clock me-1"></i> Hoàn thành: @proposal.DeliveryDays ngày</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="sidebar-card mb-4">
+                <h5 class="sidebar-title">Thông tin dự án</h5>
+                <ul class="job-info-list">
+                    <li>
+                        <span class="info-label"><i class="bi bi-hash"></i> ID dự án</span>
+                        <span class="info-val">@Model.Job.Id</span>
+                    </li>
+                    <li>
+                        <span class="info-label"><i class="bi bi-clock-history"></i> Ngày đăng</span>
+                        <span class="info-val">@Model.Job.CreatedAt.ToString("dd/MM/yyyy, HH:mm")</span>
+                    </li>
+                    <li>
+                        <span class="info-label"><i class="bi bi-hourglass-split"></i> Hạn nộp hồ sơ</span>
+                        <span class="info-val text-dark fw-bold">@(Model.Job.Deadline?.ToString("dd/MM/yyyy") ?? "Không thời hạn")</span>
+                    </li>
+                    <li>
+                        <span class="info-label"><i class="bi bi-geo-alt"></i> Địa điểm</span>
+                        <span class="info-val">@(Model.Job.LocationCity ?? "Toàn quốc")</span>
+                    </li>
+                    <li>
+                        <span class="info-label"><i class="bi bi-cash-stack"></i> Ngân sách</span>
+                        <span class="info-val budget-highlight">
+                            @(Model.Job.BudgetMin.HasValue ? Model.Job.BudgetMin.Value.ToString("N0") + "đ" : "Thỏa thuận") -
+                            @(Model.Job.BudgetMax.HasValue ? Model.Job.BudgetMax.Value.ToString("N0") + "đ" : "")
+                        </span>
+                    </li>
+                    <li>
+                        <span class="info-label"><i class="bi bi-laptop"></i> Hình thức</span>
+                        <span class="info-val">@Model.Job.WorkMode</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="sidebar-card mb-4">
+                <h5 class="sidebar-title">Thông tin khách hàng</h5>
+                @{
+                    var client = Model.Job.ClientProfile;
+                    var user = client?.User;
+                    var userProfile = user?.UserProfile;
+
+                    string displayName = "Khách hàng";
+                    if (!string.IsNullOrWhiteSpace(client?.DisplayName))
+                    {
+                        displayName = client.DisplayName.Trim();
+                    }
+                    else if (!string.IsNullOrWhiteSpace(userProfile?.FullName))
+                    {
+                        displayName = userProfile.FullName.Trim();
+                    }
+                    else if (!string.IsNullOrWhiteSpace(user?.Email))
+                    {
+                        displayName = user.Email.Split('@')[0];
+                    }
+
+                    string avatarUrl = !string.IsNullOrWhiteSpace(userProfile?.AvatarUrl)
+                        ? userProfile.AvatarUrl
+                        : $"https://ui-avatars.com/api/?name={Uri.EscapeDataString(displayName)}&background=0f172a&color=fff&size=128";
+
+                    string location = !string.IsNullOrWhiteSpace(userProfile?.City)
+                        ? userProfile.City
+                        : (!string.IsNullOrWhiteSpace(Model.Job.LocationCity) ? Model.Job.LocationCity : "Toàn quốc");
+
+                    string joinedDate = user?.CreatedAt != null && user.CreatedAt != default(DateTime)
+                        ? user.CreatedAt.ToString("dd/MM/yyyy")
+                        : (userProfile?.CreatedAt != null && userProfile.CreatedAt != default(DateTime)
+                            ? userProfile.CreatedAt.ToString("dd/MM/yyyy")
+                            : Model.Job.CreatedAt.ToString("dd/MM/yyyy"));
+                }
+                <div class="client-profile-block">
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <div class="client-avatar">
+                            <img src="@avatarUrl" alt="@displayName" style="width: 48px; height: 48px; border-radius: 50%; object-fit: cover;" />
+                        </div>
+                        <div>
+                            <h6 class="client-name mb-0">@displayName</h6>
+                            @if (!string.IsNullOrWhiteSpace(client?.DisplayName) && !string.IsNullOrWhiteSpace(userProfile?.FullName))
+                            {
+                                <small class="text-muted d-block mt-1">Đại diện: @userProfile.FullName</small>
+                            }
+                        </div>
+                    </div>
+
+                    <ul class="client-meta-list">
+                        <li><span>Địa chỉ:</span> <strong>@location</strong></li>
+                        <li><span>Tham gia:</span> <strong>@joinedDate</strong></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="sidebar-card job-bid-card" id="bidFormBlock">
+                <div class="alert alert-danger d-none py-2 px-3 small mb-3" id="proposalAlertMessage" role="alert"></div>
+
+                <div id="bidFormContainer" class="@(currentProposal != null ? "d-none" : "")">
+                    <h5 class="sidebar-title"><i class="bi bi-send-fill me-2"></i>Thông tin chào giá</h5>
+
+                    <form id="bidForm" enctype="multipart/form-data">
+                        <input type="hidden" id="JobId" name="JobId" value="@Model.Job.Id" />
+                        <input type="hidden" id="ProposalId" name="Id" value="@(currentProposal?.Id ?? 0)" />
+
+                        <div class="mb-3">
+                            <label class="form-label-nh">Đề xuất chi phí (VNĐ) <span class="text-danger">*</span></label>
+                            <div class="input-group bid-input-group">
+                                <input type="number" id="BidAmount" name="BidAmount" class="form-control form-control-nh"
+                                       placeholder="Nhập số tiền..." min="100000" step="50000" value="@(currentProposal?.BidAmount)" required />
+                                <span class="input-group-text bid-addon">VNĐ</span>
+                            </div>
+                            <small class="text-dark fw-semibold mt-1 d-block" id="bidFormattedText"></small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label-nh">Dự kiến hoàn thành trong <span class="text-danger">*</span></label>
+                            <div class="input-group bid-input-group">
+                                <input type="number" id="DeliveryDays" name="DeliveryDays" class="form-control form-control-nh"
+                                       placeholder="VD: 7" min="1" value="@(currentProposal?.DeliveryDays)" required />
+                                <span class="input-group-text bid-addon">Ngày</span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label-nh">Số điện thoại liên hệ <span class="text-danger">*</span></label>
+                            <input type="tel" id="PhoneNumber" name="PhoneNumber" class="form-control form-control-nh"
+                                   placeholder="VD: 0987654321" pattern="^0[35789]\d{8}$" value="@(currentProposal?.PhoneNumber)" required />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label-nh">Đề xuất thuyết phục khách hàng</label>
+                            <textarea id="CoverLetter" name="CoverLetter" class="form-control form-control-nh textarea-nh" rows="4"
+                                      placeholder="1. Kinh nghiệm và kỹ năng phù hợp?&#10;2. Quy trình dự kiến triển khai?...">@(currentProposal?.CoverLetter)</textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label-nh">Tài liệu đính kèm (CV / Portfolio)</label>
+                            <div>
+                                <input type="file" id="AttachmentFile" name="AttachmentFile" class="d-none"
+                                       accept=".pdf,.doc,.docx,.zip,.rar,.png,.jpg,.jpeg" />
+
+                                <a href="javascript:void(0)" id="btnTriggerFile" class="text-decoration-none small fw-semibold d-inline-flex align-items-center gap-1">
+                                    <i class="bi bi-paperclip fs-6"></i> <span>Thêm tài liệu đính kèm</span>
+                                </a>
+
+                                <div id="fileSelectedInfo" class="mt-2 small text-secondary align-items-center gap-2 @(!string.IsNullOrEmpty(currentProposal?.AttachmentUrl) ? "d-flex" : "d-none")">
+                                    <i class="bi bi-file-earmark-check text-dark"></i>
+                                    <span id="selectedFileNameText" class="fw-semibold text-dark text-truncate" style="max-width: 200px;">
+                                        @(currentProposal?.AttachmentUrl != null ? System.IO.Path.GetFileName(currentProposal.AttachmentUrl) : "")
+                                    </span>
+                                    <a href="javascript:void(0)" id="btnRemoveSelectedFile" class="text-danger ms-2 text-decoration-none fw-bold small">
+                                        Xóa bỏ
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2 mt-3">
+                            <button type="submit" class="btn-nexthub-submit w-100" id="btnSubmitProposal">
+                                <i class="bi bi-send-fill me-1"></i> <span id="submitBtnText">@(currentProposal != null ? "Cập nhật báo giá" : "Gửi chào giá ngay")</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <div id="submittedBidBox" class="@(currentProposal == null ? "d-none" : "")">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="badge-submitted"><i class="bi bi-check-circle-fill me-1"></i> ĐÃ CHÀO GIÁ</span>
+                        <button type="button" class="btn btn-sm btn-outline-dark fw-bold btn-trigger-edit-bid">
+                            <i class="bi bi-pencil-square me-1"></i> Chỉnh sửa
+                        </button>
+                    </div>
+
+                    <div class="submitted-details-list">
+                        <div class="submitted-item">
+                            <span class="text-muted">Chi phí đề xuất:</span>
+                            <strong class="text-dark fs-5 ms-2" id="dispBidAmount">@(currentProposal?.BidAmount.ToString("N0") ?? "0") VNĐ</strong>
+                        </div>
+                        <div class="submitted-item">
+                            <span class="text-muted">Thời gian hoàn thành:</span>
+                            <strong class="ms-2" id="dispEstimatedDays">@(currentProposal?.DeliveryDays ?? 0) ngày</strong>
+                        </div>
+                        <div class="submitted-item">
+                            <span class="text-muted">Số điện thoại:</span>
+                            <strong class="ms-2" id="dispPhoneNumber">@(currentProposal?.PhoneNumber ?? "---")</strong>
+                        </div>
+                        <div class="submitted-item">
+                            <span class="text-muted">File đính kèm:</span>
+                            <span class="ms-2 fw-semibold text-dark" id="dispFileName">@(string.IsNullOrEmpty(currentProposal?.AttachmentUrl) ? "Không có" : "Tài liệu đính kèm")</span>
+                        </div>
+                        <div class="submitted-item mt-2">
+                            <span class="text-muted d-block mb-1">Nội dung đề xuất:</span>
+                            <p class="p-2 bg-light rounded text-dark small mb-0" id="dispProposalText" style="white-space: pre-line;">@(currentProposal?.CoverLetter ?? "Không có")</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="~/js/job-detail.js" asp-append-version="true"></script>

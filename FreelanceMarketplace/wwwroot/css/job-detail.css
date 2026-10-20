@@ -1,0 +1,374 @@
+﻿:root {
+    --auth-bg: #f1f5f9;
+    --card-bg: #ffffff;
+    --border-color: #cbd5e1;
+    --primary-color: #0f172a;
+    --primary-hover: #334155;
+    --text-dark: #0f172a;
+    --text-muted: #64748b;
+}
+
+html {
+    overflow-y: scroll !important;
+}
+
+body {
+    background-color: var(--auth-bg) !important;
+    color: var(--text-dark) !important;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+}
+
+.nexthub-detail-container {
+    width: 100% !important;
+    max-width: 1300px !important;
+    margin: 20px auto 60px auto;
+    padding: 0 15px;
+}
+
+.nexthub-breadcrumb {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+    .nexthub-breadcrumb a {
+        color: var(--text-muted);
+        text-decoration: none;
+        transition: color 0.15s ease;
+    }
+
+        .nexthub-breadcrumb a:hover {
+            color: var(--primary-color);
+        }
+
+.fs-14 {
+    font-size: 14px;
+}
+
+.job-detail-main-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 28px 32px;
+}
+
+.badge-status-new {
+    background-color: var(--primary-color);
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 4px;
+    letter-spacing: 0.5px;
+}
+
+.job-title-text {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--text-dark);
+    line-height: 1.4;
+    margin-bottom: 14px;
+}
+
+.job-service-type {
+    background-color: #f8fafc;
+    border: 1px solid var(--border-color);
+    padding: 9px 14px;
+    border-radius: 6px;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: 22px;
+}
+
+.service-link {
+    color: var(--primary-color);
+    font-weight: 700;
+}
+
+.section-heading {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1.5px solid #e2e8f0;
+}
+
+.job-description-content {
+    font-size: 14px;
+    line-height: 1.7;
+    color: #334155;
+}
+
+.job-skills-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.skill-tag {
+    background-color: #f1f5f9;
+    color: #1e293b;
+    border: 1px solid #cbd5e1;
+    font-size: 12.5px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 6px;
+}
+
+.sidebar-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 22px 24px;
+}
+
+.job-bid-card {
+    border: 1.5px solid #0f172a !important;
+    background-color: #ffffff !important;
+}
+
+.sidebar-title {
+    font-size: 14.5px;
+    font-weight: 800;
+    color: var(--text-dark);
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1.5px solid #e2e8f0;
+    text-transform: uppercase;
+}
+
+.job-info-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+    .job-info-list li {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 0;
+        border-bottom: 1px solid #f1f5f9;
+        font-size: 13.5px;
+    }
+
+.info-label {
+    color: var(--text-muted);
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.info-val {
+    font-weight: 700;
+    color: var(--text-dark);
+}
+
+.budget-highlight {
+    color: var(--primary-color) !important;
+    font-size: 14.5px;
+    font-weight: 800;
+}
+
+.client-avatar {
+    width: 48px;
+    height: 48px;
+}
+
+    .client-avatar img {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+    }
+
+.client-name {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 2px;
+}
+
+.client-meta-list {
+    list-style: none;
+    padding: 10px 14px;
+    margin: 12px 0 0 0;
+    background-color: #f8fafc;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 13px;
+}
+
+    .client-meta-list li {
+        display: flex;
+        justify-content: space-between;
+        padding: 3px 0;
+    }
+
+.form-label-nh {
+    font-size: 13px;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 6px;
+}
+
+.bid-input-group {
+    display: flex !important;
+    align-items: stretch !important;
+    width: 100% !important;
+}
+
+    .bid-input-group .form-control-nh {
+        flex: 1 1 auto !important;
+        width: 1% !important;
+        border-top-right-radius: 0 !important;
+        border-bottom-right-radius: 0 !important;
+    }
+
+.form-control-nh {
+    width: 100%;
+    border: 1.5px solid var(--border-color);
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 14px;
+    color: var(--text-dark);
+    outline: none;
+    transition: border-color 0.15s ease;
+}
+
+    .form-control-nh:focus {
+        border-color: var(--primary-color);
+        box-shadow: none;
+    }
+
+.bid-addon {
+    background-color: #f8fafc !important;
+    border: 1.5px solid var(--border-color) !important;
+    border-left: none !important;
+    border-top-right-radius: 6px !important;
+    border-bottom-right-radius: 6px !important;
+    color: var(--text-muted) !important;
+    font-weight: 600 !important;
+    font-size: 13.5px !important;
+    padding: 0 14px !important;
+    display: flex !important;
+    align-items: center !important;
+}
+
+#btnTriggerFile {
+    color: var(--primary-color) !important;
+    transition: color 0.15s ease;
+}
+
+    #btnTriggerFile:hover {
+        color: var(--primary-hover) !important;
+        text-decoration: underline !important;
+    }
+
+.btn-nexthub-submit {
+    background-color: var(--primary-color);
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 14px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+
+    .btn-nexthub-submit:hover {
+        background-color: var(--primary-hover);
+    }
+
+.submitted-item {
+    font-size: 13.5px;
+    margin-bottom: 8px;
+}
+
+.badge-submitted {
+    background-color: var(--primary-color);
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+.vlance-bid-stats-bar {
+    background-color: #f8fafc !important;
+    border: 1px solid var(--border-color) !important;
+    color: #0f172a !important;
+    font-size: 13.5px;
+}
+
+    .vlance-bid-stats-bar .stat-label {
+        color: var(--text-muted) !important;
+        font-weight: 600;
+    }
+
+    .vlance-bid-stats-bar strong {
+        color: #0f172a;
+    }
+
+    .vlance-bid-stats-bar .stat-val {
+        color: var(--primary-color) !important;
+        font-weight: 800;
+    }
+
+.applications-section-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 24px;
+}
+
+.bid-item-card {
+    padding: 16px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    margin-bottom: 12px;
+    background-color: #ffffff;
+    transition: border-color 0.15s ease;
+}
+
+    .bid-item-card.is-my-bid {
+        border: 1.5px solid var(--primary-color);
+        background-color: #f8fafc;
+    }
+
+.freelancer-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+}
+
+.bid-price-tag {
+    background-color: #0f172a;
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 13.5px;
+    padding: 3px 8px;
+    border-radius: 4px;
+}
+
+.badge-my-bid {
+    background-color: #0f172a;
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+.bid-proposal-preview {
+    background-color: #f1f5f9;
+    padding: 8px 12px;
+    border-radius: 4px;
+    border-left: 3px solid var(--primary-color);
+}
