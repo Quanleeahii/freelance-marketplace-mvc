@@ -126,8 +126,14 @@ public class JobSearchService : IJobSearchService
         return await _context.Jobs
             .AsNoTracking()
             .Include(j => j.Category)
-            .Include(j => j.Proposals)
             .Include(j => j.Skills)
+            .Include(j => j.ClientProfile)
+            .ThenInclude(cp => cp.User)
+                .ThenInclude(u => u.UserProfile)
+            .Include(j => j.Proposals)
+                .ThenInclude(p => p.FreelancerProfile)
+                    .ThenInclude(fp => fp.User)
+                        .ThenInclude(u => u.UserProfile)
             .FirstOrDefaultAsync(j => j.Id == id);
     }
 }

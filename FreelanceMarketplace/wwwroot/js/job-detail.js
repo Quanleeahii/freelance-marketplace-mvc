@@ -1,20 +1,20 @@
 ﻿$(document).ready(function () {
-    // Hàm format VNĐ
+    const numberFormatter = new Intl.NumberFormat('vi-VN');
+
     function formatVND(amount) {
-        return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
+        return numberFormatter.format(amount) + " VNĐ";
     }
 
-    // Hàm tính toán lại Thanh Thống Kê vLance động
     function recalculateStats() {
         let prices = [];
         let daysList = [];
 
-        $(".bid-item-card").each(function () {
+        $(".bid-item-card:not(.d-none)").each(function () {
             const price = parseFloat($(this).attr("data-price"));
             const days = parseFloat($(this).attr("data-days"));
 
-            if (!isNaN(price)) prices.push(price);
-            if (!isNaN(days)) daysList.push(days);
+            if (!isNaN(price) && price > 0) prices.push(price);
+            if (!isNaN(days) && days > 0) daysList.push(days);
         });
 
         const totalBids = prices.length;
@@ -27,132 +27,125 @@
             const avgPrice = Math.round(sumPrice / totalBids);
 
             const sumDays = daysList.reduce((a, b) => a + b, 0);
-            const avgDays = Math.round(sumDays / totalBids);
+            const avgDays = Math.round((sumDays / totalBids) * 10) / 10;
 
             $("#statMinPrice").text(formatVND(minPrice));
             $("#statMaxPrice").text(formatVND(maxPrice));
             $("#statAvgPrice").text(formatVND(avgPrice));
             $("#statAvgDays").text(avgDays + " ngày");
+        } else {
+            $("#statMinPrice").text("0 VNĐ");
+            $("#statMaxPrice").text("0 VNĐ");
+            $("#statAvgPrice").text("0 VNĐ");
+            $("#statAvgDays").text("0 ngày");
         }
     }
 
-    // Chạy tính toán ban đầu
-    recalculateStats();
-
-    // Format tiền VNĐ khi gõ giá đề xuất
     $("#BidAmount").on("input", function () {
-        const val = $(this).val();
-        if (val && val > 0) {
+        const val = parseFloat($(this).val());
+        if (!isNaN(val) && val > 0) {
             $("#bidFormattedText").text("Bằng chữ: " + formatVND(val));
         } else {
             $("#bidFormattedText").text("");
         }
     });
 
-    // Xử lý Upload File Custom
-    const dropzone = $("#fileUploadDropzone");
     const fileInput = $("#AttachmentFile");
 
-    dropzone.on("click", function () { fileInput.click(); });
+    $("#btnTriggerFile").on("click", function () {
+        fileInput.click();
+    });
 
     fileInput.on("change", function () {
         if (this.files && this.files.length > 0) {
             $("#selectedFileNameText").text(this.files[0].name);
-            $("#uploadBoxPlaceholder").hide();
-            $("#uploadFileSelectedInfo").show();
+            $("#fileSelectedInfo").removeClass("d-none").addClass("d-flex");
         }
     });
 
     $("#btnRemoveSelectedFile").on("click", function (e) {
-        e.stopPropagation();
-        fileInput.val("");
-        $("#uploadFileSelectedInfo").hide();
-        $("#uploadBoxPlaceholder").show();
-    });
-
-    // Drag & Drop
-    dropzone.on("dragover", function (e) { e.preventDefault(); $(this).addClass("dragover"); });
-    dropzone.on("dragleave drop", function (e) {
         e.preventDefault();
-        $(this).removeClass("dragover");
-        if (e.type === "drop" && e.originalEvent.dataTransfer.files.length > 0) {
-            fileInput[0].files = e.originalEvent.dataTransfer.files;
-            fileInput.trigger("change");
-        }
+        fileInput.val("");
+        $("#fileSelectedInfo").removeClass("d-flex").addClass("d-none");
     });
 
-    // XỬ LÝ NỘP FORM CHÀO GIÁ
     $("#bidForm").on("submit", function (e) {
         e.preventDefault();
 
+        const alertBox = $("#proposalAlertMessage");
+        alertBox.addClass("d-none").text("");
+
+        const formData = new FormData(this);
+        const proposalId = parseInt($("#ProposalId").val()) || 0;
+        const isUpdate = proposalId > 0;
+
+        const endpoint = isUpdate ? `/api/proposals/${proposalId}` : `/api/proposals`;
+        const methodType = isUpdate ? "PUT" : "POST";
+
         const amount = parseFloat($("#BidAmount").val());
-        const days = parseInt($("#EstimatedDays").val());
+        const days = parseInt($("#DeliveryDays").val());
         const phone = $("#PhoneNumber").val();
-        const proposal = $("#ProposalText").val();
+        const coverLetter = $("#CoverLetter").val() || "";
         const files = fileInput[0].files;
-        const fileName = files.length > 0 ? files[0].name : "Không có file";
+        const fileName = files.length > 0 ? files[0].name : ($("#selectedFileNameText").text().trim() || "Không có");
 
-        const formattedAmount = formatVND(amount);
+        const submitBtn = $("#btnSubmitProposal");
+        submitBtn.prop("disabled", true);
 
-        // 1. Cập nhật Sidebar Cột Phải
-        $("#dispBidAmount").text(formattedAmount);
-        $("#dispEstimatedDays").text(days + " ngày");
-        $("#dispPhoneNumber").text(phone);
-        $("#dispFileName").text(fileName);
-        $("#dispProposalText").text(proposal);
+        $.ajax({
+            url: endpoint,
+            type: methodType,
+            data: formData,
+            contentType: false,
+            processData: false,
+            success: function (res) {
+                submitBtn.prop("disabled", false);
 
-        // 2. Ẩn form nhập, hiện thẻ Đã Chào Giá
-        $("#bidFormContainer").slideUp(300);
-        $("#submittedBidBox").slideDown(300);
+                $("#dispBidAmount").text(formatVND(amount));
+                $("#dispEstimatedDays").text(days + " ngày");
+                $("#dispPhoneNumber").text(phone);
+                $("#dispFileName").text(fileName);
+                $("#dispProposalText").text(coverLetter.length > 0 ? coverLetter : "Không có");
 
-        // 3. Tạo Card bài nộp của bạn với data-price và data-days động
-        const myBidHtml = `
-            <div class="bid-item-card border-success bg-light" id="myBidCard" data-price="${amount}" data-days="${days}">
-                <div class="d-flex align-items-start gap-3">
-                    <img src="https://ui-avatars.com/api/?name=Nguyen+Quoc+Truong&background=00b14f&color=fff&size=64" class="freelancer-avatar" alt="Avatar" />
-                    <div class="flex-grow-1">
-                        <div class="d-flex justify-content-between align-items-center mb-1">
-                            <h6 class="freelancer-name mb-0">
-                                Nguyễn Quốc Trường <span class="badge bg-success text-white ms-2"><i class="bi bi-star-fill"></i> Báo giá của bạn</span>
-                            </h6>
-                            <span class="bid-price-tag text-success">${formattedAmount}</span>
-                        </div>
-                        <p class="freelancer-headline text-muted small mb-2">Lập trình viên ASP.NET Core / Digital Marketer</p>
-                        <div class="d-flex align-items-center gap-3 small text-muted mb-2">
-                            <span><i class="bi bi-telephone-fill text-success"></i> SĐT: <strong>${phone}</strong></span>
-                            <span><i class="bi bi-clock me-1"></i> Hoàn thành trong <strong>${days} ngày</strong></span>
-                            <span><i class="bi bi-paperclip me-1"></i> File: <strong>${fileName}</strong></span>
-                        </div>
-                        <div class="bid-proposal-preview text-secondary small">
-                            "${proposal}"
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
+                $("#bidFormContainer").addClass("d-none");
+                $("#submittedBidBox").removeClass("d-none");
 
-        if ($("#myBidCard").length > 0) {
-            $("#myBidCard").replaceWith(myBidHtml);
-        } else {
-            $("#bidsList").prepend(myBidHtml);
-        }
+                const myBidCard = $("#myBidCard");
+                myBidCard.attr("data-price", amount);
+                myBidCard.attr("data-days", days);
+                $("#myBidPriceTag").text(formatVND(amount));
+                $("#myBidPhone").text(phone);
+                $("#myBidDays").text(days + " ngày");
+                $("#myBidFileName").text(fileName);
 
-        // 4. TỰ ĐỘNG TÍNH TOÁN LẠI THANH THỐNG KÊ GIÁ VÀ NGÀY
-        recalculateStats();
+                if (coverLetter.length > 0) {
+                    $("#myBidCoverLetterText").text(coverLetter);
+                    $("#myBidCoverLetterBox").removeClass("d-none");
+                } else {
+                    $("#myBidCoverLetterBox").addClass("d-none");
+                }
 
-        // Cuộn xuống bài vừa nộp
-        $('html, body').animate({
-            scrollTop: $("#myBidCard").offset().top - 80
-        }, 500);
+                myBidCard.removeClass("d-none");
+                recalculateStats();
+            },
+            error: function (err) {
+                submitBtn.prop("disabled", false);
+                if (err.responseJSON && err.responseJSON.message) {
+                    alertBox.text(err.responseJSON.message).removeClass("d-none");
+                } else {
+                    alertBox.text("Có lỗi xảy ra trong quá trình xử lý.").removeClass("d-none");
+                }
+            }
+        });
     });
 
-    // Nút chỉnh sửa báo giá
     $(document).on("click", ".btn-trigger-edit-bid", function () {
-        $("#submittedBidBox").slideUp(300);
-        $("#bidFormContainer").slideDown(300);
+        $("#submittedBidBox").addClass("d-none");
+        $("#bidFormContainer").removeClass("d-none");
+        $("#submitBtnText").text("Cập nhật báo giá");
 
         $('html, body').animate({
-            scrollTop: $("#bidFormBlock").offset().top - 40
-        }, 400);
+            scrollTop: $("#bidFormBlock").offset().top - 30
+        }, 200);
     });
 });

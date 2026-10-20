@@ -1,7 +1,8 @@
-﻿using FreelanceMarketplace.Services;
+﻿using System.Security.Claims;
+using FreelanceMarketplace.Services;
 using FreelanceMarketplace.ViewModels;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
+
 namespace FreelanceMarketplace.Controllers.Api;
 
 [ApiController]
@@ -14,11 +15,11 @@ public class ProposalApiController : ControllerBase
     {
         _proposalService = proposalService;
     }
+
     private int? GetCurrentUserId()
     {
-        int currentUserId = 0;
         var idClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (int.TryParse(idClaim, out currentUserId) && currentUserId > 0)
+        if (int.TryParse(idClaim, out int currentUserId) && currentUserId > 0)
         {
             return currentUserId;
         }
@@ -34,27 +35,40 @@ public class ProposalApiController : ControllerBase
 
     [HttpPost]
     [Consumes("multipart/form-data")]
-    public async Task<IActionResult> Submit([FromForm] SubmitProposalViewModel model)
+    public async Task<IActionResult> Submit([FromForm] SubmitProposalRequest model)
     {
         if (!ModelState.IsValid)
         {
-            return BadRequest(ModelState);
+            return BadRequest(new
+            {
+                success = false,
+                errors = ModelState
+            });
         }
 
         var userId = GetCurrentUserId();
         if (userId == null)
         {
-            return Unauthorized(new { message = "Vui lòng đăng nhập để gửi báo giá" });
+            return Unauthorized(new
+            {
+                success = false,
+                message = "Vui lòng đăng nhập để gửi báo giá"
+            });
         }
 
         var (success, errorMessage) = await _proposalService.SubmitProposalAsync(model, userId.Value);
         if (!success)
         {
-            return BadRequest(new { message = errorMessage });
+            return BadRequest(new
+            {
+                success = false,
+                message = errorMessage
+            });
         }
 
         return StatusCode(StatusCodes.Status201Created, new
         {
+            success = true,
             message = "Gửi báo giá thành công"
         });
     }
@@ -65,41 +79,69 @@ public class ProposalApiController : ControllerBase
         var userId = GetCurrentUserId();
         if (userId == null)
         {
-            return Unauthorized(new { message = "Vui lòng đăng nhập." });
+            return Unauthorized(new
+            {
+                success = false,
+                message = "Vui lòng đăng nhập"
+            });
         }
 
         var proposal = await _proposalService.GetProposalForEditAsync(id, userId.Value);
         if (proposal == null)
         {
-            return NotFound(new { message = "Bài chào giá không tồn tại hoặc bạn không có quyền truy cập." });
+            return NotFound(new
+            {
+                success = false,
+                message = "Bài chào giá không tồn tại hoặc bạn không có quyền truy cập"
+            });
         }
 
-        return Ok(proposal);
+        return Ok(new
+        {
+            success = true,
+            data = proposal
+        });
     }
 
     [HttpPut("{id:int}")]
     [Consumes("multipart/form-data")]
-    public async Task<IActionResult> Update(int id, [FromForm] SubmitProposalViewModel model)
+    public async Task<IActionResult> Update(int id, [FromForm] SubmitProposalRequest model)
     {
         model.Id = id;
 
         if (!ModelState.IsValid)
         {
-            return BadRequest(ModelState);
+            return BadRequest(new
+            {
+                success = false,
+                errors = ModelState
+            });
         }
 
         var userId = GetCurrentUserId();
         if (userId == null)
         {
-            return Unauthorized(new { message = "Vui lòng đăng nhập để chỉnh sửa báo giá" });
+            return Unauthorized(new
+            {
+                success = false,
+                message = "Vui lòng đăng nhập để chỉnh sửa báo giá"
+            });
         }
 
         var (success, errorMessage) = await _proposalService.UpdateProposalAsync(model, userId.Value);
         if (!success)
         {
-            return BadRequest(new { message = errorMessage });
+            return BadRequest(new
+            {
+                success = false,
+                message = errorMessage
+            });
         }
 
-        return Ok(new { message = "Cập nhật báo giá thành công" });
+        return Ok(new
+        {
+            success = true,
+            message = "Cập nhật báo giá thành công"
+        });
     }
 }

@@ -2,6 +2,7 @@
 using FreelanceMarketplace.Services;
 using FreelanceMarketplace.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace FreelanceMarketplace.Controllers;
 
@@ -35,7 +36,55 @@ public class JobSearchController : Controller
         {
             return NotFound();
         }
-        return View(job);
+
+        // 1. Lấy Id User đăng nhập (tương thích cả Claims và Session từ SignInService)
+        int? currentUserId = GetCurrentUserId();
+
+        // 2. Tìm proposal của chính user đó (nếu có)
+        var proposalList = job.Proposals?.OrderByDescending(p => p.CreatedAt).ToList() ?? new List<Proposal>();
+        Proposal? currentProposal = null;
+
+        if (currentUserId.HasValue)
+        {
+            currentProposal = proposalList.FirstOrDefault(p => p.FreelancerProfile?.UserId == currentUserId.Value);
+        }
+
+        // 3. Đóng gói đầy đủ vào JobDetailViewModel cho View JobDetail.cshtml
+        var viewModel = new JobDetailViewModel
+        {
+            Job = job,
+            Proposals = proposalList,
+            CurrentUserProposal = currentProposal,
+            ProposalForm = new SubmitProposalRequest
+            {
+                JobId = job.Id,
+                Id = currentProposal?.Id,
+                BidAmount = currentProposal?.BidAmount ?? 0,
+                DeliveryDays = currentProposal?.DeliveryDays ?? 0,
+                PhoneNumber = currentProposal?.PhoneNumber ?? string.Empty,
+                CoverLetter = currentProposal?.CoverLetter,
+                CurrentAttachmentUrl = currentProposal?.AttachmentUrl
+            }
+        };
+
+        return View("~/Views/Job/JobDetail.cshtml", viewModel);
+    }
+
+    private int? GetCurrentUserId()
+    {
+        var idClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (int.TryParse(idClaim, out int uid) && uid > 0)
+        {
+            return uid;
+        }
+
+        var sessionUid = HttpContext.Session.GetString("UserId");
+        if (int.TryParse(sessionUid, out uid) && uid > 0)
+        {
+            return uid;
+        }
+
+        return null;
     }
 
     private async Task LoadSidebarDataAsync(int? selectedCategoryId = null)

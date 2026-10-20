@@ -1,11 +1,15 @@
 ﻿:root {
-    --auth-bg: #f8fafc;
+    --auth-bg: #f1f5f9;
     --card-bg: #ffffff;
-    --border-color: #e2e8f0;
-    --primary-green: #00b14f;
-    --primary-green-hover: #009643;
+    --border-color: #cbd5e1;
+    --primary-color: #0f172a;
+    --primary-hover: #334155;
     --text-dark: #0f172a;
     --text-muted: #64748b;
+}
+
+html {
+    overflow-y: scroll !important;
 }
 
 body {
@@ -16,9 +20,9 @@ body {
 
 .nexthub-detail-container {
     width: 100% !important;
-    max-width: 1400px !important;
+    max-width: 1300px !important;
     margin: 20px auto 60px auto;
-    padding: 0 20px;
+    padding: 0 15px;
 }
 
 .nexthub-breadcrumb {
@@ -33,70 +37,65 @@ body {
     .nexthub-breadcrumb a {
         color: var(--text-muted);
         text-decoration: none;
+        transition: color 0.15s ease;
     }
 
         .nexthub-breadcrumb a:hover {
-            color: var(--primary-green);
+            color: var(--primary-color);
         }
 
 .fs-14 {
     font-size: 14px;
 }
 
-.fs-16 {
-    font-size: 16px;
-}
-
-/* Card bên trái */
 .job-detail-main-card {
     background: var(--card-bg);
     border: 1px solid var(--border-color);
-    border-radius: 12px;
-    padding: 30px 35px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+    border-radius: 8px;
+    padding: 28px 32px;
 }
 
 .badge-status-new {
-    background-color: #ff5722;
+    background-color: var(--primary-color);
     color: #ffffff;
-    font-size: 12px;
-    font-weight: 800;
+    font-size: 11px;
+    font-weight: 700;
     padding: 3px 8px;
     border-radius: 4px;
+    letter-spacing: 0.5px;
 }
 
 .job-title-text {
-    font-size: 24px;
+    font-size: 22px;
     font-weight: 800;
     color: var(--text-dark);
-    line-height: 1.35;
-    margin-bottom: 15px;
+    line-height: 1.4;
+    margin-bottom: 14px;
 }
 
 .job-service-type {
-    background-color: #f0fdf4;
-    border: 1px solid #bbf7d0;
-    padding: 10px 16px;
-    border-radius: 8px;
-    font-size: 14px;
+    background-color: #f8fafc;
+    border: 1px solid var(--border-color);
+    padding: 9px 14px;
+    border-radius: 6px;
+    font-size: 13.5px;
     font-weight: 600;
-    color: #166534;
+    color: #334155;
     margin-bottom: 22px;
 }
 
 .service-link {
-    color: var(--primary-green);
-    text-decoration: none;
+    color: var(--primary-color);
     font-weight: 700;
 }
 
 .section-heading {
-    font-size: 17px;
+    font-size: 16px;
     font-weight: 700;
     color: var(--text-dark);
     margin-bottom: 12px;
     padding-bottom: 8px;
-    border-bottom: 2px solid #f1f5f9;
+    border-bottom: 1.5px solid #e2e8f0;
 }
 
 .job-description-content {
@@ -113,35 +112,33 @@ body {
 
 .skill-tag {
     background-color: #f1f5f9;
-    color: #334155;
+    color: #1e293b;
     border: 1px solid #cbd5e1;
-    font-size: 13px;
+    font-size: 12.5px;
     font-weight: 600;
-    padding: 5px 12px;
+    padding: 4px 10px;
     border-radius: 6px;
 }
 
-/* Sidebar Cột Phải */
 .sidebar-card {
     background: var(--card-bg);
     border: 1px solid var(--border-color);
-    border-radius: 12px;
+    border-radius: 8px;
     padding: 22px 24px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
 }
 
 .job-bid-card {
-    border: 2px solid #bbf7d0 !important;
-    background-color: #fafdfb !important;
+    border: 1.5px solid #0f172a !important;
+    background-color: #ffffff !important;
 }
 
 .sidebar-title {
-    font-size: 15px;
+    font-size: 14.5px;
     font-weight: 800;
     color: var(--text-dark);
     margin-bottom: 16px;
-    padding-bottom: 10px;
-    border-bottom: 2px solid #f1f5f9;
+    padding-bottom: 8px;
+    border-bottom: 1.5px solid #e2e8f0;
     text-transform: uppercase;
 }
 
@@ -155,9 +152,9 @@ body {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 9px 0;
+        padding: 8px 0;
         border-bottom: 1px solid #f1f5f9;
-        font-size: 14px;
+        font-size: 13.5px;
     }
 
 .info-label {
@@ -174,15 +171,14 @@ body {
 }
 
 .budget-highlight {
-    color: var(--primary-green) !important;
-    font-size: 15px;
+    color: var(--primary-color) !important;
+    font-size: 14.5px;
     font-weight: 800;
 }
 
 .client-avatar {
-    position: relative;
-    width: 50px;
-    height: 50px;
+    width: 48px;
+    height: 48px;
 }
 
     .client-avatar img {
@@ -191,18 +187,9 @@ body {
         border-radius: 50%;
     }
 
-.verified-icon {
-    position: absolute;
-    bottom: -2px;
-    right: -2px;
-    color: var(--primary-green);
-    background: #fff;
-    border-radius: 50%;
-}
-
 .client-name {
     font-size: 15px;
-    font-weight: 800;
+    font-weight: 700;
     color: var(--text-dark);
     margin-bottom: 2px;
 }
@@ -212,14 +199,15 @@ body {
     padding: 10px 14px;
     margin: 12px 0 0 0;
     background-color: #f8fafc;
-    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
     font-size: 13px;
 }
 
     .client-meta-list li {
         display: flex;
         justify-content: space-between;
-        padding: 4px 0;
+        padding: 3px 0;
     }
 
 .form-label-nh {
@@ -229,67 +217,98 @@ body {
     margin-bottom: 6px;
 }
 
+.bid-input-group {
+    display: flex !important;
+    align-items: stretch !important;
+    width: 100% !important;
+}
+
+    .bid-input-group .form-control-nh {
+        flex: 1 1 auto !important;
+        width: 1% !important;
+        border-top-right-radius: 0 !important;
+        border-bottom-right-radius: 0 !important;
+    }
+
 .form-control-nh {
     width: 100%;
     border: 1.5px solid var(--border-color);
     border-radius: 6px;
-    padding: 9px 12px;
+    padding: 8px 12px;
     font-size: 14px;
     color: var(--text-dark);
+    outline: none;
+    transition: border-color 0.15s ease;
 }
 
     .form-control-nh:focus {
-        outline: none;
-        border-color: var(--primary-green);
-        box-shadow: 0 0 0 3px rgba(0, 177, 79, 0.15);
+        border-color: var(--primary-color);
+        box-shadow: none;
     }
 
-.custom-file-upload-box {
-    border: 2px dashed #cbd5e1;
-    border-radius: 8px;
-    padding: 18px 12px;
-    background-color: #f8fafc;
-    cursor: pointer;
-    transition: all 0.2s ease-in-out;
+.bid-addon {
+    background-color: #f8fafc !important;
+    border: 1.5px solid var(--border-color) !important;
+    border-left: none !important;
+    border-top-right-radius: 6px !important;
+    border-bottom-right-radius: 6px !important;
+    color: var(--text-muted) !important;
+    font-weight: 600 !important;
+    font-size: 13.5px !important;
+    padding: 0 14px !important;
+    display: flex !important;
+    align-items: center !important;
 }
 
-    .custom-file-upload-box:hover, .custom-file-upload-box.dragover {
-        border-color: var(--primary-green);
-        background-color: #f0fdf4;
+#btnTriggerFile {
+    color: var(--primary-color) !important;
+    transition: color 0.15s ease;
+}
+
+    #btnTriggerFile:hover {
+        color: var(--primary-hover) !important;
+        text-decoration: underline !important;
     }
 
 .btn-nexthub-submit {
-    background-color: var(--primary-green);
+    background-color: var(--primary-color);
     color: #ffffff;
     font-weight: 700;
-    font-size: 15px;
-    padding: 11px 20px;
+    font-size: 14px;
+    padding: 10px 20px;
     border: none;
     border-radius: 6px;
     cursor: pointer;
-    transition: background-color 0.2s;
+    transition: background-color 0.15s ease;
 }
 
     .btn-nexthub-submit:hover {
-        background-color: var(--primary-green-hover);
+        background-color: var(--primary-hover);
     }
 
 .submitted-item {
-    font-size: 14px;
+    font-size: 13.5px;
     margin-bottom: 8px;
 }
 
-/* THANH THỐNG KÊ CHÀO GIÁ NEXTHUB (Đồng màu xanh #00b14f & Nền viền sáng) */
+.badge-submitted {
+    background-color: var(--primary-color);
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
 .vlance-bid-stats-bar {
-    background-color: #f0fdf4 !important;
-    border: 1.5px solid #bbf7d0 !important;
+    background-color: #f8fafc !important;
+    border: 1px solid var(--border-color) !important;
     color: #0f172a !important;
-    font-size: 14px;
-    box-shadow: 0 2px 6px rgba(0, 177, 79, 0.05);
+    font-size: 13.5px;
 }
 
     .vlance-bid-stats-bar .stat-label {
-        color: #475569 !important;
+        color: var(--text-muted) !important;
         font-weight: 600;
     }
 
@@ -297,53 +316,59 @@ body {
         color: #0f172a;
     }
 
-    .vlance-bid-stats-bar .stat-val,
-    .vlance-bid-stats-bar .text-success {
-        color: var(--primary-green) !important;
+    .vlance-bid-stats-bar .stat-val {
+        color: var(--primary-color) !important;
         font-weight: 800;
     }
 
 .applications-section-card {
     background: var(--card-bg);
     border: 1px solid var(--border-color);
-    border-radius: 12px;
-    padding: 24px 28px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+    border-radius: 8px;
+    padding: 24px;
 }
 
 .bid-item-card {
-    padding: 18px;
-    border: 1px solid #e2e8f0;
-    border-radius: 10px;
-    margin-bottom: 16px;
+    padding: 16px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    margin-bottom: 12px;
     background-color: #ffffff;
-    transition: transform 0.2s, box-shadow 0.2s;
+    transition: border-color 0.15s ease;
 }
 
-    .bid-item-card:hover {
-        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
-        border-color: #bbf7d0;
+    .bid-item-card.is-my-bid {
+        border: 1.5px solid var(--primary-color);
+        background-color: #f8fafc;
     }
 
 .freelancer-avatar {
-    width: 52px;
-    height: 52px;
+    width: 48px;
+    height: 48px;
     border-radius: 50%;
 }
 
 .bid-price-tag {
-    background-color: #f0fdf4;
-    color: var(--primary-green);
-    font-weight: 800;
-    font-size: 15px;
-    padding: 5px 12px;
-    border-radius: 6px;
-    border: 1px solid #bbf7d0;
+    background-color: #0f172a;
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 13.5px;
+    padding: 3px 8px;
+    border-radius: 4px;
+}
+
+.badge-my-bid {
+    background-color: #0f172a;
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 4px;
 }
 
 .bid-proposal-preview {
-    background-color: #f8fafc;
-    padding: 10px 14px;
-    border-radius: 6px;
-    border-left: 3px solid var(--primary-green);
+    background-color: #f1f5f9;
+    padding: 8px 12px;
+    border-radius: 4px;
+    border-left: 3px solid var(--primary-color);
 }

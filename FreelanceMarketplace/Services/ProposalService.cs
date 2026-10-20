@@ -16,7 +16,7 @@ public class ProposalService : IProposalService
         _fileStorage = fileStorage;
     }
 
-    public async Task<(bool Success, string ErrorMessage)> SubmitProposalAsync(SubmitProposalViewModel model, int freelancerUserId)
+    public async Task<(bool Success, string ErrorMessage)> SubmitProposalAsync(SubmitProposalRequest model, int freelancerUserId)
     {
         var job = await _context.Jobs
             .AsNoTracking()
@@ -80,7 +80,7 @@ public class ProposalService : IProposalService
             FreelancerProfileId = freelancerProfile.Id,
             BidAmount = model.BidAmount,
             DeliveryDays = model.DeliveryDays,
-            CoverLetter = model.CoverLetter.Trim(),
+            CoverLetter = model.CoverLetter?.Trim() ?? string.Empty,
             PhoneNumber = model.PhoneNumber.Trim(),
             AttachmentUrl = attachmentUrl,
             Status = "Pending",
@@ -92,7 +92,7 @@ public class ProposalService : IProposalService
         return (true, string.Empty);
     }
 
-    public async Task<(bool Success, string ErrorMessage)> UpdateProposalAsync(SubmitProposalViewModel model, int freelancerUserId)
+    public async Task<(bool Success, string ErrorMessage)> UpdateProposalAsync(SubmitProposalRequest model, int freelancerUserId)
     {
         var freelancerProfile = await _context.FreelancerProfiles
             .AsNoTracking()
@@ -112,7 +112,7 @@ public class ProposalService : IProposalService
 
         proposal.BidAmount = model.BidAmount;
         proposal.DeliveryDays = model.DeliveryDays;
-        proposal.CoverLetter = model.CoverLetter.Trim();
+        proposal.CoverLetter = model.CoverLetter?.Trim() ?? string.Empty;
         proposal.PhoneNumber = model.PhoneNumber.Trim();
         proposal.UpdatedAt = DateTime.UtcNow;
 
@@ -132,7 +132,7 @@ public class ProposalService : IProposalService
         return (true, string.Empty);
     }
 
-    public async Task<SubmitProposalViewModel?> GetProposalForEditAsync(int proposalId, int freelancerUserId)
+    public async Task<SubmitProposalRequest?> GetProposalForEditAsync(int proposalId, int freelancerUserId)
     {
         var freelancerProfile = await _context.FreelancerProfiles
             .AsNoTracking()
@@ -148,7 +148,7 @@ public class ProposalService : IProposalService
         if (proposal == null)
             return null;
 
-        return new SubmitProposalViewModel
+        return new SubmitProposalRequest
         {
             Id = proposal.Id,
             JobId = proposal.JobId,
