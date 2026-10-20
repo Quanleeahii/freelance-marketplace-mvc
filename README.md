@@ -21,7 +21,7 @@ Tài liệu này cung cấp kiến trúc kỹ thuật và hướng dẫn cài đ
 
 ## 3. Kiến trúc & Cấu trúc mã nguồn
 
-Dự án được thiết kế theo mô hình **MVC (Model-View-Controller)** kết hợp với **Service Layer** nhằm tách biệt phần xử lý logic nghiệp vụ khỏi giao diện, giúp dễ bảo trì và mở rộng. Cấu trúc mã nguồn chi tiết (dựa theo Solution Explorer):
+Dự án được thiết kế theo mô hình **MVC (Model-View-Controller)** kết hợp với **Service Layer** nhằm tách biệt phần xử lý logic nghiệp vụ khỏi giao diện, giúp dễ bảo trì và mở rộng. Cấu trúc mã nguồn chi tiết:
 
 ```text
 freelance-marketplace-mvc/
